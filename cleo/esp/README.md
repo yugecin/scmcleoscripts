@@ -2,8 +2,8 @@ ESP script
 
 ![preview](/cleo/esp/scrot.png?raw=true)  
 
-F5: show peds  
-F6: dont show peds  
+F5: use actor memory pool for peds instead of opcodes (needed to draw esp on samp players)  
+F6: dont use actor memory pool  
 F7: show objects  
 F8: dont show objects  
 F9: show lines  
