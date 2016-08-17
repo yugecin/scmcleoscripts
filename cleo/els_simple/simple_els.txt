@@ -1,0 +1,153 @@
+{$CLEO .cs}
+
+03A4: name_thread 'ELS'
+
+// vars:
+//  1@  ELS enabled?
+//  4@  is player in car?
+//  5@  pattern index
+//  8@  player car
+//  9@  CDamageHandler pointer for player car
+//  33@ pattern delay timer
+
+0006: 1@ = 0
+0006: 5@ = 0
+
+// Fix vehicle back lights both using light state 3 (SA bug)
+// https://github.com/multitheftauto/mtasa-blue/blob/c0a35ccd2b7704c92907fd48f66eeea869e533a4/MTA10/multiplayer_sa/CMultiplayerSA.cpp#L1247
+0A8C: write_memory 0x6E1D4F size 1 value 2 vp 0 // default value: 3
+
+// ----------------------------------------------------------------------------
+// main start point
+
+
+:ELS_START
+0001: wait 0
+0050: gosub @INCAR
+00D6: if
+0039:   4@ == 1 //incar
+004D: jf @ELS_START 
+00D6: if
+0AB0:   key_pressed 0x7B // f12
+004D: jf @ELS_START_PATTERN
+0050: gosub @TOGGLE
+0001: wait $DEFAULT_WAIT_TIME // prevent double key
+0002: jump @ELS_START
+
+:ELS_START_PATTERN
+00D6: if and
+0039:   1@ == 1 //enabled
+0019:   33@ > 75 // pattern delay
+004D: jf @ELS_START
+067F: force_car 8@ lights_to 2 // 0 = NO_CAR_LIGHT_OVERRIDE | 1 = FORCE_CAR_LIGHTS_OFF | 2 = FORCE_CAR_LIGHTS_ON
+0050: gosub @PATTERN_FRONT
+0050: gosub @PATTERN_BACK
+0006: 33@ = 0
+000A: 5@ += 1 // pattern index
+00D6: if
+0019:   5@ > 23
+004D: jf @ELS_START
+0006: 5@ = 0
+0002: jump @ELS_START
+
+
+// ----------------------------------------------------------------------------
+// pattern control
+    
+// -------------- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3
+// front pattern: L - L - - - R - R - - - L - L - - - R - R - - - 
+:PATTERN_FRONT
+0871: switch 5@ total_cases 16 default_case -1 @R case 0 @FL case 1 @FN case 2 @FL case 3 @FN case 6 @FR case 7 @FN case 8 @FR
+0872: switch_continued case 9 @FN case 12 @FL case 13 @FN case 14 @FL case 15 @FN case 18 @FR case 19 @FN case 20 @FR case 21 @FN
+                                                                
+// ------------- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3
+// back pattern: L L L R R R L L L R R R L L L R R R L L L R R R
+:PATTERN_BACK
+0871: switch 5@ total_cases 8 default_case -1 @R case 0 @BL case 3 @BR case 6 @BL case 9 @BR case 12 @BL case 15 @BR case 18 @BL
+0872: switch_continued case 21 @BR case -1 @R case -1 @R case -1 @R case -1 @R case -1 @R case -1 @R case -1 @R case -1 @R
+
+:R
+return
+                
+// ----------------------------------------------------------------------------
+// light control
+
+:FL // front left
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 0 param_light_nr 0
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 1 param_light_nr 1
+return
+
+:FR // front right
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 1 param_light_nr 0
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 0 param_light_nr 1
+return
+
+:FB // front both
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 0 param_light_nr 0
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 0 param_light_nr 1
+return
+
+:FN // front none
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 1 param_light_nr 0
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 1 param_light_nr 1
+return
+
+:BL // back left
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 0 param_light_nr 2
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 1 param_light_nr 3
+return
+
+:BR // back right
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 1 param_light_nr 2
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 0 param_light_nr 3 
+return
+
+:BB // back both
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 0 param_light_nr 2
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 0 param_light_nr 3 
+return
+
+:BN // back none
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 1 param_light_nr 2
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop 0 param_destroyed 1 param_light_nr 3
+return
+
+// ----------------------------------------------------------------------------
+// incar subroutine
+
+:INCAR
+0006: 4@ = 0 //incar
+00D6: if and
+00DF:   actor $PLAYER_ACTOR driving 
+84C8:   not actor $PLAYER_ACTOR driving_flying_vehicle 
+84A9:   not actor $PLAYER_ACTOR driving_heli 
+84A7:   not actor $PLAYER_ACTOR driving_boat
+847A:   not actor $PLAYER_ACTOR driving_bike
+004D: jf @INCAR_1 
+0006: 4@ = 1 //incar
+0A97: 9@ = car 8@ pointer
+000A: 9@ += 0x5A0
+:INCAR_1   
+return
+  
+// ----------------------------------------------------------------------------
+// toggle subroutine
+
+:TOGGLE
+00D6: if
+0039:   1@ == 1 //enabled
+004D: jf @ENABLE
+0AD0: show_formatted_text_lowpriority "ELS ~r~disabled" time 2000
+0006: 1@ = 0                                    
+067F: force_car 8@ lights_to 1 // 1 = FORCE_CAR_LIGHTS_OFF
+018C: play_sound 1053 at 0.0 0.0 0.0
+return
+
+:ENABLE
+0AD0: show_formatted_text_lowpriority "ELS ~g~enabled" time 2000
+0006: 1@ = 1
+0006: 33@ = 0 // reset timer
+018C: play_sound 1052 at 0.0 0.0 0.0
+return
+
+0A93: end_custom_thread

@@ -1,0 +1,17 @@
+{$CLEO .cs}
+{$NOSOURCE} 
+
+0000:
+:zero
+wait 250
+if
+0AB0:  key_pressed 116 // f5
+then 
+015D: set_gamespeed 0.1
+end
+if
+0AB0:  key_pressed 117 // f6
+then
+015D: set_gamespeed 1.0
+end
+jump @zero          

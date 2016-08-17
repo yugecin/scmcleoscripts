@@ -1,0 +1,339 @@
+{$CLEO}
+
+const
+    DRAWLINES = 1
+    DRAWOBJ = 2
+    PEDPOOL = 3
+    RADIUS = 300.0
+    SUBJECT = 3@
+    CAM_POS_X = 4@
+    CAM_POS_Y = 5@
+    CAM_POS_Z = 6@
+    CAM_LOK_X = 7@
+    CAM_LOK_Y = 8@
+    CAM_LOK_Z = TEMP1
+    SUBJECT_X = 9@
+    SUBJECT_Y = 10@
+    SUBJECT_Z = 11@
+    SUBJECT_HEALTH = 12@
+    SCREEN_X = 13@
+    SCREEN_Y = 14@
+    COL_R = 15@
+    COL_G = 16@
+    COL_B = 17@
+    OPTIONS = 18@
+    _11 = 20@
+    _12 = 21@
+    _13 = 22@
+    _21 = 23@
+    _22 = 24@
+    _23 = 25@
+    _31 = 26@
+    _32 = 27@
+    _33 = 28@
+    _41 = 29@
+    _42 = 30@
+    _43 = 31@
+    TEMP1 = 0@
+    TEMP2 = 32@
+    TEMP3 = 33@
+end
+
+var
+    SUBJECT : Integer
+end
+
+03A4: name_thread 'ESP'
+
+03F0: enable_text_draw 1
+0390: load_txd_dictionary 'MOD_HUD'
+038F: load_texture "HUD_LINEV" as 1 // Load dictionary with 0390 first 
+
+0006: OPTIONS = 0
+
+:MAIN_LOOP
+wait 0
+
+if
+    0AB0:   key_pressed 116
+then
+    08BD: set OPTIONS bit PEDPOOL
+end
+if
+    0AB0:   key_pressed 117
+then
+    08C3: clear OPTIONS bit PEDPOOL
+end
+if
+    0AB0:   key_pressed 118
+then      
+    08BD: set OPTIONS bit DRAWOBJ
+end
+if
+    0AB0:   key_pressed 119 
+then
+    08C3: clear OPTIONS bit DRAWOBJ
+end
+if
+    0AB0:   key_pressed 120
+then
+    08BD: set OPTIONS bit DRAWLINES
+end
+if
+    0AB0:   key_pressed 121
+then
+    08C3: clear OPTIONS bit DRAWLINES
+end
+
+068D: get_camera_position_to CAM_POS_X CAM_POS_Y CAM_POS_Z 
+068E: get_camera_target_point_to CAM_LOK_X CAM_LOK_Y TEMP1
+
+0006: TEMP1 = 0xB6FA2C // CAMERAVIEWMATRIX
+0A8D: _11 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _12 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _13 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 8
+0A8D: _21 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _22 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _23 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 8
+0A8D: _31 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _32 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _33 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 8
+0A8D: _41 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _42 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _43 = read_memory TEMP1 size 4 vp 0
+
+0006: COL_R = 255
+0006: COL_G = 255
+0006: COL_B = 0
+if
+    0AE2: SUBJECT = random_vehicle_near_point CAM_POS_X CAM_POS_Y CAM_POS_Z in_radius RADIUS find_next 1 pass_wrecked 0
+then
+    repeat
+        00AA: store_car SUBJECT position_to SUBJECT_X SUBJECT_Y SUBJECT_Z
+        0227: SUBJECT_HEALTH = car SUBJECT health
+        0050: gosub @DRAW
+    until 8AE2: not SUBJECT = random_vehicle_near_point CAM_POS_X CAM_POS_Y CAM_POS_Z in_radius RADIUS find_next 1 pass_wrecked 0
+end
+
+0006: COL_R = 255
+0006: COL_G = 0
+0006: COL_B = 0
+if
+    08B7:   test OPTIONS bit PEDPOOL
+then
+    0006: 2@ = 0x00B74490  // PED POOL
+    0A8D: 2@ = read_process_memory 2@ size 4 vp 0 // CPool<T, T> *pPool = *(CPool<T, T> **)aScriptParams[0];
+    000A: 2@ += 8 // CPool<T, T>.m_iSize
+    0A8D: SUBJECT = read_process_memory 2@ size 4 vp 0 // int iSize = pPool->m_iSize;
+    if
+    0019:  SUBJECT > 0 // if(iSize > 0)
+    then
+        000E: 2@ -= 4 // CPool<T, T>.m_pFlags
+        0A8D: 2@ = read_process_memory 2@ size 4 vp 0
+        000E: SUBJECT -= 1
+        005A: 2@ += SUBJECT // unsigned char *pFlags = pPool->m_pFlags[--iSize];
+        0012: SUBJECT *= 256
+        for 19@ = SUBJECT downto 0 step 256 // for(int iShiftedID = iSize <<= 8; iShiftedID >= 0; iShiftedID -= 256)
+                0A8D: SUBJECT = read_process_memory 2@ size 1 vp 0 // unsigned char ucFlag = *pFlags;
+            if
+            88B7:  not test SUBJECT bit 7 // if(!(ucFlag & POOL_FREE_SLOT))
+            then
+                005A: SUBJECT += 19@ // unsigned int uiHandle = iShiftedID | ucFlag;
+                00A0: store_actor SUBJECT position_to SUBJECT_X SUBJECT_Y SUBJECT_Z
+                000B: SUBJECT_Z += 0.5
+                //0226: SUBJECT_HEALTH = actor SUBJECT health // samp always says 100
+                0A96: TEMP1 = actor SUBJECT struct
+                000A: TEMP1 += 0x540
+                0A8D: SUBJECT_HEALTH = read_memory TEMP1 size 4 vp 0  
+                0092: SUBJECT_HEALTH = float SUBJECT_HEALTH to_integer      // WERKT OOK NIE, WTF SAMP?        
+                00D6: if
+                87D6:   not SUBJECT == $PLAYER_ACTOR // @ == $ (int)
+                004D: jump_if_false @NEXT2
+                0050: gosub @DRAW
+                :NEXT2
+            end
+            000E: 2@ -= 1 // pFlags--;
+        end
+    end
+else
+    if
+        0AE1: SUBJECT = random_actor_near_point CAM_POS_X CAM_POS_Y CAM_POS_Z in_radius RADIUS find_next 1 pass_deads 0
+    then
+        repeat
+            00A0: store_actor SUBJECT position_to SUBJECT_X SUBJECT_Y SUBJECT_Z
+            000B: SUBJECT_Z += 0.5
+            0226: SUBJECT_HEALTH = actor SUBJECT health
+            00D6: if
+            87D6:   not SUBJECT == $PLAYER_ACTOR // @ == $ (int)
+            004D: jump_if_false @NEXT1
+            0050: gosub @DRAW
+            :NEXT1
+        until 8AE1:  not SUBJECT = random_actor_near_point CAM_POS_X CAM_POS_Y CAM_POS_Z in_radius RADIUS find_next 1 pass_deads 0
+    end
+end
+
+if
+    08B7:   test OPTIONS bit DRAWOBJ
+then
+    0006: COL_R = 0
+    0006: COL_G = 0
+    0006: COL_B = 255
+    if
+        0AE3: SUBJECT = random_object_near_point CAM_POS_X CAM_POS_Y CAM_POS_Z in_radius RADIUS find_next 1 //IF and SET
+    then
+        repeat
+            01BB: store_object SUBJECT position_to SUBJECT_X SUBJECT_Y SUBJECT_Z
+            071E: get_object SUBJECT health_to SUBJECT_HEALTH
+            0050: gosub @DRAW
+        until 8AE3: not SUBJECT = random_object_near_point CAM_POS_X CAM_POS_Y CAM_POS_Z in_radius RADIUS find_next 1 //IF and SET
+    end
+end
+
+0002: jump @MAIN_LOOP
+
+:DRAW
+000B: SUBJECT_Z += 1.0
+
+0509: TEMP1 = distance_between_XY SUBJECT_X SUBJECT_Y and_XY CAM_POS_X CAM_POS_Y
+00D6: if                                      
+8021:   not TEMP1 > 200.0
+004D: jump_if_false @DRAW_SKIP
+
+// https://github.com/multitheftauto/mtasa-blue/blob/9b1fbaf639657a446790469aa6711e11be0d3eee/MTA10/core/CGraphics.cpp#L498
+0087: TEMP1 = CAM_POS_X // (float)
+0087: TEMP2 = CAM_POS_Y // (float)
+
+0063: TEMP1 -= CAM_LOK_X  // (float)
+0063: TEMP2 -= CAM_LOK_Y  // (float)
+
+0604: get_Z_angle_for_point TEMP1 TEMP2 store_to TEMP3 // horis angle camera to camera lookat
+
+0087: TEMP1 = CAM_POS_X // (float)
+0087: TEMP2 = CAM_POS_Y // (float)
+
+0063: TEMP1 -= SUBJECT_X  // (float)
+0063: TEMP2 -= SUBJECT_Y  // (float)  
+
+0604: get_Z_angle_for_point TEMP1 TEMP2 store_to TEMP1 // 11 is horiz angle camera to car
+
+0063: TEMP3 -= TEMP1  // (float)   
+0656: get_angle TEMP3 absolute_degrees_to TEMP3
+// lets say max fov is 110 (/2 = 55)
+00D6: if or
+0023:   55.0 > TEMP3
+0021:   TEMP3 > 305.0
+004D: jump_if_false @DRAW_SKIP 
+
+0007: SCREEN_X = 0.0 // vecScreen->fX = vecWorld->fZ * m._31 + vecWorld->fY * m._21 + vecWorld->fX * m._11 + m._41;
+
+0087: TEMP1 = SUBJECT_Z // (float)
+006F: TEMP1 *= _31 // (float)
+005B: SCREEN_X += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_Y // (float)
+006F: TEMP1 *= _21 // (float)
+005B: SCREEN_X += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_X // (float)
+006F: TEMP1 *= _11 // (float)
+005B: SCREEN_X += TEMP1  // (float)
+
+005D: SCREEN_X += _41  // (float)
+
+0007: SCREEN_Y = 0.0 // vecScreen->fY = vecWorld->fZ * m._32 + vecWorld->fY * m._22 + vecWorld->fX * m._12 + m._42;
+
+0087: TEMP1 = SUBJECT_Z // (float)
+006F: TEMP1 *= _32 // (float)
+005B: SCREEN_Y += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_Y // (float)
+006F: TEMP1 *= _22 // (float)
+005B: SCREEN_Y += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_X // (float)
+006F: TEMP1 *= _12 // (float)
+005B: SCREEN_Y += TEMP1  // (float)
+
+005D: SCREEN_Y += _42  // (float)
+
+0007: TEMP2 = 0.0 // vecScreen->fZ = vecWorld->fZ * m._33 + vecWorld->fY * m._23 + vecWorld->fX * m._13 + m._43;
+
+0087: TEMP1 = SUBJECT_Z // (float)
+006F: TEMP1 *= _33 // (float)
+005B: TEMP2 += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_Y // (float)
+006F: TEMP1 *= _23 // (float)
+005B: TEMP2 += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_X // (float)
+006F: TEMP1 *= _13 // (float)
+005B: TEMP2 += TEMP1  // (float)
+
+005D: TEMP2 += _43  // (float)
+
+// float fRecip = 1.0f / vecScreen->fZ;
+0007: TEMP1 = 1.0
+0073: TEMP1 /= TEMP2 // (float)
+
+0087: TEMP2 = TEMP1 // (float)
+0087: TEMP3 = TEMP1 // (float)
+
+0013: TEMP2 *= 640.0
+0013: TEMP3 *= 480.0
+
+006B: SCREEN_X *= TEMP2  // (float)
+006B: SCREEN_Y *= TEMP3  // (float)
+               
+00D6: if and
+0021:   SCREEN_X > 0.0
+0021:   SCREEN_Y > 0.0
+8021:   not SCREEN_X > 640.0
+8021:   not SCREEN_Y > 480.0 
+004D: jump_if_false @DRAW_SKIP
+
+0342: set_text_draw_centered 1
+081C: draw_text_outline 1 RGBA 0 0 0 255
+0340: set_text_draw_RGBA COL_R COL_G COL_B 255
+//033F: set_text_draw_letter_size 0.20 1.20
+033F: set_text_draw_letter_size 0.15 0.95
+
+045A: draw_text_1number SCREEN_X SCREEN_Y GXT 'NUMBER' number SUBJECT_HEALTH // ~1~
+
+if
+    08B7:   test OPTIONS bit DRAWLINES
+then
+    000F: SCREEN_X -= 320.0
+    000F: SCREEN_Y -= 240.0
+    
+    0604: get_Z_angle_for_point SCREEN_X SCREEN_Y store_to TEMP1
+    
+    0017: SCREEN_X /= 2.0
+    0017: SCREEN_Y /= 2.0
+    000B: SCREEN_X += 320.0
+    000B: SCREEN_Y += 240.0
+    //0013: SCREEN_Y *= 0.93333333
+    
+    0509: TEMP2 = distance_between_XY 320.0 240.0 and_XY SCREEN_X SCREEN_Y
+    0013: TEMP2 *= 2.0
+    
+    // 320x224 mid
+    // 800x448
+    074B: draw_texture 1 position SCREEN_X SCREEN_Y scale 1.0 TEMP2 angle TEMP1 color_RGBA COL_R COL_G COL_B 192
+end
+
+:DRAW_SKIP
+return
+
+0A93: end_custom_thread

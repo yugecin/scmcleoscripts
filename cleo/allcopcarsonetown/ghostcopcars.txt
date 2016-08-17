@@ -1,0 +1,32 @@
+{$CLEO .cs}
+
+03A4: name_thread 'COPC'
+
+// 599 policeranger     8a5a8c
+// 596 policels         8a5a90
+// 597 policesf         8a5a94
+// 598 policelv         8a5a98
+// 523 policebike       8a8a9c
+              
+0A8C: write_memory 0x8a8a9c size 4 value #NRG500 vp 0
+
+0006: 1@ = 604
+
+:loopdaloop
+0001: wait 250
+
+0006: 0@ = 0x8a5a8c
+:nextcar
+0A8C: write_memory 0@ size 4 value 1@ vp 0
+000A: 0@ += 4
+00D6: if
+0019:   0@ > 0x8a5a98
+004D: jump_if_false @nextcar
+000A: 1@ += 1
+00D6: if
+0019:   1@ > 605
+004D: jump_if_false @loopdaloop
+0006: 1@ = 604
+0002: jump @loopdaloop
+
+0A93: end_custom_thread

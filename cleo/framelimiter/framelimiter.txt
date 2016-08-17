@@ -1,0 +1,69 @@
+{$CLEO .cs}
+{$NOSOURCE}
+
+03A4: name_thread 'FRAMEL'
+
+// remove 14ms wait
+0A8C: write_memory 0x53E94A size 4 value 0x90909090 vp 0
+0A8C: write_memory 0x53E94E size 1 value 0x90 vp 0
+
+0006: 0@ = 0 // fps
+0006: 1@ = 0 // fps counter
+0006: 2@ = 0 // keydelay active
+0006: 10@ = 71 // fps limit limit
+0006: 33@ = 0 // delay for fps
+
+0050: gosub @writelimit
+
+03F0: enable_text_draw 1
+:fps
+0001: wait 0
+000A: 1@ += 1
+00D6: if
+0019:   33@ > 999
+004D: jf @fps_keydelay
+0085: 0@ = 1@ // (int)
+0006: 1@ = 0
+0006: 33@ = 0
+
+:fps_keydelay
+00D6: if
+0019:   32@ > 750
+004D: jf @fps_key
+0006: 2@ = 0
+:fps_key          
+00D6: if and
+0AB0:  key_pressed 106 // num*
+0039:  2@ == 0
+004D: jf @fps
+0006: 2@ = 1
+0006: 32@ = 0
+      
+00D6: if
+0AB0:  key_pressed 107 // num+ 
+004D: jf @fpskey_minus
+000A: 10@ += 2
+0ACE: show_formatted_text_box "FPS: %d~n~Limit: ~g~%d" 0@ 10@ 
+0050: gosub @writelimit
+0002: jump @fps
+
+:fpskey_minus 
+00D6: if and
+0AB0:  key_pressed 109 // num-
+0019:  10@ > 20
+004D: jf @fps_nokey
+000E: 10@ -= 2
+0ACE: show_formatted_text_box "FPS: %d~n~Limit: ~r~%d" 0@ 10@
+0050: gosub @writelimit
+0002: jump @fps
+
+:fps_nokey
+0ACE: show_formatted_text_box "FPS: %d~n~Limit: %d" 0@ 10@
+0050: gosub @writelimit
+0002: jump @fps
+
+:writelimit
+0A8C: write_memory 0xC1704C size 4 value 10@ vp 0
+return
+
+0A93: end_custom_thread

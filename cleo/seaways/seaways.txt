@@ -1,0 +1,32 @@
+{$CLEO .cs}
+{$NOSOURCE}
+
+03A4: name_thread 'SEAWAYS'
+
+:SEAWAYS
+00D6: if
+8ADC:   not test_cheat "SEAWAYS"
+004D: jf @CHEAT
+0001: wait 0 ms
+0002: jump @SEAWAYS
+
+:CHEAT
+0A8D: 0@ = read_memory 0x969152 size 1 virtual_protect 0
+0B12: 0@ = 0@ xor 1
+0A8C: write_memory 0x969152 size 1 value 0@ virtual_protect 0
+0A8C: write_memory 0x96918C size 4 value 1 virtual_protect 0
+0A8C: write_memory 0xBAA472 size 4 value 1 virtual_protect 0
+0A8D: 1@ = read_memory 0xB79044 size 4 virtual_protect 0
+000A: 1@ += 1
+0A8C: write_memory 0xB79044 size 4 value 1@ virtual_protect 0
+00D6: if
+0039:   0@ == 1
+004D: jf @DEACTIVATED
+03E5: show_text_box 'CHEAT1' // Cheat activated
+0002: jump @SEAWAYS
+
+:DEACTIVATED
+03E5: show_text_box 'CHEAT8' // Cheat deactivated
+0002: jump @SEAWAYS
+
+0A93: end_custom_thread
