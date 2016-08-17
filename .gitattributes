@@ -1,0 +1,4 @@
+* -lf
+*.cs binary
+*.md eol=lf
+.git* eol=lf
