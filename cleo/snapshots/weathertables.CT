@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="19">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"No description"</Description>
+      <LastState Value="15" RealAddress="00B7CB20"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>gta_sa.exe+77CB20</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>2</ID>
+      <Description>"No description"</Description>
+      <LastState Value="15" RealAddress="00B7CB24"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>gta_sa.exe+77CB24</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"CWeather__M_wTownID"</Description>
+      <LastState Value="0" RealAddress="00C81314"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>c81314</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"CWeather__LockedWeather"</Description>
+      <LastState Value="15" RealAddress="00C81318"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>gta_sa.exe+881318</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>4</ID>
+      <Description>"CWeather__Upcoming_Weather"</Description>
+      <LastState Value="15" RealAddress="00C8131C"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>gta_sa.exe+88131C</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"CWeater__CurrentWeather"</Description>
+      <LastState Value="15" RealAddress="00C81320"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>gta_sa.exe+881320</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>7</ID>
+      <Description>"CWeather__AmountOfRain"</Description>
+      <LastState Value="0" RealAddress="00C81324"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>c81324</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"CWeather__m_bRain"</Description>
+      <LastState Value="0" RealAddress="00C81328"/>
+      <VariableType>4 Bytes</VariableType>
+      <Address>c81324+4</Address>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>

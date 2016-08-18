@@ -1,0 +1,29 @@
+008CD5D8 _miCamerapickup
+opcode create snapshot pickup 004778AA
+
+73C1F0 takes photo, show flash etc
+456a70 checks it
+
+NOP 455765 (2 bytes) to always show camera pickups
+NOP 455767 - 455776 (15 bytes) to not show camera pickups, even when using camera
+
+to not remove pickups after getting em: change 456c26 to 0x75 (1 byte), orig: 0x74 (jz -> jnz)
+(crashes games after taking more than 1 snapshot)
+
+view distance: float C3EF9C
+
+NOP 6 bytes to 52CA59 to prevent viewdistance changes
+
+800 viewdistance: 580 maxdistance
+700 viewdistance: 560 maxdistance (alnsfmzo)
+650 viewdistance: 550 maxdistance (scottishsummer)
+400 viewdistance: 400 maxdistance (nightprowler)
+178 viewdistance: 178 maxdistance (cantseewhereimgoing)
+150 viewdistance: 150 maxdistance (cwjxuoc)
+
+//
+CAMERA MODE: 8CC388 
+https://github.com/DK22Pac/plugin-sdk/blob/c7d9257541ab00a86f0ae9f66d197d5475c4df07/plugin_sa/game_sa/eCamMode.h
+NOP 6 bytes 527D29 to prevent reset
+doesnt change much doe
+//
