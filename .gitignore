@@ -1,2 +1,12 @@
 cleo/\!notmine
 cleo/esp/mod_hud.txd
+cleo/snapshots/old
+
+# vs shenanigans
+*.ilk
+*.suo
+*.opensdf
+*.sdf
+*.user
+[Dd]ebug
+[Rr]elease
