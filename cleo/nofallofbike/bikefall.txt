@@ -1,0 +1,7 @@
+{$CLEO .cs}
+
+03A4: name_thread 'BIKEFALL'
+    
+0A8C: write_memory 0x5df510 size 1 value 0xC3 virtual_protect 0 // retn
+
+0A93: end_custom_thread
