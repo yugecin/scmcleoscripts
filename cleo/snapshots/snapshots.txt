@@ -1,0 +1,295 @@
+{$CLEO}
+{$NOSOURCE}
+{$O 0C26=2,sign_extend %1d% store_to %2d%}
+
+03A4: name_thread 'SNAPSHO' 
+
+//vrockpokey spawns nrg
+0A8C: write_memory 0x43A4D1 size 4 value #NRG500 vp 0 
+
+// don't fall off bike
+0A8C: write_memory 0x5df510 size 1 value 0xC3 vp 0 // retn
+
+// show pickups even when not looking thru camera
+0A8C: write_memory 0x455765 size 2 value 0x9090 vp 0
+
+const
+    MAX_ESP_DISTANCE = 600.0 
+    MAX_SNAP_DISTANCE = 1@
+    VIEW_DISTANCE = 2@
+    PTR = 3@
+    CAM_POS_X = 4@
+    CAM_POS_Y = 5@
+    CAM_POS_Z = 6@
+    CAM_LOK_X = 7@
+    CAM_LOK_Y = 8@
+    CAM_LOK_Z = TEMP1
+    SUBJECT_X = 9@
+    SUBJECT_Y = 10@
+    SUBJECT_Z = 11@
+    DISTANCE = 12@
+    SCREEN_X = 13@
+    SCREEN_Y = 14@
+    CURMEM = 15@
+    PLAYA_X = 16@
+    PLAYA_Y = 17@   
+    PLAYA_Z = 18@
+    __UNASSIGNED = 19@
+    _11 = 20@
+    _12 = 21@
+    _13 = 22@
+    _21 = 23@
+    _22 = 24@
+    _23 = 25@
+    _31 = 26@
+    _32 = 27@
+    _33 = 28@
+    _41 = 29@
+    _42 = 30@
+    _43 = 31@
+    TEMP1 = 0@
+    TEMP2 = 32@
+    TEMP3 = 33@
+end
+
+03F0: enable_text_draw 1
+
+:MAIN_LOOP
+wait 0
+
+// view distance stuff
+
+0A8D: VIEW_DISTANCE = read_memory 0xC3EF9C size 4 vp 0
+0087: MAX_SNAP_DISTANCE = VIEW_DISTANCE // (float)
+
+// get the max distance, by trying it all.... (not accurate at all)
+00D6: if
+0021:   VIEW_DISTANCE > 700.0
+004D: jump_if_false @DIST0
+0007: TEMP1 = 0.725
+0002: jump @DISTEND
+:DIST0
+00D6: if
+0021:   VIEW_DISTANCE > 650.0
+004D: jump_if_false @DIST1
+0007: TEMP1 = 0.8
+0002: jump @DISTEND
+:DIST1
+00D6: if
+0021:   VIEW_DISTANCE > 600.0
+004D: jump_if_false @DIST2
+0007: TEMP1 = 0.8538
+0002: jump @DISTEND
+:DIST2
+00D6: if
+0021:   VIEW_DISTANCE > 550.0
+004D: jump_if_false @DIST3
+0007: TEMP1 = 0.941667
+0002: jump @DISTEND
+:DIST3
+0007: TEMP1 = 1.0
+:DISTEND
+
+006B: MAX_SNAP_DISTANCE *= TEMP1  // (float)
+0092: VIEW_DISTANCE = float VIEW_DISTANCE to_integer
+
+0092: TEMP1 = float MAX_SNAP_DISTANCE to_integer
+033F: set_text_draw_letter_size 0.15 0.95
+081C: draw_text_outline 1 RGBA 0 0 0 255
+0340: set_text_draw_RGBA 50 50 255 255
+045A: draw_text_1number 10.0 430.0 GXT 'NUMBER' number VIEW_DISTANCE // ~1~  
+033F: set_text_draw_letter_size 0.15 0.95
+081C: draw_text_outline 1 RGBA 0 0 0 255
+0340: set_text_draw_RGBA 50 50 255 255
+045A: draw_text_1number 40.0 430.0 GXT 'NUMBER' number TEMP1 // ~1~
+ 
+0652: TEMP1 = integer_stat 231 // taken
+0652: TEMP2 = integer_stat 232 // total 
+033F: set_text_draw_letter_size 0.15 0.95
+081C: draw_text_outline 1 RGBA 0 0 0 255
+0340: set_text_draw_RGBA 50 50 255 255
+045A: draw_text_1number 70.0 430.0 GXT 'NUMBER' number TEMP1 // ~1~
+033F: set_text_draw_letter_size 0.15 0.95
+081C: draw_text_outline 1 RGBA 0 0 0 255
+0340: set_text_draw_RGBA 50 50 255 255
+045A: draw_text_1number 85.0 430.0 GXT 'NUMBER' number TEMP2 // ~1~
+
+// esp prep stuff
+
+00A0: store_actor $PLAYER_ACTOR position_to PLAYA_X PLAYA_Y PLAYA_Z
+068D: get_camera_position_to CAM_POS_X CAM_POS_Y CAM_POS_Z 
+068E: get_camera_target_point_to CAM_LOK_X CAM_LOK_Y TEMP1
+
+0006: TEMP1 = 0xB6FA2C // CAMERAVIEWMATRIX
+0A8D: _11 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _12 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _13 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 8
+0A8D: _21 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _22 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _23 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 8
+0A8D: _31 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _32 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _33 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 8
+0A8D: _41 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _42 = read_memory TEMP1 size 4 vp 0 
+000A: TEMP1 += 4
+0A8D: _43 = read_memory TEMP1 size 4 vp 0
+
+// read pickups stuff
+
+0006: PTR = 0x9788C0
+:DO_PICKUP
+0085: TEMP1 = PTR // (int)
+000A: TEMP1 += 0x1C // type
+0A8D: TEMP1 = read_memory TEMP1 size 1 vp 0 
+00D6: if
+0039:   TEMP1 == 0x14
+004D: jump_if_false @NEXT_PICKUP  
+0085: TEMP1 = PTR // (int)
+000A: TEMP1 += 0x10 // X
+0A8D: TEMP2 = read_memory TEMP1 size 2 vp 0
+0C26: sign_extend TEMP2 store_to SUBJECT_X
+000A: TEMP1 += 0x2
+0A8D: TEMP2 = read_memory TEMP1 size 2 vp 0
+0C26: sign_extend TEMP2 store_to SUBJECT_Y
+000A: TEMP1 += 0x2
+0A8D: TEMP2 = read_memory TEMP1 size 2 vp 0
+0C26: sign_extend TEMP2 store_to SUBJECT_Z
+0050: gosub @DRAW
+:NEXT_PICKUP        
+000A: PTR += 0x20
+00D6: if
+0029:   PTR >= 0x97D640
+004D: jump_if_false @DO_PICKUP
+0002: jump @MAIN_LOOP
+
+:DRAW
+050A: DISTANCE = distance_between_XYZ SUBJECT_X SUBJECT_Y SUBJECT_Z and_XYZ PLAYA_X PLAYA_Y PLAYA_Z
+00D6: if
+0023:   MAX_ESP_DISTANCE > DISTANCE
+004D: jump_if_false @SKIP_CURRENT
+
+// https://github.com/multitheftauto/mtasa-blue/blob/9b1fbaf639657a446790469aa6711e11be0d3eee/MTA10/core/CGraphics.cpp#L498
+0087: TEMP1 = CAM_POS_X // (float)
+0087: TEMP2 = CAM_POS_Y // (float)
+
+0063: TEMP1 -= CAM_LOK_X  // (float)
+0063: TEMP2 -= CAM_LOK_Y  // (float)
+
+0604: get_Z_angle_for_point TEMP1 TEMP2 store_to TEMP3 // horis angle camera to camera lookat
+
+0087: TEMP1 = CAM_POS_X // (float)
+0087: TEMP2 = CAM_POS_Y // (float)
+
+0063: TEMP1 -= SUBJECT_X  // (float)
+0063: TEMP2 -= SUBJECT_Y  // (float)  
+
+0604: get_Z_angle_for_point TEMP1 TEMP2 store_to TEMP1 // 11 is horiz angle camera to car
+
+0063: TEMP3 -= TEMP1  // (float)   
+0656: get_angle TEMP3 absolute_degrees_to TEMP3
+// lets say max fov is 110 (/2 = 55)
+00D6: if or
+0023:   55.0 > TEMP3
+0021:   TEMP3 > 305.0
+004D: jump_if_false @SKIP_CURRENT 
+
+0007: SCREEN_X = 0.0 // vecScreen->fX = vecWorld->fZ * m._31 + vecWorld->fY * m._21 + vecWorld->fX * m._11 + m._41;
+
+0087: TEMP1 = SUBJECT_Z // (float)
+006F: TEMP1 *= _31 // (float)
+005B: SCREEN_X += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_Y // (float)
+006F: TEMP1 *= _21 // (float)
+005B: SCREEN_X += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_X // (float)
+006F: TEMP1 *= _11 // (float)
+005B: SCREEN_X += TEMP1  // (float)
+
+005D: SCREEN_X += _41  // (float)
+
+0007: SCREEN_Y = 0.0 // vecScreen->fY = vecWorld->fZ * m._32 + vecWorld->fY * m._22 + vecWorld->fX * m._12 + m._42;
+
+0087: TEMP1 = SUBJECT_Z // (float)
+006F: TEMP1 *= _32 // (float)
+005B: SCREEN_Y += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_Y // (float)
+006F: TEMP1 *= _22 // (float)
+005B: SCREEN_Y += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_X // (float)
+006F: TEMP1 *= _12 // (float)
+005B: SCREEN_Y += TEMP1  // (float)
+
+005D: SCREEN_Y += _42  // (float)
+
+0007: TEMP2 = 0.0 // vecScreen->fZ = vecWorld->fZ * m._33 + vecWorld->fY * m._23 + vecWorld->fX * m._13 + m._43;
+
+0087: TEMP1 = SUBJECT_Z // (float)
+006F: TEMP1 *= _33 // (float)
+005B: TEMP2 += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_Y // (float)
+006F: TEMP1 *= _23 // (float)
+005B: TEMP2 += TEMP1  // (float)
+
+0087: TEMP1 = SUBJECT_X // (float)
+006F: TEMP1 *= _13 // (float)
+005B: TEMP2 += TEMP1  // (float)
+
+005D: TEMP2 += _43  // (float)
+
+// float fRecip = 1.0f / vecScreen->fZ;
+0007: TEMP1 = 1.0
+0073: TEMP1 /= TEMP2 // (float)
+
+0087: TEMP2 = TEMP1 // (float)
+0087: TEMP3 = TEMP1 // (float)
+
+0013: TEMP2 *= 640.0
+0013: TEMP3 *= 480.0
+
+006B: SCREEN_X *= TEMP2  // (float)
+006B: SCREEN_Y *= TEMP3  // (float)
+               
+00D6: if and
+0021:   SCREEN_X > 0.0
+0021:   SCREEN_Y > 0.0
+8021:   not SCREEN_X > 640.0
+8021:   not SCREEN_Y > 480.0 
+004D: jump_if_false @SKIP_CURRENT
+
+0342: set_text_draw_centered 1
+081C: draw_text_outline 1 RGBA 0 0 0 255
+
+00D6: if
+0025:   MAX_SNAP_DISTANCE > DISTANCE  // (float)
+004D: jump_if_false @RED
+0340: set_text_draw_RGBA 50 255 50 255
+0002: jump @GRN
+:RED
+0340: set_text_draw_RGBA 255 50 50 255
+:GRN
+
+033F: set_text_draw_letter_size 0.15 0.95
+
+0092: DISTANCE = float DISTANCE to_integer
+045A: draw_text_1number SCREEN_X SCREEN_Y GXT 'NUMBER' number DISTANCE // ~1~
+
+:SKIP_CURRENT
+return
+
+0A93: end_custom_thread
