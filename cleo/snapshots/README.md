@@ -1,5 +1,4 @@
 ESP for snapshots, usefull for routing all snapshots speedruns  
-Make sure you also put signext.cleo in your cleo folder or the game will crash (unless you've already taken all snapshots)  
 
 [Demo video](https://youtu.be/F3fbW10hvOk)
   
@@ -14,5 +13,7 @@ The calculation behind that is.. not a calculation and not very accurate, but it
   
 It doesn't check if you zoomed in far enough to get the shot, I'll add that later when I find out how to do that.  
   
-The signext.cleo plugin is needed for sign extending the XYZ positions of pickups, because they are saved as 2byte values. Let me know if you find a way to make it work in pure cleo, so the plugin wouldn't be needed anymore.
+~~The signext.cleo plugin is needed for sign extending the XYZ positions of pickups, because they are saved as 2byte values. Let me know if you find a way to make it work in pure cleo, so the plugin wouldn't be needed anymore.~~
+Finally found how to do it properly (I kept forgetting one step), the [snapshots.cs](snapshots.cs) script doesn't need the plugin anymore.
+I'm keeping the last version that used the plugin as [snapshots-withplugin.cs](snapshots-withplugin.cs), if you want to use that one, make sure to also put the [signext.cleo](../../cleoplugins/signext/bin/signext.cleo) plugin in your CLEO folder.
 

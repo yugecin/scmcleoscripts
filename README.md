@@ -14,7 +14,7 @@
 [train editing](/scm/trains)  
 
 ###CLEO plugins
-[sign extending floats](/cleo/snapshots/signext) (compiled is in [snapshots](/cleo/snapshots) folder)  
+[sign extending floats](/cleoplugins/signext)  
 
 ###License
 [MIT](/LICENSE)  
