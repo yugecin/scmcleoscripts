@@ -184,11 +184,10 @@ wait 0
 0019:   TEMP3 > 31
 004D: jump_if_false @SIGNEXT0
 0012: TEMP2 *= -1
-0006: TEMP3 = 1
 :SIGNEXT2         
 0093: TEMP2 = integer TEMP2 to_float
 0017: TEMP2 /= 8.0
-0039:   TEMP3 == 1    
+0039:   TEMP3 == 32    
 004D: jump_if_false @SIGNEXT3     
 0013: TEMP2 *= -1.0  
 :SIGNEXT3
