@@ -173,8 +173,7 @@ wait 0
 :READ_TEMP1_SIGNEXT_STORETO_TEMP2  
 000A: TEMP1 += 0x2  
 0A8D: TEMP2 = read_memory TEMP1 size 2 vp 0
-:SIGNEXT     
-0006: TEMP3 = 0    
+:SIGNEXT 
 08B7:   test TEMP2 bit 15
 004D: jump_if_false @SIGNEXT2  
 0006: TEMP3 = 15
@@ -183,14 +182,9 @@ wait 0
 08BF: set TEMP2 bit TEMP3
 0019:   TEMP3 > 31
 004D: jump_if_false @SIGNEXT0
-0012: TEMP2 *= -1
 :SIGNEXT2         
 0093: TEMP2 = integer TEMP2 to_float
 0017: TEMP2 /= 8.0
-0039:   TEMP3 == 32    
-004D: jump_if_false @SIGNEXT3     
-0013: TEMP2 *= -1.0  
-:SIGNEXT3
 return
 
 :DRAW

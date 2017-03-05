@@ -21,9 +21,8 @@ This can be still usefull if you don't mind the dependency on this plugin so you
 Eventually I found out how to do it without plugins (I kept forgetting about the 2-complement thing when I first searched for it).
 ```
 // 1@ is input (and output)
-// 2@ is a temp variable
+// 2@ is a temp variable (not used for positive values)
 :SIGNEXT
-0006: 2@ = 0
 08B7:   test 1@ bit 15
 004D: jump_if_false @SIGNEXT2
 0006: 2@ = 15
@@ -32,12 +31,7 @@ Eventually I found out how to do it without plugins (I kept forgetting about the
 08BF: set 1@ bit 2@
 0019:   2@ > 31
 004D: jump_if_false @SIGNEXT0
-0012: 1@ *= -1
 :SIGNEXT2
 0093: 1@ = integer 1@ to_float
-0039:   2@ == 32
-004D: jump_if_false @SIGNEXT3
-0013: 1@ *= -1.0
-:SIGNEXT3
 return
 ```
