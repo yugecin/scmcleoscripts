@@ -12,5 +12,7 @@ Usefull stuff:
 ESP is red when snapshot is too far, green when it is possible to get them.  
 The calculation behind that is.. not a calculation and not very accurate, but it comes close.  
   
-It doesn't check if you zoomed in far enough to get the shot, I'll add that later when I find out how to do that.
+It doesn't check if you zoomed in far enough to get the shot, I'll add that later when I find out how to do that.  
+  
+The signext.cleo plugin is needed for sign extending the XYZ positions of pickups, because they are saved as 2byte values. Let me know if you find a way to make it work in pure cleo, so the plugin wouldn't be needed anymore.
 
