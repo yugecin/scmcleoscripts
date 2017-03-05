@@ -8,5 +8,6 @@ cleo/snapshots/old
 *.opensdf
 *.sdf
 *.user
+*.pdb
 [Dd]ebug
 [Rr]elease
