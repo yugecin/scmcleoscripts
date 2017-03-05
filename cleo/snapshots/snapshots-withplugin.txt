@@ -1,5 +1,6 @@
 {$CLEO}
 {$NOSOURCE}
+{$O 0C26=2,sign_extend %1d% store_to %2d%}
 
 03A4: name_thread 'SNAPSHO' 
 
@@ -155,13 +156,15 @@ wait 0
 0039:   TEMP1 == 0x14
 004D: jump_if_false @NEXT_PICKUP  
 0085: TEMP1 = PTR // (int)
-000A: TEMP1 += 0xE // X - 0x2
-0050: gosub @READ_TEMP1_SIGNEXT_STORETO_TEMP2
-0087: SUBJECT_X = TEMP2 // (float)
-0050: gosub @READ_TEMP1_SIGNEXT_STORETO_TEMP2
-0087: SUBJECT_Y = TEMP2 // (float)
-0050: gosub @READ_TEMP1_SIGNEXT_STORETO_TEMP2
-0087: SUBJECT_Z = TEMP2 // (float)
+000A: TEMP1 += 0x10 // X
+0A8D: TEMP2 = read_memory TEMP1 size 2 vp 0
+0C26: sign_extend TEMP2 store_to SUBJECT_X
+000A: TEMP1 += 0x2
+0A8D: TEMP2 = read_memory TEMP1 size 2 vp 0
+0C26: sign_extend TEMP2 store_to SUBJECT_Y
+000A: TEMP1 += 0x2
+0A8D: TEMP2 = read_memory TEMP1 size 2 vp 0
+0C26: sign_extend TEMP2 store_to SUBJECT_Z
 0050: gosub @DRAW
 :NEXT_PICKUP        
 000A: PTR += 0x20
@@ -169,30 +172,6 @@ wait 0
 0029:   PTR >= 0x97D640
 004D: jump_if_false @DO_PICKUP
 0002: jump @MAIN_LOOP
-
-:READ_TEMP1_SIGNEXT_STORETO_TEMP2  
-000A: TEMP1 += 0x2  
-0A8D: TEMP2 = read_memory TEMP1 size 2 vp 0
-:SIGNEXT     
-0006: TEMP3 = 0    
-08B7:   test TEMP2 bit 15
-004D: jump_if_false @SIGNEXT2  
-0006: TEMP3 = 15
-:SIGNEXT0
-000A: TEMP3 += 1
-08BF: set TEMP2 bit TEMP3
-0019:   TEMP3 > 31
-004D: jump_if_false @SIGNEXT0
-0012: TEMP2 *= -1
-0006: TEMP3 = 1
-:SIGNEXT2         
-0093: TEMP2 = integer TEMP2 to_float
-0017: TEMP2 /= 8.0
-0039:   TEMP3 == 1    
-004D: jump_if_false @SIGNEXT3     
-0013: TEMP2 *= -1.0  
-:SIGNEXT3
-return
 
 :DRAW
 050A: DISTANCE = distance_between_XYZ SUBJECT_X SUBJECT_Y SUBJECT_Z and_XYZ PLAYA_X PLAYA_Y PLAYA_Z
