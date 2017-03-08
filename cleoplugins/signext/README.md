@@ -11,9 +11,10 @@ Then you can call it like any other opcode:
 ```
 0C26: sign_extend 1@ store_to 2@
 ```
+What this does: it converts a 2-byte int to a 4-byte float and divides the value by 8 (because this is how R\* stores some coordinates (e.g. for pickups) to save some memory).
 
 ### Usecase
-This was used in the [snapshots](../../cleo/snapshots) esp CLEO script as (snapshot) pickup XYZ locations are saved in memory as 2 byte coordinates, and we need to work with 4 byte values in the script.  
+This was used in the [snapshots](../../cleo/snapshots) esp CLEO script as (snapshot) pickup XYZ locations are saved in memory as 2-byte ints (and divided by 8), and we need to work with 4 byte values in the script.  
 After a while I did find a way to do this in plain CLEO, which means this plugins isn't used for that anymore.  
 This can be still usefull if you don't mind the dependency on this plugin so you don't have to bother with sign extension in your CLEO code (or if you simply don't have any spare local variables :p).
 
