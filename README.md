@@ -1,5 +1,5 @@
 
-###CLEO scripts
+### CLEO scripts
 [allcopcarsonetown](/cleo/allcopcarsonetown)  
 [simple ELS](/cleo/els_simple)  
 [ESP](/cleo/esp)  
@@ -10,12 +10,12 @@
 [dont fall of bike](/cleo/nofallofbike)  
 [snapshots ESP](/cleo/snapshots)  
 
-###SCM scripts
+### SCM scripts
 [train editing](/scm/trains)  
 
-###CLEO plugins
+### CLEO plugins
 [sign extending floats](/cleoplugins/signext)  
 
-###License
+### License
 [MIT](/LICENSE)  
 
