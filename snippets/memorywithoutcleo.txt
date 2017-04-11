@@ -1,0 +1,15 @@
+// 0xA49960: script variables are saved here
+// &0: ADMA first variable, so pointing to 0xA49960
+
+// 0xB7CE50: player money
+// 0xB7CE50 - 0xA49960 = 0x1334F0
+
+0006: 2@ = 0x1334F0
+// divide by 4, because every element in array is a dword
+0016: 2@ /= 4
+0004: &0(2@,1i) = 50000
+//     ^ always &0
+
+// player now has $50000
+
+// inferred from this post by seemann: https://sannybuilder.com/forums/viewtopic.php?pid=133#p133

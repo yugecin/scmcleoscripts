@@ -16,6 +16,9 @@
 ### CLEO plugins
 [sign extending floats](/cleoplugins/signext)  
 
+### Snippets
+[altering memory without CLEO](/snippets/memorywithoutcleo.txt)
+
 ### License
 [MIT](/LICENSE)  
 
