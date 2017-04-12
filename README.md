@@ -19,7 +19,7 @@
 
 ### Snippets
 [altering memory without CLEO](/snippets/memorywithoutcleo.txt)  
-[creating coronas in a loop](/snippets/corona.txt)  
+[creating coronas in a loop](/snippets/coronas.txt)  
 
 ### License
 [MIT](/LICENSE)  
