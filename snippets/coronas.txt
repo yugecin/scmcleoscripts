@@ -1,0 +1,107 @@
+:MAIN_LOOP
+wait 0     
+
+// works
+25@ = 1932.9313
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+25@ -= 2.0
+04D5: create_corona_at 25@ -2486.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0 
+
+// does not work, only the last one appears
+25@ = 1932.9313
+FOR $MyCounter = 1 to 12 step 1
+04D5: create_corona_at 25@ -2496.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0
+25@ -= 2.0
+end
+
+// hack, works
+0@ = 0
+25@ = 1932.9313
+FOR $MyCounter = 1 to 12 step 1
+26@ = -2499.9329
+27@ = 13.5391
+28@ = 1.0
+29@ = 9
+30@ = 0
+31@ = 255
+32@ = 0
+33@ = 0
+gosub @MAGIC
+25@ -= 2.0
+end
+
+0002: jump @MAIN_LOOP
+
+:MAGIC
+0@ += 2
+0AC6: 2@ = label @MAGICSTART offset
+005A: 2@ += 0@  // (int) 
+
+0A8C: write_memory 2@ size 1 value 0x00 vp 0
+2@ += 1
+0A8C: write_memory 2@ size 4 value 0x0604D500 vp 0
+2@ += 4
+0A8C: write_memory 2@ size 4 value 25@ vp 0
+2@ += 4
+0A8C: write_memory 2@ size 1 value 0x06 vp 0
+2@ += 1
+0A8C: write_memory 2@ size 4 value 26@ vp 0
+2@ += 4                                    
+0A8C: write_memory 2@ size 1 value 0x06 vp 0
+2@ += 1
+0A8C: write_memory 2@ size 4 value 27@ vp 0
+2@ += 4                                    
+0A8C: write_memory 2@ size 1 value 0x06 vp 0
+2@ += 1  
+0A8C: write_memory 2@ size 4 value 28@ vp 0
+2@ += 4                              
+0A8C: write_memory 2@ size 1 value 0x04 vp 0
+2@ += 1  
+0A8C: write_memory 2@ size 1 value 29@ vp 0
+2@ += 1                             
+0A8C: write_memory 2@ size 1 value 0x04 vp 0
+2@ += 1  
+0A8C: write_memory 2@ size 1 value 30@ vp 0
+2@ += 1                            
+0A8C: write_memory 2@ size 1 value 0x05 vp 0
+2@ += 1  
+0A8C: write_memory 2@ size 2 value 31@ vp 0
+2@ += 2                           
+0A8C: write_memory 2@ size 1 value 0x04 vp 0
+2@ += 1  
+0A8C: write_memory 2@ size 1 value 32@ vp 0
+2@ += 1                           
+0A8C: write_memory 2@ size 1 value 0x04 vp 0
+2@ += 1  
+0A8C: write_memory 2@ size 1 value 33@ vp 0
+2@ += 1
+0A8C: write_memory 2@ size 4 value 0x00510000 vp 0
+
+// D5 04 06 33 33 D7 41 06 ED 6E 1B C5 06 27 A0 58 41 06 00 00 80 3F 04 09 04 00 05 FF 00 04 00 04 00
+// D5 04 06 ----- x --- 06 ----- y --- 06 ----- z --- 06 --- rad --- 04 -t 04 -f 05 - r - 04 -g 04 -b
+:MAGICSTART
+hex
+   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+end
