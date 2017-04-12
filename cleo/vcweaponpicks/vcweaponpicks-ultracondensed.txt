@@ -1,0 +1,279 @@
+{$CLEO}
+{$NOSOURCE}
+
+const
+    CORONA_ALPHA = 0x48BFA5
+    PICKUP_POOL_START = 0x9788C0
+    PICKUP_POOL_END = 0x97D640
+    CPICKUP_SIZE = 0x20
+    
+    INNER_RING_SIZE = 0.5
+    
+    INNER_RING_ALPHA = 0x80
+end
+
+03A4: name_thread 'VCWEAPO' 
+
+0662: SCRDEBUG PRINTSTRING "github.com/yugecin/scmcleoscripts"
+
+0006: 32@ = 0
+
+:MAIN_LOOP
+0001: wait 0
+0006: 31@ = PICKUP_POOL_START
+0006: 20@ = 0x0
+
+// timer
+0019:   32@ > 5000
+004D: jump_if_false @SAME_CYCLE
+0006: 32@ = 0
+:SAME_CYCLE
+0085: 25@ = 32@ // (int)
+0016: 25@ /= 500
+
+:CHECK_PICKUP
+0085: 21@ = 31@ // (int)
+000A: 21@ += 0x1D // flags 0x1D  
+0A8D: 10@ = read_memory 21@ size 1 vp 0   
+00D6: if and
+88B7:   not test 10@ bit 0 // empty flag
+08B7:   test 10@ bit 3 // visible flag (as in close enough, not visible on screen)
+004D: jump_if_false @NEXT_PICKUP   
+000E: 21@ -= 0x5 // model id 0x18
+0A8D: 4@ = read_memory 21@ size 2 vp 0    
+00D6: if
+0039:   4@ == 1242 // bodyarmour
+004D: jump_if_false @NOT_BODYARMOUR
+000E: 4@ -= 1242
+0002: jump @GOTIDX
+:NOT_BODYARMOUR
+000E: 4@ -= 320  
+00D6: if and
+0029:   4@ >= 0
+001B:   53 > 4@
+004D: jump_if_false @NEXT_PICKUP
+:GOTIDX
+000E: 21@ -= 0x8 // X - 0x10
+0050: gosub @READ_NEXT_21_SIGNEXT_STORETO_10
+0087: 0@ = 10@ // (float)
+0050: gosub @READ_NEXT_21_SIGNEXT_STORETO_10
+0087: 1@ = 10@ // (float)
+0050: gosub @READ_NEXT_21_SIGNEXT_STORETO_10
+0087: 2@ = 10@ // (float)
+00C2:   sphere_onscreen 0@ 1@ 2@ radius 1.0
+004D: jump_if_false @NEXT_PICKUP
+0050: gosub @DOPICKUP
+:NEXT_PICKUP        
+000A: 31@ += CPICKUP_SIZE
+00D6: if
+0029:   31@ >= PICKUP_POOL_END
+004D: jump_if_false @CHECK_PICKUP
+0A8C: write_memory CORONA_ALPHA size 4 value 0xFF vp 0
+0002: jump @MAIN_LOOP
+
+:READ_NEXT_21_SIGNEXT_STORETO_10  
+0A8D: 10@ = read_memory 21@ size 2 vp 0   
+000A: 21@ += 0x2  
+:SIGNEXT 
+08B7:   test 10@ bit 15
+004D: jump_if_false @SIGNEXT2  
+0006: 30@ = 15
+:SIGNEXT0
+000A: 30@ += 1
+08BF: set 10@ bit 30@
+0019:   30@ > 31
+004D: jump_if_false @SIGNEXT0
+:SIGNEXT2         
+0093: 10@ = integer 10@ to_float
+0017: 10@ /= 8.0
+0051: return
+
+:DOPICKUP
+0012: 4@ *= 3
+0AC6: 6@ = label @COLORS offset
+005A: 6@ += 4@  // (int)
+0A8D: 4@ = read_memory 6@ size 1 vp 0
+000A: 6@ += 1
+0A8D: 5@ = read_memory 6@ size 1 vp 0 
+000A: 6@ += 1
+0A8D: 6@ = read_memory 6@ size 1 vp 0
+0A8C: write_memory CORONA_ALPHA size 4 value INNER_RING_ALPHA vp 0
+0050: gosub @MAGIC 
+
+:MAGIC           
+0019:   20@ > 128 // good for 64 coronas (which is the complete corona pool) (3 coronas for each pickup)
+004D: jump_if_false @MAGIC_IS_OK
+0019:   33@ > 0
+004D: jump_if_false @NOMSG
+0663: SCRDEBUG PRINTINT "POOL EXHAUSTED" 32@
+0006: 33@ = -3789
+:NOMSG
+0051: return
+:MAGIC_IS_OK      
+000A: 20@ += 2
+0AC6: 21@ = label @MAGICSTART offset
+005A: 21@ += 20@  // (int) 
+
+0A8C: write_memory 21@ size 1 value 0x00 vp 0
+000A: 21@ += 1
+0A8C: write_memory 21@ size 4 value 0x0604D500 vp 0
+000A: 21@ += 4
+0A8C: write_memory 21@ size 4 value 0@ vp 0
+000A: 21@ += 4
+0A8C: write_memory 21@ size 1 value 0x06 vp 0
+000A: 21@ += 1
+0A8C: write_memory 21@ size 4 value 1@ vp 0
+000A: 21@ += 4                                    
+0A8C: write_memory 21@ size 1 value 0x06 vp 0
+000A: 21@ += 1
+0A8C: write_memory 21@ size 4 value 2@ vp 0
+000A: 21@ += 4                                    
+0A8C: write_memory 21@ size 1 value 0x06 vp 0
+000A: 21@ += 1  
+0A8C: write_memory 21@ size 4 value INNER_RING_SIZE vp 0
+000A: 21@ += 4                              
+0A8C: write_memory 21@ size 1 value 0x04 vp 0
+000A: 21@ += 1  
+0A8C: write_memory 21@ size 1 value 9 vp 0
+000A: 21@ += 1                             
+0A8C: write_memory 21@ size 1 value 0x04 vp 0
+000A: 21@ += 1  
+0A8C: write_memory 21@ size 1 value 0 vp 0
+000A: 21@ += 1                            
+0A8C: write_memory 21@ size 1 value 0x05 vp 0
+000A: 21@ += 1  
+0A8C: write_memory 21@ size 2 value 4@ vp 0
+000A: 21@ += 2                           
+0A8C: write_memory 21@ size 1 value 0x04 vp 0
+000A: 21@ += 1  
+0A8C: write_memory 21@ size 1 value 5@ vp 0
+000A: 21@ += 1                           
+0A8C: write_memory 21@ size 1 value 0x04 vp 0
+000A: 21@ += 1  
+0A8C: write_memory 21@ size 1 value 6@ vp 0
+000A: 21@ += 1
+0A8C: write_memory 21@ size 2 value 0x0051 vp 0
+
+// D5 04 06 33 33 D7 41 06 ED 6E 1B C5 06 27 A0 58 41 06 00 00 80 3F 04 09 04 00 05 FF 00 04 00 04 00
+// D5 04 06 ----- x --- 06 ----- y --- 06 ----- z --- 06 --- rad --- 04 -t 04 -f 05 - r - 04 -g 04 -b
+:MAGICSTART
+hex
+// NP NP D5 04 06 33 33 D7 41 06 ED 6E 1B C5 06 27 A0 58 41 06 00 00 80 3F 04 09 04 00 05 FF 00 04 00 04 00 RT RT
+   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+   
+   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 // +21 coronas (= 7 pickups)
+   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 // +21 coronas (= 7 pickups)
+   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 // +21 coronas (= 7 pickups)
+   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 // +21 coronas (= 7 pickups)
+end
+
+:COLORS
+hex
+// sa weapons
+// model slot name
+ 80 FF 80 // 1242 armor    
+ F7 E1 61 // 321 10 purple dildo
+ F7 E1 61 // 322 10 dildo
+ F7 E1 61 // 323 10 vibrator
+ F7 E1 61 // 324 10 silver vibrator
+ F7 E1 61 // 325 10 flowers
+ F7 E1 61 // 326 10 cane
+ 00 00 00 // 327 padding
+ 00 00 00 // 328 padding  
+ 00 00 00 // 329 padding  
+ 00 00 00 // 330 padding  
+ 80 80 80 // 331  0 brass knuckles
+ 00 00 00 // 332 padding  
+ 61 C2 F7 // 333  1 golfclub
+ 61 C2 F7 // 334  1 nightstick
+ 61 C2 F7 // 335  1 knife
+ 61 C2 F7 // 336  1 baseball bayt
+ 61 C2 F7 // 337  1 shovel
+ 61 C2 F7 // 338  1 pool cue 
+ 61 C2 F7 // 339  1 katana    
+ 00 00 00 // 340 padding 
+ 61 C2 F7 // 341  1 chainsaw   
+ 1B 59 82 // 342  8 grenade
+ 1B 59 82 // 343  8 tear gas
+ 1B 59 82 // 344  8 molotov
+ 00 00 00 // 345 padding  
+ 95 C2 18 // 346  2 9mm
+ 95 C2 18 // 347  2 silenced 9mm
+ 95 C2 18 // 348  2 desert eagle
+ 2D 9B 5A // 349  3 shotgun
+ 2D 9B 5A // 350  3 sawnoff
+ 2D 9B 5A // 351  3 combat shotgun
+ FF E3 4F // 352  4 micro smg/uzi
+ FF E3 4F // 353  4 MP5   
+ 00 00 00 // 354 padding  
+ FE 89 00 // 355  5 ak47
+ FE 89 00 // 356  5 m4
+ F9 83 D7 // 357  6 country rifle
+ F9 83 D7 // 358  6 sniper rifle
+ A4 28 B2 // 359  7 rpg
+ A4 28 B2 // 360  7 hs rocket
+ A4 28 B2 // 361  7 flamethrower
+ A4 28 B2 // 362  7 minigun
+ 1B 59 82 // 363  8 satchel charge  
+ 1B 59 82 // 364 12 detonator
+ C2 F7 61 // 365  9 spraycan
+ C2 F7 61 // 366  9 fire ext
+ C2 F7 61 // 367  9 camera
+ 61 F7 E1 // 368 11 nv
+ 61 F7 E1 // 369 11 thermal 
+ 00 00 00 // 370 padding  
+ 61 F7 E1 // 371 11 parachute  
+ FF E3 4F // 372  4 tec9
+end
+
+/*
+// vc colors, gtavc.exe 00688098
+hex
+ 80 80 80 00 00 00 80 3F // fist
+ 80 80 80 00 00 00 80 3F // brass knucles
+ 61 C2 F7 00 00 00 80 3F // (screwdriver)
+ 61 C2 F7 00 00 00 80 3F // golf club
+ 61 C2 F7 00 00 00 80 3F // nitestick
+ 61 C2 F7 00 00 00 80 3F // (hammer)
+ 61 C2 F7 00 00 00 80 3F // (knife)
+ 61 C2 F7 00 00 00 80 3F // (baseball bat)
+ 61 C2 F7 00 00 00 80 3F // meat cleaver
+ 61 C2 F7 00 00 00 80 3F // machete
+ 61 C2 F7 00 00 00 80 3F // (katana)
+ 61 C2 F7 00 00 00 80 3F // chainsaw
+ 1B 59 82 00 00 00 80 3F // (teargas)
+ 1B 59 82 00 00 00 80 3F // (molotov)
+ 1B 59 82 00 00 00 80 3F // (remote grenade)
+ 1B 59 82 00 00 00 80 3F // (detonator)
+ 1B 59 82 00 00 00 80 3F // grenade
+ 95 C2 18 00 00 00 80 3F // colt.45/pistol
+ 95 C2 18 00 00 00 80 3F // colt python/.357
+ 2D 9B 5A 00 00 00 80 3F // (pump action shotgun)
+ 2D 9B 5A 00 00 00 80 3F // combat shotgun
+ 2D 9B 5A 00 00 00 80 3F // (stubby shotgun)
+ FF E3 4F 00 00 00 80 3F // (tec-9)
+ FF E3 4F 00 00 00 80 3F // (ingram mac10/mac)
+ FF E3 4F 00 00 00 80 3F // (uzi 9mm/uz-I)
+ FF E3 4F 00 00 00 80 3F // MP5/MP
+ FE 89 00 00 00 00 80 3F // m4
+ FE 89 00 00 00 00 80 3F // ruger/kruger
+ F9 83 D7 00 00 00 80 3F // sniper rifle
+ F9 83 D7 00 00 00 80 3F // psg1 sniper
+ A4 28 B2 00 00 00 80 3F // rocket launcher
+ A4 28 B2 00 00 00 80 3F // flamethrower
+ A4 28 B2 00 00 00 80 3F // m60
+ A4 28 B2 00 00 00 80 3F // minigun
+ 45 45 45 00 00 00 80 3F
+ 45 45 45 00 00 00 80 3F
+ 45 45 45 00 00 00 80 3F
+ FF 64 64 00 00 00 80 3F
+ 80 FF 80 00 00 00 80 3F // armor
+ 64 64 FF 00 00 00 80 3F
+ FF FF 64 00 00 00 80 3F
+ FF 64 64 00 00 00 80 3F
+ 64 FF 64 00 00 00 80 3F
+ FF FF FF 00 00 00 80 3F
+end
+*/
+
+0A93: end_custom_thread

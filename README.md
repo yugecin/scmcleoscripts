@@ -9,6 +9,7 @@
 [edited colors](/cleo/customcolor)  
 [dont fall of bike](/cleo/nofallofbike)  
 [snapshots ESP](/cleo/snapshots)  
+[vice city styled weapon pickups](/cleo/vcweaponpicks)  
 
 ### SCM scripts
 [train editing](/scm/trains)  
