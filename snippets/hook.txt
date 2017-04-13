@@ -1,0 +1,36 @@
+// hook HUD
+
+/*
+.text:0058EAF0     _DrawHud        proc near               ; CODE XREF: CHud__Draw+F6p
+.text:0058EAF0 000                 sub     esp, 1A0h
+.text:0058EAF6 1A0                 movzx   eax, _currentPlayer
+
+0058EAF0  81 EC A0 01 00 0
+*/
+
+0AC6: 1@ = label @HUDHOOK offset
+000E: 1@ -= 0x58EAF1
+000E: 1@ -= 0x4
+0A8C: write_memory 0x58EAF0 size 1 value 0xE9 vp 0 // jmp near 
+0A8C: write_memory 0x58EAF1 size 4 value 1@ vp 0 
+0A8C: write_memory 0x58EAF5 size 1 value 0x90 vp 0 // NOP 
+
+0AC6: 0@ = label @HUHOOKRETURNJUMP offset
+0006: 1@ = 0x58EAF1
+0062: 1@ -= 0@  // (int)
+0A8C: write_memory 0@ size 4 value 1@ vp 0
+
+:HUDHOOK
+hex
+    81          // sub
+    EC          // esp
+    A0 01 00 00 // 0x1A0
+
+    // stuff
+
+    E9          // jmp near
+end
+:HUHOOKRETURNJUMP
+hex
+    00 00 00 00
+end
