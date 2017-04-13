@@ -1,0 +1,83 @@
+// hook DrawHud function at 58EAF0 and draw a polygon
+
+0AC6: 1@ = label @HUDHOOK offset
+000E: 1@ -= 0x58EAF1
+000E: 1@ -= 0x4
+0A8C: write_memory 0x58EAF0 size 1 value 0xE9 vp 0 // jmp near 
+0A8C: write_memory 0x58EAF1 size 4 value 1@ vp 0 
+0A8C: write_memory 0x58EAF5 size 1 value 0x90 vp 0 // NOP 
+
+0AC6: 0@ = label @HUHOOKRETURNJUMP offset
+0006: 1@ = 0x58EAF1
+0062: 1@ -= 0@  // (int)
+0A8C: write_memory 0@ size 4 value 1@ vp 0
+
+0AC6: 0@ = label @HUCALL offset
+0006: 1@ = 0x7285B0
+0062: 1@ -= 0@  // (int)
+000E: 1@ -= 0x4
+0A8C: write_memory 0@ size 4 value 1@ vp 0
+
+0AC6: 0@ = label @COLOR offset
+0AC6: 1@ = label @COLORHERE offset
+0A8C: write_memory 1@ size 4 value 0@ vp 0
+
+jump @over
+
+:HUDHOOK
+hex
+    81          // sub
+    EC          // esp
+    A0 01 00 00 // 0x1A0
+
+    // stuff
+    68          // push imm32
+end
+:COLORHERE
+hex
+    00 00 00 00 // POINTER TO color
+    68          // push imm32
+    00 00 C8 42 // y4
+    68          // push imm32
+    00 00 C8 42 // x4
+    68          // push imm32
+    00 00 C8 42 // y3
+    68          // push imm32
+    00 00 48 43 // x3
+    68          // push imm32
+    00 00 C8 42 // y2
+    68          // push imm32
+    00 00 C8 42 // x2
+    68          // push imm32
+    00 00 00 00 // y1
+    68          // push imm32
+    00 00 00 00 // x1
+
+    E8          // call (near, relative)
+end
+:HUCALL
+hex
+    00 00 00 00
+
+    58          // pop eax
+    58          // pop eax
+    58          // pop eax
+    58          // pop eax
+    58          // pop eax
+    58          // pop eax
+    58          // pop eax
+    58          // pop eax
+    58          // pop eax
+    
+    E9          // jmp near
+end
+:HUHOOKRETURNJUMP
+hex
+    00 00 00 00
+end
+:COLOR
+hex
+    FF 00 00 FF
+end
+
+:over

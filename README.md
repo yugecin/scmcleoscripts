@@ -21,6 +21,7 @@
 [altering memory without CLEO](/snippets/memorywithoutcleo.txt)  
 [creating coronas in a loop](/snippets/coronas.txt)  
 [hook](/snippets/hook.txt)  
+[hook drawhud and draw a polygon](/snippets/hookdrawpoly.txt)  
 
 ### License
 [MIT](/LICENSE)  
