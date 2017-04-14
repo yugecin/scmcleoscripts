@@ -124,6 +124,7 @@ return
 84A7:   not actor $PLAYER_ACTOR driving_boat
 847A:   not actor $PLAYER_ACTOR driving_bike
 004D: jf @INCAR_1 
+03C0: 8@ = actor $PLAYER_ACTOR car
 0006: 4@ = 1 //incar
 0A97: 9@ = car 8@ pointer
 000A: 9@ += 0x5A0
