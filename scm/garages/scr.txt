@@ -1,0 +1,630 @@
+
+03A4: name_thread 'MAIN' 
+01F0: set_max_wanted_level_to 6
+0111: toggle_wasted_busted_check 0 
+00C0: set_current_time_hours_to 23 minutes_to 0 
+04E4: unknown_refresh_game_renderer_at 2488.56 -1666.84 
+03CB: set_rendering_origin_at 2488.56 -1666.84 13.38 
+0053: $PLAYER_CHAR = create_player #NULL at 1355.3323 -612.0568 109.1328
+//0053: $PLAYER_CHAR = create_player #NULL at 1027.6394 -1028.3864 44.5156
+01F5: $PLAYER_ACTOR = create_player_actor $PLAYER_CHAR 
+07AF: $PLAYER_GROUP = player $PLAYER_CHAR group 
+0373: set_camera_directly_behind_player 
+01B6: set_weather 0
+0001: wait 0 ms 
+087B: set_player $PLAYER_CHAR clothes_texture "PLAYER_FACE" model "HEAD" body_part 1 
+087B: set_player $PLAYER_CHAR clothes_texture "worktrcamogrn" model "worktr" body_part 2 
+087B: set_player $PLAYER_CHAR clothes_texture "sneakerprowht" model "SNEAKER" body_part 3 
+087B: set_player $PLAYER_CHAR clothes_texture "hatmancblk" model "hatmanc" body_part 16 
+087B: set_player $PLAYER_CHAR clothes_texture "glasses04dark" model "glasses04" body_part 15
+087B: set_player $PLAYER_CHAR clothes_texture "player_torso" model "torso" body_part 0  
+070D: rebuild_player $PLAYER_CHAR 
+01B4: toggle_player $PLAYER_CHAR can_move 1 
+016A: fade 1 time 0 
+04BB: select_interior 0 
+0629: change_integer_stat 181 to 4
+016C: restart_if_wasted_at 2032.1702 -1416.7808 16.9922 angle 133.0 town_number 0 
+016D: restart_if_busted_at 2492.6692 -1670.1124 13.3359 angle 0.0 town_number 0 
+0180: set_on_mission_flag_to $ONMISSION // Note: your missions have to use the variable defined here 
+0004: $DEFAULT_WAIT_TIME = 250
+03E6: remove_text_box
+
+01F7: set_player $PLAYER_CHAR ignored_by_cops 1
+0A8C: write_memory 0x43A4D1 size 4 value #INFERNUS vp 0 
+0AC6: $NUMVERTICES = label @NUMVERTICES offset
+
+0AC6: 1@ = label @HUDHOOK offset
+000E: 1@ -= 0x58EAF1
+000E: 1@ -= 0x4
+0A8C: write_memory 0x58EAF0 size 1 value 0xE9 vp 0 // jmp near 
+0A8C: write_memory 0x58EAF1 size 4 value 1@ vp 0 
+0A8C: write_memory 0x58EAF5 size 1 value 0x90 vp 0 // NOP 
+
+0AC6: 0@ = label @HUHOOKRETURNJUMP offset
+0006: 1@ = 0x58EAF1
+0062: 1@ -= 0@  // (int)
+0A8C: write_memory 0@ size 4 value 1@ vp 0
+
+0AC6: 0@ = label @HUCALL offset
+0006: 1@ = 0x734E90
+0062: 1@ -= 0@  // (int)
+000E: 1@ -= 0x4
+0A8C: write_memory 0@ size 4 value 1@ vp 0
+
+0AC6: 0@ = label @LINES offset
+0AC6: 1@ = label @LINEHERE offset
+0A8C: write_memory 1@ size 4 value 0@ vp 0
+
+jump @MAIN_LOOP
+:HUDHOOK
+hex
+    81          // sub
+    EC          // esp
+    A0 01 00 00 // 0x1A0
+
+    // stuff
+    68          // push imm32
+end
+:NUMVERTICES
+hex
+    00 00 00 00 // numVertices
+    68          // push imm32
+end
+:LINEHERE
+hex
+    00 00 00 00 // *vertices
+    68          // push imm32
+    01 00 00 00 // primitiveType
+
+    E8          // call (near, relative)
+end
+:HUCALL
+hex
+    00 00 00 00
+
+    58          // pop eax
+    58          // pop eax
+    58          // pop eax
+    
+    E9          // jmp near
+end
+:HUHOOKRETURNJUMP
+hex
+    00 00 00 00
+end       
+
+const
+    GARAGE_POOL_START = 0x96C048 
+    GARAGE_POOL_END = 0x96E9A0
+    SIZEOF_GARAGE = 0xD8 
+end
+
+$CURRENT_VERTEX_COUNT = 0
+:MAIN_LOOP
+0001: wait 0
+
+0050: gosub @TP
+                         
+0A8C: write_memory $NUMVERTICES size 4 value $CURRENT_VERTEX_COUNT vp 0
+$CURRENT_VERTEX_COUNT = 0
+0006: 31@ = GARAGE_POOL_START
+0006: 20@ = 0x0
+
+00A0: store_actor $PLAYER_ACTOR position_to $PLAYA_X $PLAYA_Y $PLAYA_Z
+
+0006: $TEMP = 0xB6FA2C // CAMERAVIEWMATRIX
+0A8D: $_11 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 4
+0A8D: $_12 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 4
+0A8D: $_13 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 8
+0A8D: $_21 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 4
+0A8D: $_22 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 4
+0A8D: $_23 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 8
+0A8D: $_31 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 4
+0A8D: $_32 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 4
+0A8D: $_33 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 8
+0A8D: $_41 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 4
+0A8D: $_42 = read_memory $TEMP size 4 vp 0 
+000A: $TEMP += 4
+0A8D: $_43 = read_memory $TEMP size 4 vp 0
+0A8D: $DISPLAY_WIDTH = read_memory 0xC17044 size 4 vp 0
+0A8D: $DISPLAY_HEIGHT = read_memory 0xC17048 size 4 vp 0  
+008D: $DISPLAY_WIDTH = integer $DISPLAY_WIDTH to_float
+008D: $DISPLAY_HEIGHT = integer $DISPLAY_HEIGHT to_float
+
+:CHECK_GARAGE
+0085: $TEMP = 31@ // (int)  
+0A8D: $X = read_memory $TEMP size 4 vp 0  
+0008: $TEMP += 4
+0A8D: $Y = read_memory $TEMP size 4 vp 0  
+0008: $TEMP += 4
+0A8D: $Z1 = read_memory $TEMP size 4 vp 0   
+0008: $TEMP += 4
+0A8D: $DV1X = read_memory $TEMP size 4 vp 0 
+0008: $TEMP += 4
+0A8D: $DV1Y = read_memory $TEMP size 4 vp 0 
+0008: $TEMP += 4
+//0A8D: $DV2X = read_memory $TEMP size 4 vp 0 
+0008: $TEMP += 4
+//0A8D: $DV2Y = read_memory $TEMP size 4 vp 0
+0008: $TEMP += 4
+0A8D: $Z2 = read_memory $TEMP size 4 vp 0   
+0008: $TEMP += 4 
+0A8D: $WIDTH = read_memory $TEMP size 4 vp 0
+0008: $TEMP += 4
+0A8D: $DEPTH = read_memory $TEMP size 4 vp 0
+0008: $TEMP += 4
+0A8D: $X1 = read_memory $TEMP size 4 vp 0
+0008: $TEMP += 4 
+0A8D: $X2 = read_memory $TEMP size 4 vp 0
+0008: $TEMP += 4  
+0A8D: $Y2 = read_memory $TEMP size 4 vp 0                                                                           
+0008: $TEMP += 4 
+0A8D: $Y1 = read_memory $TEMP size 4 vp 0 
+0509: 10@ = distance_between_XY $X1 $Y1 and_XY $PLAYA_X $PLAYA_Y
+0023:   200.0 > 10@   
+004D: jump_if_false @NEXT_GARAGE  
+
+0086: $MIDX = $X1 // (float) GLOBALVAR ASSIGNMENT FLOAT
+0059: $MIDX += $X2 // (float) GLOBALVAR PLUS FLOAT
+0015: $MIDX /= 2.0 // GLOBALVAR DIVIDE FLOAT
+
+0086: $MIDY = $Y1 // (float) GLOBALVAR ASSIGNMENT FLOAT
+0059: $MIDY += $Y2 // (float) GLOBALVAR PLUS FLOAT
+0015: $MIDY /= 2.0 // GLOBALVAR DIVIDE FLOAT  
+
+var
+    $WORLDCOORDSX: array 8 of Float
+    $WORLDCOORDSY: array 8 of Float
+    $WORLDCOORDSZ: array 8 of Float
+    $SCREENCOORDSX: array 8 of Float
+    $SCREENCOORDSY: array 8 of Float
+end
+
+for $IDX = 0 to 3 step 1
+0086: $WORLDCOORDSZ[$IDX] = $Z1 // (float) GLOBALVAR ASSIGNMENT FLOAT
+end
+for $IDX = 4 to 7 step 1
+0086: $WORLDCOORDSZ[$IDX] = $Z2 // (float) GLOBALVAR ASSIGNMENT FLOAT
+end
+
+0086: $WORLDCOORDSX[0] = $X // (float) GLOBALVAR ASSIGNMENT FLOAT      
+0086: $WORLDCOORDSY[0] = $Y // (float) GLOBALVAR ASSIGNMENT FLOAT
+
+0086: $MIDXDIF = $X // (float) GLOBALVAR ASSIGNMENT FLOAT 
+0061: $MIDXDIF -= $MIDX // (float) GLOBALVAR MIN FLOAT
+0011: $MIDXDIF *= -1.0 // GLOBALVAR MULTIPLY FLOAT
+
+0086: $WORLDCOORDSX[3] = $MIDX // (float) GLOBALVAR ASSIGNMENT FLOAT
+0059: $WORLDCOORDSX[3] += $MIDXDIF // (float) GLOBALVAR PLUS FLOAT  
+
+0086: $MIDYDIF = $MIDY // (float) GLOBALVAR ASSIGNMENT FLOAT 
+0061: $MIDYDIF -= $Y // (float) GLOBALVAR MIN FLOAT
+
+0086: $WORLDCOORDSY[3] = $MIDY // (float) GLOBALVAR ASSIGNMENT FLOAT
+0059: $WORLDCOORDSY[3] += $MIDYDIF // (float) GLOBALVAR PLUS FLOAT     
+
+0086: $WORLDCOORDSX[1] = $WIDTH// (float) GLOBALVAR ASSIGNMENT FLOAT   
+0069: $WORLDCOORDSX[1] *= $DV1X // (float) GLOBALVAR MULTIPLY FLOAT       
+0011: $WORLDCOORDSX[1] *= -1.0 // GLOBALVAR MULTIPLY FLOAT
+0059: $WORLDCOORDSX[1] += $WORLDCOORDSX[3] // (float) GLOBALVAR PLUS FLOAT  
+0086: $WORLDCOORDSY[1] = $WIDTH // (float) GLOBALVAR ASSIGNMENT FLOAT   
+0069: $WORLDCOORDSY[1] *= $DV1Y // (float) GLOBALVAR MULTIPLY FLOAT     
+0011: $WORLDCOORDSY[1] *= -1.0 // GLOBALVAR MULTIPLY FLOAT
+0059: $WORLDCOORDSY[1] += $WORLDCOORDSY[3]// (float) GLOBALVAR PLUS FLOAT 
+
+0086: $MIDXDIF = $WORLDCOORDSX[1] // (float) GLOBALVAR ASSIGNMENT FLOAT 
+0061: $MIDXDIF -= $MIDX // (float) GLOBALVAR MIN FLOAT
+0011: $MIDXDIF *= -1.0 // GLOBALVAR MULTIPLY FLOAT
+
+0086: $WORLDCOORDSX[2] = $MIDX // (float) GLOBALVAR ASSIGNMENT FLOAT
+0059: $WORLDCOORDSX[2] += $MIDXDIF // (float) GLOBALVAR PLUS FLOAT  
+
+0086: $MIDYDIF = $MIDY // (float) GLOBALVAR ASSIGNMENT FLOAT 
+0061: $MIDYDIF -= $WORLDCOORDSY[1] // (float) GLOBALVAR MIN FLOAT
+
+0086: $WORLDCOORDSY[2] = $MIDY // (float) GLOBALVAR ASSIGNMENT FLOAT
+0059: $WORLDCOORDSY[2] += $MIDYDIF // (float) GLOBALVAR PLUS FLOAT  
+
+0050: gosub @DOGARAGE
+:NEXT_GARAGE        
+000A: 31@ += SIZEOF_GARAGE
+00D6: if
+0029:   31@ > GARAGE_POOL_END
+004D: jump_if_false @CHECK_GARAGE
+0002: jump @MAIN_LOOP
+
+:SHOWNAME
+000A: $TEMP += 16
+0A8D: 21@ = read_memory $TEMP size 4 vp 0
+000A: $TEMP += 4
+0A8D: 22@ = read_memory $TEMP size 4 vp 0
+0662: SCRDEBUG PRINTSTRING 21@v
+return
+
+:DOGARAGE
+gosub @SHOWNAME
+/*       N
+    2 -------- 3
+    |          |
+    |          |
+    |          |
+    0 -------- 1
+    high Z: add 4
+*/
+
+0086: $WORLDCOORDSX[4] = $WORLDCOORDSX[0] // (float) GLOBALVAR ASSIGNMENT FLOAT  
+0086: $WORLDCOORDSX[5] = $WORLDCOORDSX[1] // (float) GLOBALVAR ASSIGNMENT FLOAT   
+0086: $WORLDCOORDSX[6] = $WORLDCOORDSX[2] // (float) GLOBALVAR ASSIGNMENT FLOAT   
+0086: $WORLDCOORDSX[7] = $WORLDCOORDSX[3] // (float) GLOBALVAR ASSIGNMENT FLOAT                                                                                 
+0086: $WORLDCOORDSY[4] = $WORLDCOORDSY[0] // (float) GLOBALVAR ASSIGNMENT FLOAT
+0086: $WORLDCOORDSY[5] = $WORLDCOORDSY[1] // (float) GLOBALVAR ASSIGNMENT FLOAT
+0086: $WORLDCOORDSY[6] = $WORLDCOORDSY[2] // (float) GLOBALVAR ASSIGNMENT FLOAT  
+0086: $WORLDCOORDSY[7] = $WORLDCOORDSY[3] // (float) GLOBALVAR ASSIGNMENT FLOAT
+
+for $IDX = 0 to 7 step 1
+0086: $WORLD_X = $WORLDCOORDSX[$IDX] // (float)
+0086: $WORLD_Y = $WORLDCOORDSY[$IDX] // (float)
+0086: $WORLD_Z = $WORLDCOORDSZ[$IDX] // (float)
+gosub @DOPROJECTION
+0086: $SCREENCOORDSX[$IDX] = $SCREEN_X // (float)
+0086: $SCREENCOORDSY[$IDX] = $SCREEN_Y // (float)
+end
+
+for $IDX = 0 to 7 step 1
+0086: $WORLD_X = $WORLDCOORDSX[$IDX] // (float)
+0086: $WORLD_Y = $WORLDCOORDSY[$IDX] // (float)
+0086: $WORLD_Z = $WORLDCOORDSZ[$IDX] // (float)
+gosub @DOPROJECTION
+0086: $SCREENCOORDSX[$IDX] = $SCREEN_X // (float)
+0086: $SCREENCOORDSY[$IDX] = $SCREEN_Y // (float)
+end
+
+$LINE_RGBA = 0xFF0000FF
+$IDX1 = 0
+$IDX2 = 1
+gosub @DOLINEIFVISIBLE  
+$IDX2 = 2
+gosub @DOLINEIFVISIBLE 
+$IDX2 = 4
+gosub @DOLINEIFVISIBLE 
+
+$IDX1 = 3
+$IDX2 = 1
+gosub @DOLINEIFVISIBLE  
+$IDX2 = 2
+gosub @DOLINEIFVISIBLE 
+$IDX2 = 7
+gosub @DOLINEIFVISIBLE 
+
+$IDX1 = 6
+$IDX2 = 4
+gosub @DOLINEIFVISIBLE  
+$IDX2 = 7
+gosub @DOLINEIFVISIBLE  
+$IDX2 = 2
+gosub @DOLINEIFVISIBLE
+
+$IDX1 = 5
+$IDX2 = 4
+gosub @DOLINEIFVISIBLE  
+$IDX2 = 7
+gosub @DOLINEIFVISIBLE  
+$IDX2 = 1
+gosub @DOLINEIFVISIBLE
+return
+
+:DOLINEIFVISIBLE
+if and
+00C2:   sphere_onscreen $WORLDCOORDSX[$IDX1] $WORLDCOORDSY[$IDX1] $WORLDCOORDSZ[$IDX1] radius 1.0
+00C2:   sphere_onscreen $WORLDCOORDSX[$IDX2] $WORLDCOORDSY[$IDX2] $WORLDCOORDSZ[$IDX2] radius 1.0
+004D: jump_if_false @NOLINE
+0086: $LINE_START_X = $SCREENCOORDSX[$IDX1] // (float)
+0086: $LINE_START_Y = $SCREENCOORDSY[$IDX1] // (float)
+0086: $LINE_END_X = $SCREENCOORDSX[$IDX2] // (float)
+0086: $LINE_END_Y = $SCREENCOORDSY[$IDX2] // (float)
+gosub @ADDLINE
+:NOLINE
+return 
+
+:DOPROJECTION
+0007: $SCREEN_X = 0.0 // vecScreen->fX = vecWorld->fZ * m._31 + vecWorld->fY * m._21 + vecWorld->fX * m._11 + m._41;
+
+0087: $TEMP1 = $WORLD_Z // (float)
+006F: $TEMP1 *= $_31 // (float)
+005B: $SCREEN_X += $TEMP1  // (float)
+
+0087: $TEMP1 = $WORLD_Y // (float)
+006F: $TEMP1 *= $_21 // (float)
+005B: $SCREEN_X += $TEMP1  // (float)
+
+0087: $TEMP1 = $WORLD_X // (float)
+006F: $TEMP1 *= $_11 // (float)
+005B: $SCREEN_X += $TEMP1  // (float)
+
+005D: $SCREEN_X += $_41  // (float)
+
+0007: $SCREEN_Y = 0.0 // vecScreen->fY = vecWorld->fZ * m._32 + vecWorld->fY * m._22 + vecWorld->fX * m._12 + m._42;
+
+0087: $TEMP1 = $WORLD_Z // (float)
+006F: $TEMP1 *= $_32 // (float)
+005B: $SCREEN_Y += $TEMP1  // (float)
+
+0087: $TEMP1 = $WORLD_Y // (float)
+006F: $TEMP1 *= $_22 // (float)
+005B: $SCREEN_Y += $TEMP1  // (float)
+
+0087: $TEMP1 = $WORLD_X // (float)
+006F: $TEMP1 *= $_12 // (float)
+005B: $SCREEN_Y += $TEMP1  // (float)
+
+005D: $SCREEN_Y += $_42  // (float)
+
+0007: $TEMP2 = 0.0 // vecScreen->fZ = vecWorld->fZ * m._33 + vecWorld->fY * m._23 + vecWorld->fX * m._13 + m._43;
+
+0087: $TEMP1 = $WORLD_Z // (float)
+006F: $TEMP1 *= $_33 // (float)
+005B: $TEMP2 += $TEMP1  // (float)
+
+0087: $TEMP1 = $WORLD_Y // (float)
+006F: $TEMP1 *= $_23 // (float)
+005B: $TEMP2 += $TEMP1  // (float)
+
+0087: $TEMP1 = $WORLD_X // (float)
+006F: $TEMP1 *= $_13 // (float)
+005B: $TEMP2 += $TEMP1  // (float)
+
+005D: $TEMP2 += $_43  // (float)
+
+// float fRecip = 1.0f / vecScreen->fZ;
+0007: $TEMP1 = 1.0
+0073: $TEMP1 /= $TEMP2 // (float)
+
+0087: $TEMP2 = $TEMP1 // (float)
+0087: $TEMP3 = $TEMP1 // (float)
+
+0069: $TEMP2 *= $DISPLAY_WIDTH // (float)
+0069: $TEMP3 *= $DISPLAY_HEIGHT // (float)
+
+0069: $SCREEN_X *= $TEMP2 // (float)
+0069: $SCREEN_Y *= $TEMP3 // (float)
+
+return
+
+:ADDLINE
+   $CURRENT_VERTEX_COUNT > 48
+004D: jump_if_false @LINE_IS_OK
+0663: SCRDEBUG PRINTINT "LINE POOL EXHAUSTED" 32@
+:NOMSG
+return
+:LINE_IS_OK
+
+0AC6: $LINE = label @LINES offset
+const
+    LINESIZE = 28
+end
+0084: $NEXTLINE = $CURRENT_VERTEX_COUNT
+$NEXTLINE *= LINESIZE
+0058: $LINE += $NEXTLINE // (int)
+$CURRENT_VERTEX_COUNT += 2
+0A8C: write_memory $LINE size 4 value $LINE_START_X vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value $LINE_START_Y vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value $LINE_START_Z vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value 0x0 vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value $LINE_RGBA 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value 0x0 vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value 0x0 vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value $LINE_END_X vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value $LINE_END_Y vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value $LINE_END_Z vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value 0x0 vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value $LINE_RGBA 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value 0x0 vp 0
+$LINE += 4
+0A8C: write_memory $LINE size 4 value 0x0 vp 0
+$LINE += 4 
+return
+
+:LINES
+hex
+//  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+// #     X     #     Y     #     Z     #    RWH    # B  G R  A #     U     #     V     #
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    
+end
+
+:TP
+0AB0:   key_pressed 0x11
+004D: jump_if_false @TP_RET  
+8@ = -1
+00A0: store_actor $PLAYER_ACTOR position_to $X $Y $Z
+0172: $TANG = actor $PLAYER_ACTOR Z_angle
+00D6: if or
+00DF:   actor $PLAYER_ACTOR driving 
+04C8:   actor $PLAYER_ACTOR driving_flying_vehicle 
+04A9:   actor $PLAYER_ACTOR driving_heli 
+04A7:   actor $PLAYER_ACTOR driving_boat
+047A:   actor $PLAYER_ACTOR driving_bike
+004D: jump_if_false @NOTINCAR
+03C0: 8@ = actor $PLAYER_ACTOR car  
+00AA: store_car 8@ position_to $X $Y $Z         
+0174: $TANG = car 8@ Z_angle
+:NOTINCAR 
+0005: $ANG = 0.0 // GLOBALVAR ASSIGNMENT FLOAT   
+0061: $ANG -= $TANG // (float) GLOBALVAR MIN FLOAT
+02F6: $SIN = sine $ANG // (float)
+02F7: $COS = cosine $ANG // (float)
+000D: $X -= 1.5 // GLOBALVAR MINUS FLOAT
+
+:TP_I
+if
+0AB0:   key_pressed 0x49
+004D: jump_if_false @TP_K 
+0005: $DIST = 5.0 // GLOBALVAR ASSIGNMENT FLOAT
+0069: $DIST *= $COS // (float) GLOBALVAR MULTIPLY FLOAT
+0059: $Y += $DIST // GLOBALVAR PLUS FLOAT
+0005: $DIST = 5.0 // GLOBALVAR ASSIGNMENT FLOAT
+0069: $DIST *= $SIN // (float) GLOBALVAR MULTIPLY FLOAT
+0059: $X += $DIST // GLOBALVAR PLUS FLOAT
+0002: jump @TP_MOVE
+
+:TP_K  
+0AB0:   key_pressed 0x4B
+004D: jump_if_false @TP_J  
+0005: $DIST = -5.0 // GLOBALVAR ASSIGNMENT FLOAT
+0069: $DIST *= $COS // (float) GLOBALVAR MULTIPLY FLOAT
+0059: $Y += $DIST // GLOBALVAR PLUS FLOAT
+0005: $DIST = -5.0 // GLOBALVAR ASSIGNMENT FLOAT
+0069: $DIST *= $SIN // (float) GLOBALVAR MULTIPLY FLOAT
+0059: $X += $DIST // GLOBALVAR PLUS FLOAT
+0002: jump @TP_MOVE
+:TP_J  
+0AB0:   key_pressed 0x4A
+004D: jump_if_false @TP_L  
+0005: $DIST = 5.0 // GLOBALVAR ASSIGNMENT FLOAT
+0069: $DIST *= $SIN // (float) GLOBALVAR MULTIPLY FLOAT
+0059: $Y += $DIST // GLOBALVAR PLUS FLOAT
+0005: $DIST = -5.0 // GLOBALVAR ASSIGNMENT FLOAT
+0069: $DIST *= $COS // (float) GLOBALVAR MULTIPLY FLOAT
+0059: $X += $DIST // GLOBALVAR PLUS FLOAT
+0002: jump @TP_MOVE
+:TP_L  
+0AB0:   key_pressed 0x4C
+004D: jump_if_false @TP_RET  
+0005: $DIST = -5.0 // GLOBALVAR ASSIGNMENT FLOAT
+0069: $DIST *= $SIN // (float) GLOBALVAR MULTIPLY FLOAT
+0059: $Y += $DIST // GLOBALVAR PLUS FLOAT
+0005: $DIST = 5.0 // GLOBALVAR ASSIGNMENT FLOAT
+0069: $DIST *= $COS // (float) GLOBALVAR MULTIPLY FLOAT
+0059: $X += $DIST // GLOBALVAR PLUS FLOAT
+0002: jump @TP_MOVE
+:TP_RET
+0051: return
+
+:TP_MOVE 
+0662: SCRDEBUG PRINTSTRING "AAAAAAAAA"
+056E:   car 8@ defined
+004D: jump_if_false @NOCAR
+00AB: put_car 8@ at $X $Y $Z
+0051: return
+:NOCAR
+00A1: put_actor $PLAYER_ACTOR at $X $Y $Z
+0051: return
+
+end_thread
