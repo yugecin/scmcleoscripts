@@ -32,6 +32,17 @@ wait 0
 FOR $MyCounter = 1 to 12 step 1
 04D5: create_corona_at 25@ -2496.9329 13.5391 radius 1.0 type 9 flare 0 RGB 255 0 0
 25@ -= 2.0
+
+// method by DK22Pac, works
+// see http://gtaforums.com/topic/885204-creating-corona-in-a-loop/
+0@ = 1932.9313 // x
+1@ = -2499.9329 // y
+2@ = 13.5391 // z
+0A9F: get_this_script_struct 3@
+for 4@ = 1 to 12
+    0AA5: 0x6FC580 21 21 draw_corona_reflection_delay 1 only_from_below 0 fade_speed 50.0 0 near_clip 0.5 long_distance 0 0 0 check_obstacles 0 enable_reflection 0 flare 0 type 9 far_clip 150.0 radius 1.0 position 0@v alpha 255 blue 0 green 0 red 255 entity 0 identifier 3@
+    0@ -= 2.0
+    3@ += 1
 end
 
 // hack, works
