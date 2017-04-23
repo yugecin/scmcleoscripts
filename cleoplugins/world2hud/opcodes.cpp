@@ -10,6 +10,9 @@ BOOL InitOpcodes()
 }
 
 RwV3D TransformWorldXYZ(RwV3D world) {
+	// partly based on
+	https://github.com/multitheftauto/mtasa-blue/blob/9b1fbaf639657a446790469aa6711e11be0d3eee/MTA10/core/CGraphics.cpp#L498
+
 	CMATRIX *cameraViewMatrix = (CMATRIX*)(0xB6FA2C);
 
 	RwV3D screen;
