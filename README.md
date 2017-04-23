@@ -17,6 +17,7 @@
 
 ### CLEO plugins
 [sign extending floats](/cleoplugins/signext)  
+[world2hud projection](/cleoplugins/world2hud)  
 
 ### Snippets
 [altering memory without CLEO](/snippets/memorywithoutcleo.txt)  
