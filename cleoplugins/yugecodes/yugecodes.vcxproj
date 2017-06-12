@@ -91,10 +91,12 @@
     <ClInclude Include="opcodes.h" />
     <ClInclude Include="rw.h" />
     <ClInclude Include="Stdafx.h" />
+    <ClInclude Include="transform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dllmain.cpp" />
     <ClCompile Include="opcodes.cpp" />
+    <ClCompile Include="transform.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
