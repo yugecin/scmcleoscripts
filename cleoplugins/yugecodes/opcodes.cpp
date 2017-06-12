@@ -6,7 +6,8 @@ BOOL InitOpcodes()
 	return
 		CLEO_RegisterOpcode(0x0c26, &Op_0C26) &&
 		CLEO_RegisterOpcode(0x0C27, &Op_0C27) &&
-		CLEO_RegisterOpcode(0x0C28, &Op_0C28);
+		CLEO_RegisterOpcode(0x0C28, &Op_0C28) &&
+		CLEO_RegisterOpcode(0x0C29, &Op_0C29);
 }
 
 // 0C26: sign_extend 1@ store_to 2@
@@ -42,4 +43,23 @@ OpcodeResult WINAPI Op_0C28(CScriptThread *thread)
 	DWORD *displayWidth = (DWORD*)(0xC17044);
 	DWORD *displayHeight = (DWORD*)(0xC17048);
 	return TransformPointFor0C270C28(thread, (*displayWidth), (*displayHeight));
+}
+
+// 0C29: lerp_ab 1@ to 2@ f 3@ store_to 4@
+// {$O 0C29=4,lerp_ab %1d% f %2d% at %3d% store_to %4d%}
+OpcodeResult WINAPI Op_0C29(CScriptThread *thread)
+{
+	float a;
+	float b;
+	float f;
+
+	a = CLEO_GetFloatOpcodeParam(thread);
+	b = CLEO_GetFloatOpcodeParam(thread);
+	f = CLEO_GetFloatOpcodeParam(thread);
+
+	// https://stackoverflow.com/questions/4353525/floating-point-linear-interpolation
+	a = a + f * (b - a);
+
+	CLEO_SetFloatOpcodeParam(thread, a);
+	return OR_CONTINUE;
 }
