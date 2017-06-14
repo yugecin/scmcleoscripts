@@ -4,6 +4,7 @@
 {$O 0C28=5,transform world_xyz %1d% %2d% %3d% to screen_xy %4d% %5d%}
 {$O 0C29=4,lerp_ab %1d% f %2d% at %3d% store_to %4d%}
 {$O 0C30=11,draw_text %1d% at_screen_xy %2d% %3d% font %4d% align %5d% RGBA %6d% %7d% %8d% %9d% letter_size %10d% %11d%}
+{$O 0C31=11,draw_text %1d% at_hud_xy %2d% %3d% font %4d% align %5d% RGBA %6d% %7d% %8d% %9d% letter_size %10d% %11d%}
 
 03A4: name_thread 'PLHUD00'
 
@@ -24,9 +25,12 @@ const
     TXT = 13@
     MX = 14@
     MY = 15@
+    ENABLED = 16@
+    RNWYCOUNT = 17@
     TEMP3 = 29@
     TEMP2 = 30@
     TEMP = 31@
+    INFOTMR = 32@
 end
 
 //==============================================================
@@ -96,21 +100,41 @@ end
 
 //==============================================================
 
+0006: INFOTMR = 3000
+
 :MAIN_LOOP
 0001: wait 0
+
+0AB0:   key_pressed 0x79 // F10
+004D: jump_if_false @SKIPKEY
+wait 200
+0039:   ENABLED == 0 // LOCALVAR EQ INT
+004D: jump_if_false @DISABLE
+0006: ENABLED = 1
+0006: INFOTMR = 0
+0002: jump @SKIPKEY
+:DISABLE
+0006: ENABLED = 0
+0A8C: write_memory NUMVERTICESMEM size 4 value 0 vp 0
+:SKIPKEY
+0039:   ENABLED == 1 // LOCALVAR EQ INT
+004D: jump_if_false @MAIN_LOOP
 
 00A0: store_actor $PLAYER_ACTOR position_to PX PY PZ
 03F0: enable_text_draw 0
 0006: CURRENT_VERTEX_COUNT = 0 // LOCALVAR ASSIGNMENT INT
 0AC6: PTR = label @AIRPORTS offset
 
+0006: RNWYCOUNT = 0
+
 :NEXTPTR
 0A8D: X1 = read_memory PTR size 4 virtual_protect 0
 0039:   X1 == 0 // LOCALVAR EQ INT
 004D: jump_if_false @MLY
 0A8C: write_memory NUMVERTICESMEM size 4 value CURRENT_VERTEX_COUNT vp 0
-0002: jump @MAIN_LOOP
+0002: jump @LOOP_END
 :MLY
+000A: RNWYCOUNT += 1 // LOCALVAR PLUS INT
 000A: PTR += 4 // LOCALVAR PLUS INT
 0A8D: Y1 = read_memory PTR size 4 virtual_protect 0
 000A: PTR += 4 // LOCALVAR PLUS INT
@@ -161,6 +185,19 @@ end
 */
 0050: gosub @ADDLINE
 0002: jump @NEXTPTR
+
+:LOOP_END
+001B:   2000 > INFOTMR // LOCALVAR CMP INT
+004D: jump_if_false @MAIN_LOOP
+0340: set_text_draw_RGBA 255 255 255 255
+033F: set_text_draw_letter_size 0.15 0.95
+0342: set_text_draw_centered 0
+081C: draw_text_outline 0 RGBA 0 0 0 255
+060D: draw_text_shadow 0 rgba 0 0 0 255
+045A: draw_text_1number 320.0 190.0 'NUMBER' number RNWYCOUNT // ~1~
+0AC6: TEMP = label @INFOSTRING offset
+0C31: draw_text TEMP at_hud_xy 320.0 210.0 font 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
+0002: jump @MAIN_LOOP
 
 //==============================================================
 
@@ -483,6 +520,11 @@ F60779C3 3FCF04C5 227DDB41 E5D16AC3 C4A309C5 FED4DB41 14 "Wadworth Hill Grass" 0
 D21C3BC4 678E8BC4 9F0D7F42 CDE84FC4 338D8BC4 9F0D7F42 0E "Excalibur AFB" 00
 E53541C4 D21051C4 29CD1343 05D956C4 6BEB66C4 A0F91243 0E "Chester Field" 00
 00000000
+end
+
+:INFOSTRING
+hex
+    "runways_loaded pl_runway_helper_v1" 00
 end
 
 0A93: end_custom_thread
