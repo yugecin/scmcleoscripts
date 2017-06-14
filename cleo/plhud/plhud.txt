@@ -103,22 +103,35 @@ end
 //==============================================================
 
 0006: INFOTMR = 3000
-0007: MAXVIEWDIST = 400.0
+0007: MAXVIEWDIST = 600.0
 
 :MAIN_LOOP
 0001: wait 0
 
 0AB0:   key_pressed 0x79 // F10
 004D: jump_if_false @SKIPKEY
-wait 200
-000A: ENABLED += 1 // LOCALVAR PLUS INT
+0001: wait 200
 0006: INFOTMR = 0
+0AB0:   key_pressed 0x59 // Y
+004D: jump_if_false @SKIPUP
 000B: MAXVIEWDIST += 200.0 // LOCALVAR PLUS FLOAT
-0019:   ENABLED > 5 // LOCALVAR CMP INT
-004D: jump_if_false @SKIPKEY
+0002: jump @SKIPKEY
+:SKIPUP
+0AB0:   key_pressed 0x48 // H
+004D: jump_if_false @SKIPDOWN
+000F: MAXVIEWDIST -= 200.0 // LOCALVAR MINUS FLOAT
+0002: jump @SKIPKEY
+:SKIPDOWN
+0019:   ENABLED > 0 // LOCALVAR CMP INT
+004D: jump_if_false @ENABLE
 0006: ENABLED = 0
-0007: MAXVIEWDIST = 400.0
 0A8C: write_memory NUMVERTICESMEM size 4 value 0 vp 0
+0002: jump @SKIPKEY
+:ENABLE
+0006: ENABLED = 1
+0023:   400.0 > MAXVIEWDIST // LOCALVAR CMP FLOAT
+004D: jump_if_false @SKIPKEY
+0007: MAXVIEWDIST = 600.0
 :SKIPKEY
 0019:   ENABLED > 0 // LOCALVAR CMP INT
 004D: jump_if_false @MAIN_LOOP
