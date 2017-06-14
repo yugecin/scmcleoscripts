@@ -20,7 +20,7 @@ namespace PLairporthelper
 					string[] parts = line.Split( ',' );
 					float x = float.Parse(parts[1].Replace('.', ','));
 					float y = float.Parse(parts[2].Replace('.', ','));
-					float z = float.Parse(parts[3].Replace('.', ',')) - 2.0f;
+					float z = float.Parse(parts[3].Replace('.', ',')) - 1.7f;
 					string comment = line.Split( '/' )[2].Substring(1);
 					res += f2h( x ) + " " + f2h(y) + " " + f2h(z);
 					if( comment.Length == 0 )
