@@ -28,6 +28,7 @@ const
     ENABLED = 16@
     RNWYCOUNT = 17@
     HCKTXTS = 18@
+    MAXVIEWDIST = 19@
     TEMP3 = 29@
     TEMP2 = 30@
     TEMP = 31@
@@ -102,6 +103,7 @@ end
 //==============================================================
 
 0006: INFOTMR = 3000
+0007: MAXVIEWDIST = 400.0
 
 :MAIN_LOOP
 0001: wait 0
@@ -109,16 +111,16 @@ end
 0AB0:   key_pressed 0x79 // F10
 004D: jump_if_false @SKIPKEY
 wait 200
-0039:   ENABLED == 0 // LOCALVAR EQ INT
-004D: jump_if_false @DISABLE
-0006: ENABLED = 1
+000A: ENABLED += 1 // LOCALVAR PLUS INT
 0006: INFOTMR = 0
-0002: jump @SKIPKEY
-:DISABLE
+000B: MAXVIEWDIST += 200.0 // LOCALVAR PLUS FLOAT
+0019:   ENABLED > 5 // LOCALVAR CMP INT
+004D: jump_if_false @SKIPKEY
 0006: ENABLED = 0
+0007: MAXVIEWDIST = 400.0
 0A8C: write_memory NUMVERTICESMEM size 4 value 0 vp 0
 :SKIPKEY
-0039:   ENABLED == 1 // LOCALVAR EQ INT
+0019:   ENABLED > 0 // LOCALVAR CMP INT
 004D: jump_if_false @MAIN_LOOP
 
 00A0: store_actor $PLAYER_ACTOR position_to PX PY PZ
@@ -164,7 +166,7 @@ wait 200
 0087: TEMP = DISTANCE // (float) GLOCALVAR ASSIGNMENT FLOAT
 000F: TEMP3 -= 40.0 // LOCALVAR MINUS FLOAT
 0063: TEMP -= TEMP3  // (float) LOCALVAR MIN FLOAT
-0023:   600.0 > TEMP // LOCALVAR CMP FLOAT
+0025:   MAXVIEWDIST > TEMP // (float) LOCALVAL CMP FLOAT
 004D: jump_if_false @NEXTPTR
 0C29: lerp_ab X1 to PX f 0.7 store_to TEMP
 0C29: lerp_ab Y1 to PY f 0.7 store_to TEMP2
@@ -199,6 +201,15 @@ wait 200
 045A: draw_text_1number 320.0 190.0 'NUMBER' number RNWYCOUNT // ~1~
 0AC6: TEMP = label @INFOSTRING offset
 0C31: draw_text TEMP at_hud_xy 320.0 210.0 font 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
+0340: set_text_draw_RGBA 255 255 255 255
+033F: set_text_draw_letter_size 0.15 0.95
+0342: set_text_draw_centered 0
+081C: draw_text_outline 0 RGBA 0 0 0 255
+060D: draw_text_shadow 0 rgba 0 0 0 255
+0092: TEMP = float MAXVIEWDIST to_integer
+045A: draw_text_1number 320.0 290.0 'NUMBER' number TEMP // ~1~
+0AC6: TEMP = label @INFOSTRING2 offset
+0C31: draw_text TEMP at_hud_xy 320.0 320.0 font 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
 0002: jump @MAIN_LOOP
 
 //==============================================================
@@ -530,6 +541,10 @@ end
 :INFOSTRING
 hex
     "runways_loaded pl_runway_helper_v1" 00
+end
+:INFOSTRING2
+hex
+    "meters_view_distance" 00
 end
 
 0A93: end_custom_thread
