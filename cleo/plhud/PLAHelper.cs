@@ -30,7 +30,7 @@ namespace PLairporthelper
 					else
 					{
 						res += " " + b2h( new byte[] { BitConverter.GetBytes( comment.Length + 1 )[0] } );
-						res += " \"" + comment + "\"";
+						res += " \"" + comment.Replace(' ', '_') + "\"";
 						res += " 00";
 						res += "\r\n";
 					}
