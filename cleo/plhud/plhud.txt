@@ -1,11 +1,11 @@
-{$CLEO}             
+{$CLEO}
 {$NOSOURCE}
 {$O 0C27=5,transform world_xyz %1d% %2d% %3d% to hud_xy %4d% %5d%}
 {$O 0C28=5,transform world_xyz %1d% %2d% %3d% to screen_xy %4d% %5d%}
-{$O 0C29=4,lerp_ab %1d% f %2d% at %3d% store_to %4d%}       
-{$O 0C30=11,draw_text %1d% at_screen_xy %2d% %3d% font %4d% align %5d% RGBA %6d% %7d% %8d% %9d% letter_size %10d% %11d%}  
+{$O 0C29=4,lerp_ab %1d% f %2d% at %3d% store_to %4d%}
+{$O 0C30=11,draw_text %1d% at_screen_xy %2d% %3d% font %4d% align %5d% RGBA %6d% %7d% %8d% %9d% letter_size %10d% %11d%}
 
-03A4: name_thread 'PLHUD00' 
+03A4: name_thread 'PLHUD00'
 
 const
     CURRENT_VERTEX_COUNT = 0@
@@ -21,11 +21,11 @@ const
     PX = 10@
     PY = 11@
     PZ = 12@
-    TXT = 13@ 
+    TXT = 13@
     MX = 14@
     MY = 15@
-    TEMP3 = 29@ 
-    TEMP2 = 30@ 
+    TEMP3 = 29@
+    TEMP2 = 30@
     TEMP = 31@
 end
 
@@ -33,9 +33,9 @@ end
 0AC6: 1@ = label @HUDHOOK offset
 000E: 1@ -= 0x58EAF1
 000E: 1@ -= 0x4
-0A8C: write_memory 0x58EAF0 size 1 value 0xE9 vp 0 // jmp near 
-0A8C: write_memory 0x58EAF1 size 4 value 1@ vp 0 
-0A8C: write_memory 0x58EAF5 size 1 value 0x90 vp 0 // NOP 
+0A8C: write_memory 0x58EAF0 size 1 value 0xE9 vp 0 // jmp near
+0A8C: write_memory 0x58EAF1 size 4 value 1@ vp 0
+0A8C: write_memory 0x58EAF5 size 1 value 0x90 vp 0 // NOP
 
 0AC6: 0@ = label @HUHOOKRETURNJUMP offset
 0006: 1@ = 0x58EAF1
@@ -86,7 +86,7 @@ hex
     58          // pop eax
     58          // pop eax
     58          // pop eax
-    
+
     E9          // jmp near
 end
 :HUHOOKRETURNJUMP
@@ -105,26 +105,26 @@ end
 0AC6: PTR = label @AIRPORTS offset
 
 :NEXTPTR
-0A8D: X1 = read_memory PTR size 4 virtual_protect 0  
+0A8D: X1 = read_memory PTR size 4 virtual_protect 0
 0039:   X1 == 0 // LOCALVAR EQ INT
-004D: jump_if_false @MLY  
+004D: jump_if_false @MLY
 0A8C: write_memory NUMVERTICESMEM size 4 value CURRENT_VERTEX_COUNT vp 0
 0002: jump @MAIN_LOOP
 :MLY
 000A: PTR += 4 // LOCALVAR PLUS INT
-0A8D: Y1 = read_memory PTR size 4 virtual_protect 0 
+0A8D: Y1 = read_memory PTR size 4 virtual_protect 0
 000A: PTR += 4 // LOCALVAR PLUS INT
-0A8D: Z1 = read_memory PTR size 4 virtual_protect 0 
+0A8D: Z1 = read_memory PTR size 4 virtual_protect 0
 000A: PTR += 4 // LOCALVAR PLUS INT
-0A8D: X2 = read_memory PTR size 4 virtual_protect 0 
+0A8D: X2 = read_memory PTR size 4 virtual_protect 0
 000A: PTR += 4 // LOCALVAR PLUS INT
-0A8D: Y2 = read_memory PTR size 4 virtual_protect 0 
+0A8D: Y2 = read_memory PTR size 4 virtual_protect 0
 000A: PTR += 4 // LOCALVAR PLUS INT
-0A8D: Z2 = read_memory PTR size 4 virtual_protect 0 
-000A: PTR += 4 // LOCALVAR PLUS INT     
+0A8D: Z2 = read_memory PTR size 4 virtual_protect 0
+000A: PTR += 4 // LOCALVAR PLUS INT
 0A8D: TEMP = read_memory PTR size 1 virtual_protect 0
 000A: PTR += 1 // LOCALVAR PLUS INT
-0085: TXT = PTR // (int) LOCALVAR ASSIGNMENT INT  
+0085: TXT = PTR // (int) LOCALVAR ASSIGNMENT INT
 005A: PTR += TEMP  // (int) LOCALVAR PLUS INT
 
 0C29: lerp_ab X1 to X2 f 0.5 store_to MX
@@ -135,10 +135,10 @@ end
 0025:   DISTANCE > TEMP3 // (float) LOCALVAL CMP FLOAT
 004D: jump_if_false @NEXTPTR
 
-0087: TEMP = DISTANCE // (float) GLOCALVAR ASSIGNMENT FLOAT   
+0087: TEMP = DISTANCE // (float) GLOCALVAR ASSIGNMENT FLOAT
 000F: TEMP3 -= 40.0 // LOCALVAR MINUS FLOAT
 0063: TEMP -= TEMP3  // (float) LOCALVAR MIN FLOAT
-0023:   600.0 > TEMP // LOCALVAR CMP FLOAT     
+0023:   600.0 > TEMP // LOCALVAR CMP FLOAT
 004D: jump_if_false @NEXTPTR
 0C29: lerp_ab X1 to PX f 0.7 store_to TEMP
 0C29: lerp_ab Y1 to PY f 0.7 store_to TEMP2
@@ -157,9 +157,9 @@ end
 004D: jump_if_false @NEXTPTR
 00C2:   sphere_onscreen X2 Y2 Z2 radius 5.0
 004D: jump_if_false @NEXTPTR
-:NOTCLOSE  
+:NOTCLOSE
 */
-0050: gosub @ADDLINE   
+0050: gosub @ADDLINE
 0002: jump @NEXTPTR
 
 //==============================================================
@@ -182,7 +182,7 @@ return
 0340: set_text_draw_RGBA 50 50 255 255
 033F: set_text_draw_letter_size 0.15 0.95
 0342: set_text_draw_centered 1
-081C: draw_text_outline 1 RGBA 0 0 0 255   
+081C: draw_text_outline 1 RGBA 0 0 0 255
 045A: draw_text_1number TEMP TEMP2 GXT 'NUMBER' number DISTANCE // ~1~
 0C30: draw_text TXT at_screen_xy X1 Y1 font 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
 
@@ -194,10 +194,10 @@ end
 const
     LINESIZE = 28
 end
-0085: TEMP2 = CURRENT_VERTEX_COUNT // (int) LOCALVAR ASSIGNMENT INT  
+0085: TEMP2 = CURRENT_VERTEX_COUNT // (int) LOCALVAR ASSIGNMENT INT
 0012: TEMP2 *= LINESIZE
 005A: LINES += TEMP2 // (int)
-000A: CURRENT_VERTEX_COUNT += 2  
+000A: CURRENT_VERTEX_COUNT += 2
 
 0A8C: write_memory LINES size 4 value X1 vp 0
 000A: LINES += 4 // LOCALVAR PLUS INT
@@ -329,7 +329,6 @@ hex
     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-    
 end
 
 :AIRPORTS
