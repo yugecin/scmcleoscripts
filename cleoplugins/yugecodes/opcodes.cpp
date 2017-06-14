@@ -7,7 +7,8 @@ BOOL InitOpcodes()
 		CLEO_RegisterOpcode(0x0c26, &Op_0C26) &&
 		CLEO_RegisterOpcode(0x0C27, &Op_0C27) &&
 		CLEO_RegisterOpcode(0x0C28, &Op_0C28) &&
-		CLEO_RegisterOpcode(0x0C29, &Op_0C29);
+		CLEO_RegisterOpcode(0x0C29, &Op_0C29) &&
+		CLEO_RegisterOpcode(0x0C30, &Op_0C30);
 }
 
 // 0C26: sign_extend 1@ store_to 2@
@@ -63,3 +64,16 @@ OpcodeResult WINAPI Op_0C29(CScriptThread *thread)
 	CLEO_SetFloatOpcodeParam(thread, a);
 	return OR_CONTINUE;
 }
+
+// 0C30: draw_text 1@ at 2@ 3@
+// {$O 0C30=3,draw_text %1d% at %2d% %3d%}
+OpcodeResult WINAPI Op_0C30(CScriptThread *thread)
+{
+	const char *text = (char*)CLEO_GetIntOpcodeParam(thread);
+	float x = CLEO_GetFloatOpcodeParam(thread);
+	float y = CLEO_GetFloatOpcodeParam(thread);
+
+	((void (__cdecl *)(float x, float y, const char* text))0x71A700)(x, y, text);
+
+	return OR_CONTINUE;
+} 
