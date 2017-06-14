@@ -27,6 +27,7 @@ const
     MY = 15@
     ENABLED = 16@
     RNWYCOUNT = 17@
+    HCKTXTS = 18@
     TEMP3 = 29@
     TEMP2 = 30@
     TEMP = 31@
@@ -126,6 +127,7 @@ wait 200
 0AC6: PTR = label @AIRPORTS offset
 
 0006: RNWYCOUNT = 0
+0006: HCKTXTS = 0
 
 :NEXTPTR
 0A8D: X1 = read_memory PTR size 4 virtual_protect 0
@@ -221,7 +223,11 @@ return
 0342: set_text_draw_centered 1
 081C: draw_text_outline 1 RGBA 0 0 0 255
 045A: draw_text_1number TEMP TEMP2 GXT 'NUMBER' number DISTANCE // ~1~
+001B:   6 > HCKTXTS // LOCALVAR CMP INT
+004D: jump_if_false @2MUCHTEXTS 
 0C30: draw_text TXT at_screen_xy X1 Y1 font 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
+000A: HCKTXTS += 1 // LOCALVAR PLUS INT
+:2MUCHTEXTS
 
 const
     LINES = TEMP
