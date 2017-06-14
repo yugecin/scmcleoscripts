@@ -1,5 +1,6 @@
 #include "opcodes.h"
 #include "transform.h"
+#include "text.h"
 
 BOOL InitOpcodes()
 {
@@ -8,7 +9,9 @@ BOOL InitOpcodes()
 		CLEO_RegisterOpcode(0x0C27, &Op_0C27) &&
 		CLEO_RegisterOpcode(0x0C28, &Op_0C28) &&
 		CLEO_RegisterOpcode(0x0C29, &Op_0C29) &&
-		CLEO_RegisterOpcode(0x0C30, &Op_0C30);
+		CLEO_RegisterOpcode(0x0C30, &Op_0C30) &&
+		CLEO_RegisterOpcode(0x0C31, &Op_0C31) &&
+		true;
 }
 
 // 0C26: sign_extend 1@ store_to 2@
@@ -65,15 +68,16 @@ OpcodeResult WINAPI Op_0C29(CScriptThread *thread)
 	return OR_CONTINUE;
 }
 
-// 0C30: draw_text 1@ at 2@ 3@
-// {$O 0C30=3,draw_text %1d% at %2d% %3d%}
+// 0C30: draw_text 1@ at_screen_xy 2@ 3@ font 4@ align 5@ RGBA 6@ 7@ 8@ 9@ letter_size 10@ 11@
+// {$O 0C30=11,draw_text %1d% at_screen_xy %2d% %3d% font %4d% align %5d% RGBA %6d% %7d% %8d% %9d% letter_size %10d% %11d%}
 OpcodeResult WINAPI Op_0C30(CScriptThread *thread)
 {
-	const char *text = (char*)CLEO_GetIntOpcodeParam(thread);
-	float x = CLEO_GetFloatOpcodeParam(thread);
-	float y = CLEO_GetFloatOpcodeParam(thread);
+	return DrawText(thread, false);
+} 
 
-	((void (__cdecl *)(float x, float y, const char* text))0x71A700)(x, y, text);
-
-	return OR_CONTINUE;
+// 0C30: draw_text 1@ at_hud_xy 2@ 3@ font 4@ align 5@ RGBA 6@ 7@ 8@ 9@ letter_size 10@ 11@
+// {$O 0C30=11,draw_text %1d% at_hud_xy %2d% %3d% font %4d% align %5d% RGBA %6d% %7d% %8d% %9d% letter_size %10d% %11d%}
+OpcodeResult WINAPI Op_0C31(CScriptThread *thread)
+{
+	return DrawText(thread, true);
 } 
