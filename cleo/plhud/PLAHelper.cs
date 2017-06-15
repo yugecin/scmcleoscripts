@@ -1,12 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
-namespace PLairporthelper
+namespace PLAHConsole
 {
 	class PLAHelper
 	{
 
-		public static string convert(string savedpositions) {
+		static void Main( string[] args )
+		{
+			StreamReader i = new StreamReader("savedpositions.txt");
+			StreamWriter o = new StreamWriter( "result.txt", false );
+			o.Write( convert( i.ReadToEnd() ) );
+			i.Close();
+			o.Close();
+		}
+
+		static string convert(string savedpositions) {
 			string res = "";
 			string[] lines = savedpositions.Split('\n', '\r');
 			string __l = "";
@@ -44,12 +56,12 @@ namespace PLairporthelper
 			return res;
 		}
 
-		public static string f2h(float fNum)
+		static string f2h(float fNum)
 		{
 			return b2h(BitConverter.GetBytes( fNum ));
 		}
 
-		public static string b2h( byte[] b )
+		static string b2h( byte[] b )
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -59,6 +71,5 @@ namespace PLairporthelper
 
 			return sb.ToString();
 		}
-
 	}
 }
