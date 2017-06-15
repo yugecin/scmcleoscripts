@@ -68,15 +68,15 @@ OpcodeResult WINAPI Op_0C29(CScriptThread *thread)
 	return OR_CONTINUE;
 }
 
-// 0C30: draw_text 1@ at_screen_xy 2@ 3@ font 4@ align 5@ RGBA 6@ 7@ 8@ 9@ letter_size 10@ 11@
-// {$O 0C30=11,draw_text %1d% at_screen_xy %2d% %3d% font %4d% align %5d% RGBA %6d% %7d% %8d% %9d% letter_size %10d% %11d%}
+// 0C30: draw_text 1@ at_screen_xy 2@ 3@ font 4@ proportional 5@ align 6@ RGBA 7@ 8@ 9@ 10@ letter_size 11@ 12@
+// {$O 0C30=12,draw_text %1d% at_screen_xy %2d% %3d% font %4d% proportional %5d% align %6d% RGBA %7d% %8d% %9d% %10d% letter_size %11d% %12d%}
 OpcodeResult WINAPI Op_0C30(CScriptThread *thread)
 {
 	return DrawText(thread, false);
 } 
 
-// 0C31: draw_text 1@ at_hud_xy 2@ 3@ font 4@ align 5@ RGBA 6@ 7@ 8@ 9@ letter_size 10@ 11@
-// {$O 0C31=11,draw_text %1d% at_hud_xy %2d% %3d% font %4d% align %5d% RGBA %6d% %7d% %8d% %9d% letter_size %10d% %11d%}
+// 0C31: draw_text 1@ at_hud_xy 2@ 3@ font 4@ proportional 5@ align 6@ RGBA 7@ 8@ 9@ 10@ letter_size 11@ 12@
+// {$O 0C31=12,draw_text %1d% at_hud_xy %2d% %3d% font %4d% proportional %5d% align %6d% RGBA %7d% %8d% %9d% %10d% letter_size %11d% %12d%}
 OpcodeResult WINAPI Op_0C31(CScriptThread *thread)
 {
 	return DrawText(thread, true);
