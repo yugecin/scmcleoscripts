@@ -163,6 +163,11 @@ end
 0006: RNWYCOUNT = 0
 0006: HCKTXTS = 0
 
+001B:   2000 > INFOTMR // LOCALVAR CMP INT
+004D: jump_if_false @NOINFO
+0006: HCKTXTS = 2
+:NOINFO
+
 :NEXTPTR
 0A8D: X1 = read_memory PTR size 4 virtual_protect 0
 0039:   X1 == 0 // LOCALVAR EQ INT
