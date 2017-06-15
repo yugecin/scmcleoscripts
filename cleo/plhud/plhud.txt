@@ -3,8 +3,8 @@
 {$O 0C27=5,transform world_xyz %1d% %2d% %3d% to hud_xy %4d% %5d%}
 {$O 0C28=5,transform world_xyz %1d% %2d% %3d% to screen_xy %4d% %5d%}
 {$O 0C29=4,lerp_ab %1d% f %2d% at %3d% store_to %4d%}
-{$O 0C30=11,draw_text %1d% at_screen_xy %2d% %3d% font %4d% align %5d% RGBA %6d% %7d% %8d% %9d% letter_size %10d% %11d%}
-{$O 0C31=11,draw_text %1d% at_hud_xy %2d% %3d% font %4d% align %5d% RGBA %6d% %7d% %8d% %9d% letter_size %10d% %11d%}
+{$O 0C30=12,draw_text %1d% at_screen_xy %2d% %3d% font %4d% proportional %5d% align %6d% RGBA %7d% %8d% %9d% %10d% letter_size %11d% %12d%}
+{$O 0C31=12,draw_text %1d% at_hud_xy %2d% %3d% font %4d% proportional %5d% align %6d% RGBA %7d% %8d% %9d% %10d% letter_size %11d% %12d%}
 
 03A4: name_thread 'PLHUD00'
 
@@ -211,18 +211,20 @@ end
 0342: set_text_draw_centered 0
 081C: draw_text_outline 0 RGBA 0 0 0 255
 060D: draw_text_shadow 0 rgba 0 0 0 255
+0348: enable_text_draw_proportional 0
 045A: draw_text_1number 320.0 190.0 'NUMBER' number RNWYCOUNT // ~1~
 0AC6: TEMP = label @INFOSTRING offset
-0C31: draw_text TEMP at_hud_xy 320.0 210.0 font 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
+0C31: draw_text TEMP at_hud_xy 320.0 210.0 font 1 proportional 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
 0340: set_text_draw_RGBA 255 255 255 255
 033F: set_text_draw_letter_size 0.15 0.95
 0342: set_text_draw_centered 0
 081C: draw_text_outline 0 RGBA 0 0 0 255
 060D: draw_text_shadow 0 rgba 0 0 0 255
 0092: TEMP = float MAXVIEWDIST to_integer
+0348: enable_text_draw_proportional 0
 045A: draw_text_1number 320.0 290.0 'NUMBER' number TEMP // ~1~
 0AC6: TEMP = label @INFOSTRING2 offset
-0C31: draw_text TEMP at_hud_xy 320.0 320.0 font 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
+0C31: draw_text TEMP at_hud_xy 320.0 320.0 font 1 proportional 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
 0002: jump @MAIN_LOOP
 
 //==============================================================
@@ -246,10 +248,11 @@ return
 033F: set_text_draw_letter_size 0.15 0.95
 0342: set_text_draw_centered 1
 081C: draw_text_outline 1 RGBA 0 0 0 255
+0348: enable_text_draw_proportional 0
 045A: draw_text_1number TEMP TEMP2 GXT 'NUMBER' number DISTANCE // ~1~
 001B:   6 > HCKTXTS // LOCALVAR CMP INT
 004D: jump_if_false @2MUCHTEXTS 
-0C30: draw_text TXT at_screen_xy X1 Y1 font 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
+0C30: draw_text TXT at_screen_xy X1 Y1 font 1 proportional 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
 000A: HCKTXTS += 1 // LOCALVAR PLUS INT
 :2MUCHTEXTS
 
