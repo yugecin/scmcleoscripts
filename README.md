@@ -10,6 +10,7 @@
 [dont fall of bike](/cleo/nofallofbike)  
 [snapshots ESP](/cleo/snapshots)  
 [vice city styled weapon pickups](/cleo/vcweaponpicks)  
+[pilot's life runways hud](/cleo/plhud)  
 
 ### SCM scripts
 [train editing](/scm/trains)  
