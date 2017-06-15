@@ -24,7 +24,7 @@ OpcodeResult DrawText(CScriptThread *thread, bool hudcoordinates) {
 
 	((void (__cdecl *)(BYTE font))0x719490)(font);
 	((void (__cdecl *)(char proportional))0x7195B0)(proportional);
-	//((void (__cdecl *)(BYTE align))0x719610)(align);
+	((void (__cdecl *)(BYTE align))0x719610)(align);
 	((void (__cdecl *)(float xsize, float ysize))0x719380)(xsize, ysize);
 	((void (__cdecl *)(DWORD rgba))0x719430)((r) | (g << 8) | (b << 16) | (a << 24));
 	((void (__cdecl *)(float x, float y, const char* text))0x71A700)(x, y, text);
