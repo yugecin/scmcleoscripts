@@ -2,6 +2,7 @@
 HUD kind of thing that shows runways, specifically for [the pilot's life SA:MP server](http://thepilotslife.com).
 
 ![preview](pic.png)
+![preview](pic2.png)
 
 [short demo video](https://youtu.be/4AXkKAutmwo)
 
