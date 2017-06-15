@@ -11,6 +11,10 @@ BOOL InitOpcodes()
 		CLEO_RegisterOpcode(0x0C29, &Op_0C29) &&
 		CLEO_RegisterOpcode(0x0C30, &Op_0C30) &&
 		CLEO_RegisterOpcode(0x0C31, &Op_0C31) &&
+		CLEO_RegisterOpcode(0x0C32, &Op_0C32) &&
+		CLEO_RegisterOpcode(0x0C33, &Op_0C33) &&
+		CLEO_RegisterOpcode(0x0C34, &Op_0C34) &&
+		CLEO_RegisterOpcode(0x0C35, &Op_0C35) &&
 		true;
 }
 
@@ -80,4 +84,52 @@ OpcodeResult WINAPI Op_0C30(CScriptThread *thread)
 OpcodeResult WINAPI Op_0C31(CScriptThread *thread)
 {
 	return DrawText(thread, true);
-} 
+}
+
+// 0C32: condition_int 1@ EQ 2@ if_true @TRUE if_false @FALSE store_to 3@
+// {$O 0C32=5,condition_int %1d% EQ %2d% if_true %3d% if_false %4d% store_to %5d%}
+OpcodeResult WINAPI Op_0C32(CScriptThread *thread)
+{
+	int a = CLEO_GetIntOpcodeParam(thread);
+	int b = CLEO_GetIntOpcodeParam(thread);
+	int jmptrue = CLEO_GetIntOpcodeParam(thread);
+	int jmpelse = CLEO_GetIntOpcodeParam(thread);
+	CLEO_SetIntOpcodeParam(thread, a == b ? jmptrue : jmpelse);
+	return OR_CONTINUE;
+}
+
+// 0C33: condition_float 1@ EQ 2@ if_true @TRUE if_false @FALSE store_to 3@
+// {$O 0C33=5,condition_float %1d% EQ %2d% if_true %3d% if_false %4d% store_to %5d%}
+OpcodeResult WINAPI Op_0C33(CScriptThread *thread)
+{
+	float a = CLEO_GetFloatOpcodeParam(thread);
+	float b = CLEO_GetFloatOpcodeParam(thread);
+	int jmptrue = CLEO_GetIntOpcodeParam(thread);
+	int jmpelse = CLEO_GetIntOpcodeParam(thread);
+	CLEO_SetIntOpcodeParam(thread, a == b ? jmptrue : jmpelse);
+	return OR_CONTINUE;
+}
+
+// 0C34: condition_int 1@ GT 2@ if_true @TRUE if_false @FALSE store_to 3@
+// {$O 0C34=5,condition_int %1d% GT %2d% if_true %3d% if_false %4d% store_to %5d%}
+OpcodeResult WINAPI Op_0C34(CScriptThread *thread)
+{
+	int a = CLEO_GetIntOpcodeParam(thread);
+	int b = CLEO_GetIntOpcodeParam(thread);
+	int jmptrue = CLEO_GetIntOpcodeParam(thread);
+	int jmpelse = CLEO_GetIntOpcodeParam(thread);
+	CLEO_SetIntOpcodeParam(thread, a > b ? jmptrue : jmpelse);
+	return OR_CONTINUE;
+}
+
+// 0C35: condition_float 1@ GT 2@ if_true @TRUE if_false @FALSE store_to 3@
+// {$O 0C35=5,condition_float %1d% GT %2d% if_true %3d% if_false %4d% store_to %5d%}
+OpcodeResult WINAPI Op_0C35(CScriptThread *thread)
+{
+	float a = CLEO_GetFloatOpcodeParam(thread);
+	float b = CLEO_GetFloatOpcodeParam(thread);
+	int jmptrue = CLEO_GetIntOpcodeParam(thread);
+	int jmpelse = CLEO_GetIntOpcodeParam(thread);
+	CLEO_SetIntOpcodeParam(thread, a > b ? jmptrue : jmpelse);
+	return OR_CONTINUE;
+}
