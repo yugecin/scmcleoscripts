@@ -11,6 +11,7 @@
 [snapshots ESP](/cleo/snapshots)  
 [vice city styled weapon pickups](/cleo/vcweaponpicks)  
 [pilot's life runways hud](/cleo/plhud)  
+[autopilot](/cleo/autopilot)  
 
 ### SCM scripts
 [train editing](/scm/trains)  

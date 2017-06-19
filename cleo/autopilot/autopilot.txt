@@ -1,0 +1,131 @@
+{$CLEO .cs}
+{$NOSOURCE} 
+
+03A4: name_thread 'AUTOPIL'
+
+// 0xB73458 pad
+// thiscall short CPad::GetSteeringUpDown(void) 0x53FBD0   
+// thiscall short CPad::GetAccelerate(void) 0x5403F0
+// thiscall short CPad::GetSteeringLeftRight(void) 0x53FB80
+
+:MAIN_LOOP
+0001: wait 0
+
+0449:   actor $PLAYER_ACTOR in_a_car
+004D: jump_if_false @MAIN_LOOP
+03C0: 0@ = actor $PLAYER_ACTOR car
+0050: gosub @KEY
+
+0019:   10@ > 0 // LOCALVAR CMP INT
+004D: jump_if_false @MAIN_LOOP
+
+/*
+00AA: store_car 0@ position_to 3@ 4@ 5@
+03F0: enable_text_draw 0
+0340: set_text_draw_RGBA 255 255 255 255
+033F: set_text_draw_letter_size 0.15 0.95
+0342: set_text_draw_centered 0
+081C: draw_text_outline 0 RGBA 0 0 0 255
+060D: draw_text_shadow 0 rgba 0 0 0 255
+0092: 6@ = float 5@ to_integer
+0348: enable_text_draw_proportional 0
+045A: draw_text_1number 320.0 290.0 'NUMBER' number 6@ // ~1~
+*/
+
+077D: 1@ = car 0@ x_angle
+
+0021:   1@ > 180.0 // LOCALVAR CMP FLOAT
+004D: jump_if_false @NOCORRECT
+000F: 1@ -= 360.0 // LOCALVAR MINUS FLOAT
+:NOCORRECT
+
+0021:   1@ > -2.0 // LOCALVAR CMP FLOAT
+004D: jump_if_false @GOUP
+0050: gosub @DOWN  
+0002: jump @FINISHUPDOWN
+:GOUP    
+0023:   -5.0 > 1@ // LOCALVAR CMP FLOAT
+004D: jump_if_false @FINISHUPDOWN
+0050: gosub @UP
+:FINISHUPDOWN
+
+06BE: 1@ = car 0@ y_angle
+
+8043:   not 1@ == 0.0 // LOCALVAR EQ FLOAT
+004D: jump_if_false @FINISHLEFTRIGHT
+0021:   1@ > 0.0 // LOCALVAR CMP FLOAT
+004D: jump_if_false @GOLEFT
+0050: gosub @RIGHT  
+0002: jump @FINISHLEFTRIGHT
+:GOLEFT    
+0050: gosub @LEFT
+:FINISHLEFTRIGHT
+
+0001: wait 0             
+0050: gosub @RESTOREUPDOWN
+0050: gosub @RESTORELEFTRIGHT
+0006: 32@ = 0 // LOCALVAR ASSIGNMENT INT
+:WAIT_LOOP
+0001: wait 0
+0050: gosub @KEY
+0019:   32@ > 50 // LOCALVAR CMP INT
+004D: jump_if_false @WAIT_LOOP
+
+0002: jump @MAIN_LOOP
+
+:KEY
+0AB0:   key_pressed 0x7B // F12
+004D: jump_if_false @SKIPKEY
+0001: wait 200
+0019:   10@ > 0 // LOCALVAR CMP INT
+004D: jump_if_false @ENABLE
+0006: 10@ = 0
+0050: gosub @RESTOREACCEL 
+0002: jump @SKIPKEY
+:ENABLE
+0006: 10@ = 1                                                     
+0050: gosub @ACCELERATE
+:SKIPKEY
+0051: return
+
+:RESTOREACCEL
+0A8C: write_memory 0x5403FA size 4 value 0x0A81B70F virtual_protect 0
+0A8C: write_memory 0x5403FE size 1 value 0x01 virtual_protect 0
+0051: return
+
+:RESTOREUPDOWN
+0A8C: write_memory 0x53FBDA size 4 value 0x0A81B70F virtual_protect 0
+0A8C: write_memory 0x53FBDE size 1 value 0x01 virtual_protect 0
+0051: return
+
+:RESTORELEFTRIGHT
+0A8C: write_memory 0x53FB8A size 4 value 0x0A81B70F virtual_protect 0
+0A8C: write_memory 0x53FB8E size 1 value 0x01 virtual_protect 0
+0051: return
+
+:ACCELERATE
+0A8C: write_memory 0x5403FA size 4 value 0x00FFB866 virtual_protect 0 // mov ax, ff
+0A8C: write_memory 0x5403FE size 1 value 0xC3 virtual_protect 0 // retn
+0051: return
+
+:DOWN
+0A8C: write_memory 0x53FBDA size 4 value 0xFFA0B866 virtual_protect 0 // mov ax, ff80
+0A8C: write_memory 0x53FBDE size 1 value 0xC3 virtual_protect 0 // retn
+0051: return
+
+:UP
+0A8C: write_memory 0x53FBDA size 4 value 0x000BB866 virtual_protect 0 // mov ax, 80
+0A8C: write_memory 0x53FBDE size 1 value 0xC3 virtual_protect 0 // retn
+0051: return
+
+:LEFT
+0A8C: write_memory 0x53FB8A size 4 value 0xFFF0B866 virtual_protect 0 // mov ax, ff80
+0A8C: write_memory 0x53FB8E size 1 value 0xC3 virtual_protect 0 // retn
+0051: return
+
+:RIGHT
+0A8C: write_memory 0x53FB8A size 4 value 0x000BB866 virtual_protect 0 // mov ax, 80
+0A8C: write_memory 0x53FB8E size 1 value 0xC3 virtual_protect 0 // retn
+0051: return
+
+0A93: end_custom_thread  
