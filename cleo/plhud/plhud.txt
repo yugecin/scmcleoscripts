@@ -32,10 +32,13 @@ const
     CX = 20@
     CY = 21@
     SMARTMODE = 22@
+    CLOSESTAS = 23@
+    ASPTR = 24@
     TEMP3 = 29@
     TEMP2 = 30@
     TEMP = 31@
     INFOTMR = 32@
+    FIXTMR = 33@
 end
 
 //==============================================================
@@ -65,7 +68,7 @@ end
 
 //==============================================================
 
-jump @MAIN_LOOP
+jump @SKIPHOOK
 :HUDHOOK
 hex
     81          // sub
@@ -102,12 +105,13 @@ end
 hex
     00 00 00 00
 end
+:SKIPHOOK
 
 //==============================================================
 
 0006: INFOTMR = 3000
 0006: SMARTMODE = 1
-0007: MAXVIEWDIST = 1000.0
+0007: MAXVIEWDIST = 1500.0
 
 :MAIN_LOOP
 0001: wait 0
@@ -140,13 +144,10 @@ end
 004D: jump_if_false @ENABLE
 0006: ENABLED = 0
 0A8C: write_memory NUMVERTICESMEM size 4 value 0 vp 0
+0050: gosub @FIXAIRSTRIP
 0002: jump @SKIPKEY
 :ENABLE
 0006: ENABLED = 1
-0023:   400.0 > MAXVIEWDIST // LOCALVAR CMP FLOAT
-004D: jump_if_false @SKIPKEY
-0007: MAXVIEWDIST = 1500.0
-0006: SMARTMODE = 1
 :SKIPKEY
 0019:   ENABLED > 0 // LOCALVAR CMP INT
 004D: jump_if_false @MAIN_LOOP
@@ -155,6 +156,20 @@ end
 004D: jump_if_false @GETCP
 :GOTCP
 
+// === fix stuff..
+0019:   FIXTMR > 10000 // LOCALVAR CMP INT
+004D: jump_if_false @FIX1
+0006: FIXTMR = 0
+0A8C: write_memory 0x587D4B size 1 value 4 vp 0
+0002: jump @NOFIX
+:FIX1
+0019:   FIXTMR > 5000 // LOCALVAR CMP INT
+004D: jump_if_false @NOFIX
+0006: FIXTMR = 11000
+0A8C: write_memory 0x587D4B size 1 value 255 vp 0
+:NOFIX
+// ===
+
 00A0: store_actor $PLAYER_ACTOR position_to PX PY PZ
 03F0: enable_text_draw 0
 0006: CURRENT_VERTEX_COUNT = 0 // LOCALVAR ASSIGNMENT INT
@@ -162,6 +177,9 @@ end
 
 0006: RNWYCOUNT = 0
 0006: HCKTXTS = 0
+0006: ASPTR = 0x8D06E0
+0007: CLOSESTAS = 100000.0
+0050: gosub @BREAKAIRSTRIP
 
 001B:   2000 > INFOTMR // LOCALVAR CMP INT
 004D: jump_if_false @NOINFO
@@ -197,8 +215,6 @@ end
 0509: TEMP3 = distance_between_XY MX MY and_XY X1 Y1
 000B: TEMP3 += 40.0 // LOCALVAR PLUS FLOAT
 0509: DISTANCE = distance_between_XY MX MY and_XY PX PY
-0025:   DISTANCE > TEMP3 // (float) LOCALVAL CMP FLOAT
-004D: jump_if_false @NEXTPTR
 
 0039:   SMARTMODE == 1 // LOCALVAR EQ INT
 004D: jump_if_false @NOSMART
@@ -209,7 +225,39 @@ end
 000F: TEMP3 -= 100.0 // LOCALVAR MINUS FLOAT
 8043:   not CX == 0.0 // LOCALVAR EQ FLOAT
 004D: jump_if_false @NEXTPTR
-:NOSMART
+:NOSMART 
+
+0039:   SMARTMODE == 0 // LOCALVAR EQ INT
+004D: jump_if_false @WRITEAIRSTRIP
+0025:   CLOSESTAS > DISTANCE // (float) LOCALVAL CMP FLOAT
+004D: jump_if_false @NOAS
+0087: CLOSESTAS = DISTANCE // (float) GLOCALVAR ASSIGNMENT FLOAT
+:WRITEAIRSTRIP
+0A8C: write_memory ASPTR size 4 value MX vp 0
+000A: ASPTR += 4 // LOCALVAR PLUS INT
+0A8C: write_memory ASPTR size 4 value MY vp 0
+000A: ASPTR += 4 // LOCALVAR PLUS INT
+0087: TEMP = X1 // (float) GLOCALVAR ASSIGNMENT FLOAT
+0087: TEMP2 = Y1 // (float) GLOCALVAR ASSIGNMENT FLOAT
+0063: TEMP -= X2  // (float) LOCALVAR MIN FLOAT
+0063: TEMP2 -= Y2  // (float) LOCALVAR MIN FLOAT
+0604: get_Z_angle_for_point TEMP TEMP2 store_to TEMP
+000F: TEMP -= 90.0 // LOCALVAR MINUS FLOAT
+0007: TEMP2 = 360.0 // LOCALVAR ASSIGNMENT FLOAT
+0063: TEMP2 -= TEMP  // (float) LOCALVAR MIN FLOAT
+//0656: get_angle TEMP2 absolute_degrees_to TEMP2
+0A8C: write_memory ASPTR size 4 value TEMP2 vp 0
+000A: ASPTR += 4 // LOCALVAR PLUS INT
+0509: TEMP = distance_between_XY X1 Y1 and_XY X2 Y2
+0A8C: write_memory ASPTR size 4 value TEMP vp 0
+000A: ASPTR += 4 // LOCALVAR PLUS INT
+0019:   ASPTR > 0x8D0710 // LOCALVAR CMP INT
+004D: jump_if_false @NOAS
+0006: ASPTR = 0x8D06E0
+:NOAS
+
+0025:   DISTANCE > TEMP3 // (float) LOCALVAL CMP FLOAT
+004D: jump_if_false @NEXTPTR
 
 0087: TEMP = DISTANCE // (float) GLOCALVAR ASSIGNMENT FLOAT
 000F: TEMP3 -= 40.0 // LOCALVAR MINUS FLOAT
@@ -281,6 +329,34 @@ end
 000A: PTR += 4 // LOCALVAR PLUS INT
 0A8D: CY = read_memory PTR size 4 virtual_protect 0
 0002: jump @GOTCP
+
+//==============================================================
+
+:BREAKAIRSTRIP
+0A8C: write_memory 0x8D06E0 size 4 value 200000.0 vp 0
+0A8C: write_memory 0x8D06F0 size 4 value 200000.0 vp 0
+0A8C: write_memory 0x8D0700 size 4 value 200000.0 vp 0
+0A8C: write_memory 0x8D0710 size 4 value 200000.0 vp 0
+0051: return
+
+:FIXAIRSTRIP
+0A8C: write_memory 0x8D06E0 size 4 value 1750.0 vp 0
+0A8C: write_memory 0x8D06E4 size 4 value -2494.0 vp 0
+0A8C: write_memory 0x8D06E8 size 4 value 180.0 vp 0
+0A8C: write_memory 0x8D06EC size 4 value 1000.0 vp 0
+0A8C: write_memory 0x8D06F0 size 4 value -1373.0 vp 0
+0A8C: write_memory 0x8D06F4 size 4 value 120.0 vp 0
+0A8C: write_memory 0x8D06F8 size 4 value 315.0 vp 0
+0A8C: write_memory 0x8D06FC size 4 value 1500.0 vp 0
+0A8C: write_memory 0x8D0700 size 4 value 1478.0 vp 0
+0A8C: write_memory 0x8D0704 size 4 value 1461.0 vp 0
+0A8C: write_memory 0x8D0708 size 4 value 90.0 vp 0
+0A8C: write_memory 0x8D070C size 4 value 1200.0 vp 0
+0A8C: write_memory 0x8D0710 size 4 value 175.0 vp 0
+0A8C: write_memory 0x8D0714 size 4 value 2502.0 vp 0
+0A8C: write_memory 0x8D0718 size 4 value 180.0 vp 0
+0A8C: write_memory 0x8D071C size 4 value 1000.0 vp 0
+0051: return
 
 //==============================================================
 
