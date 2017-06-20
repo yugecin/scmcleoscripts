@@ -1,0 +1,207 @@
+{$CLEO}
+{$NOSOURCE}
+
+03A4: name_thread 'PLRADAR'
+
+const
+    X1 = 1@
+    Y1 = 2@
+    X2 = 3@
+    Y2 = 4@
+    PTR = 5@
+    DISTANCE = 6@
+    PX = 7@
+    PY = 8@
+    MX = 9@
+    MY = 10@
+    ENABLED = 11@
+    CX = 12@
+    CY = 13@
+    SMARTMODE = 14@
+    CLOSESTAS = 15@
+    ASPTR = 16@
+    TEMP3 = 17@
+    TEMP2 = 18@
+    TEMP = 19@
+    FIXTMR = 33@
+end
+
+0006: SMARTMODE = 1
+
+:MAIN_LOOP
+0001: wait 0
+
+0AB0:   key_pressed 0x7A // F11
+004D: jump_if_false @SKIPKEY
+0001: wait 200
+0AB0:   key_pressed 0x47 // G
+004D: jump_if_false @SKIPMODE
+0019:   SMARTMODE > 0 // LOCALVAR CMP INT
+004D: jump_if_false @ENMODE
+0006: SMARTMODE = 0
+0002: jump @SKIPKEY
+:ENMODE
+0006: SMARTMODE = 1
+0002: jump @SKIPKEY
+:SKIPMODE
+0019:   ENABLED > 0 // LOCALVAR CMP INT
+004D: jump_if_false @ENABLE
+0006: ENABLED = 0
+0050: gosub @FIXAIRSTRIP
+0002: jump @SKIPKEY
+:ENABLE
+0006: ENABLED = 1
+:SKIPKEY
+0019:   ENABLED > 0 // LOCALVAR CMP INT
+004D: jump_if_false @MAIN_LOOP
+
+0039:   SMARTMODE == 0 // LOCALVAR EQ INT
+004D: jump_if_false @GETCP
+:GOTCP
+
+// === fix stuff..
+0019:   FIXTMR > 10000 // LOCALVAR CMP INT
+004D: jump_if_false @FIX1
+0006: FIXTMR = 0
+0A8C: write_memory 0x587D4B size 1 value 4 vp 0
+0002: jump @NOFIX
+:FIX1
+0019:   FIXTMR > 5000 // LOCALVAR CMP INT
+004D: jump_if_false @NOFIX
+0006: FIXTMR = 11000
+0A8C: write_memory 0x587D4B size 1 value 255 vp 0
+:NOFIX
+// ===
+
+00A0: store_actor $PLAYER_ACTOR position_to PX PY TEMP
+0AC6: PTR = label @AIRPORTS offset
+
+0006: ASPTR = 0x8D06E0
+0007: CLOSESTAS = 100000.0
+0050: gosub @BREAKAIRSTRIP
+
+:NEXTPTR
+0A8D: X1 = read_memory PTR size 4 virtual_protect 0
+0039:   X1 == 0 // LOCALVAR EQ INT
+004D: jump_if_false @MLY
+0002: jump @MAIN_LOOP
+:MLY
+000A: PTR += 4 // LOCALVAR PLUS INT
+0A8D: Y1 = read_memory PTR size 4 virtual_protect 0
+000A: PTR += 8 // LOCALVAR PLUS INT
+0A8D: X2 = read_memory PTR size 4 virtual_protect 0
+000A: PTR += 4 // LOCALVAR PLUS INT
+0A8D: Y2 = read_memory PTR size 4 virtual_protect 0
+000A: PTR += 8 // LOCALVAR PLUS INT
+0A8D: TEMP = read_memory PTR size 1 virtual_protect 0
+000A: PTR += 1 // LOCALVAR PLUS INT
+005A: PTR += TEMP  // (int) LOCALVAR PLUS INT
+
+0087: MX = X2 // (float) GLOCALVAR ASSIGNMENT FLOAT
+0063: MX -= X1  // (float) LOCALVAR MIN FLOAT
+0013: MX *= 0.5 // LOCALVAR MULTIPLY FLOAT
+005B: MX += X1 // (float) LOCALVAR PLUS FLOAT
+0087: MY = Y2 // (float) GLOCALVAR ASSIGNMENT FLOAT
+0063: MY -= Y1  // (float) LOCALVAR MIN FLOAT
+0013: MY *= 0.5 // LOCALVAR MULTIPLY FLOAT
+005B: MY += Y1 // (float) LOCALVAR PLUS FLOAT
+0509: TEMP3 = distance_between_XY MX MY and_XY X1 Y1
+000B: TEMP3 += 40.0 // LOCALVAR PLUS FLOAT
+0509: DISTANCE = distance_between_XY MX MY and_XY PX PY
+
+0039:   SMARTMODE == 1 // LOCALVAR EQ INT
+004D: jump_if_false @NOSMART
+000B: TEMP3 += 100.0 // LOCALVAR PLUS FLOAT
+0509: TEMP = distance_between_XY MX MY and_XY CX CY
+0025:   TEMP3 > TEMP // (float) LOCALVAL CMP FLOAT
+004D: jump_if_false @NEXTPTR
+000F: TEMP3 -= 100.0 // LOCALVAR MINUS FLOAT
+8043:   not CX == 0.0 // LOCALVAR EQ FLOAT
+004D: jump_if_false @NEXTPTR
+:NOSMART 
+
+0039:   SMARTMODE == 0 // LOCALVAR EQ INT
+004D: jump_if_false @WRITEAIRSTRIP
+0025:   CLOSESTAS > DISTANCE // (float) LOCALVAL CMP FLOAT
+004D: jump_if_false @NOAS
+0087: CLOSESTAS = DISTANCE // (float) GLOCALVAR ASSIGNMENT FLOAT
+:WRITEAIRSTRIP
+0A8C: write_memory ASPTR size 4 value MX vp 0
+000A: ASPTR += 4 // LOCALVAR PLUS INT
+0A8C: write_memory ASPTR size 4 value MY vp 0
+000A: ASPTR += 4 // LOCALVAR PLUS INT
+0087: TEMP = X1 // (float) GLOCALVAR ASSIGNMENT FLOAT
+0087: TEMP2 = Y1 // (float) GLOCALVAR ASSIGNMENT FLOAT
+0063: TEMP -= X2  // (float) LOCALVAR MIN FLOAT
+0063: TEMP2 -= Y2  // (float) LOCALVAR MIN FLOAT
+0604: get_Z_angle_for_point TEMP TEMP2 store_to TEMP
+000F: TEMP -= 90.0 // LOCALVAR MINUS FLOAT
+0007: TEMP2 = 360.0 // LOCALVAR ASSIGNMENT FLOAT
+0063: TEMP2 -= TEMP  // (float) LOCALVAR MIN FLOAT
+//0656: get_angle TEMP2 absolute_degrees_to TEMP2
+0A8C: write_memory ASPTR size 4 value TEMP2 vp 0
+000A: ASPTR += 4 // LOCALVAR PLUS INT
+0509: TEMP = distance_between_XY X1 Y1 and_XY X2 Y2
+0013: TEMP *= 2.0 // LOCALVAR MULTIPLY FLOAT
+0A8C: write_memory ASPTR size 4 value TEMP vp 0
+000A: ASPTR += 4 // LOCALVAR PLUS INT
+0019:   ASPTR > 0x8D0710 // LOCALVAR CMP INT
+004D: jump_if_false @NOAS
+0006: ASPTR = 0x8D06E0
+:NOAS
+
+0002: jump @NEXTPTR
+
+:GETCP
+0006: PTR = 0xC7F158
+0006: TEMP = 0
+0007: CX = 0.0
+:NEXTCP
+001B:   32 > TEMP // LOCALVAR CMP INT
+004D: jump_if_false @GOTCP
+000A: TEMP += 1 // LOCALVAR PLUS INT
+000A: PTR += 2 // LOCALVAR PLUS INT
+0A8D: TEMP2 = read_memory PTR size 1 virtual_protect 0
+000A: PTR += 0x36 // LOCALVAR PLUS INT
+0039:   TEMP2 == 1 // LOCALVAR EQ INT
+004D: jump_if_false @NEXTCP
+000E: PTR -= 0x38 // LOCALVAR MINUS INT
+000A: PTR += 0x10 // LOCALVAR PLUS INT
+0A8D: CX = read_memory PTR size 4 virtual_protect 0
+000A: PTR += 4 // LOCALVAR PLUS INT
+0A8D: CY = read_memory PTR size 4 virtual_protect 0
+0002: jump @GOTCP
+
+//==============================================================
+
+:BREAKAIRSTRIP
+0A8C: write_memory 0x8D06E0 size 4 value 200000.0 vp 0
+0A8C: write_memory 0x8D06F0 size 4 value 200000.0 vp 0
+0A8C: write_memory 0x8D0700 size 4 value 200000.0 vp 0
+0A8C: write_memory 0x8D0710 size 4 value 200000.0 vp 0
+0051: return
+
+:FIXAIRSTRIP
+0A8C: write_memory 0x8D06E0 size 4 value 1750.0 vp 0
+0A8C: write_memory 0x8D06E4 size 4 value -2494.0 vp 0
+0A8C: write_memory 0x8D06E8 size 4 value 180.0 vp 0
+0A8C: write_memory 0x8D06EC size 4 value 1000.0 vp 0
+0A8C: write_memory 0x8D06F0 size 4 value -1373.0 vp 0
+0A8C: write_memory 0x8D06F4 size 4 value 120.0 vp 0
+0A8C: write_memory 0x8D06F8 size 4 value 315.0 vp 0
+0A8C: write_memory 0x8D06FC size 4 value 1500.0 vp 0
+0A8C: write_memory 0x8D0700 size 4 value 1478.0 vp 0
+0A8C: write_memory 0x8D0704 size 4 value 1461.0 vp 0
+0A8C: write_memory 0x8D0708 size 4 value 90.0 vp 0
+0A8C: write_memory 0x8D070C size 4 value 1200.0 vp 0
+0A8C: write_memory 0x8D0710 size 4 value 175.0 vp 0
+0A8C: write_memory 0x8D0714 size 4 value 2502.0 vp 0
+0A8C: write_memory 0x8D0718 size 4 value 180.0 vp 0
+0A8C: write_memory 0x8D071C size 4 value 1000.0 vp 0
+0051: return
+
+//==============================================================
+
+{$INCLUDE ../plhud/plhudairports.txt}
+
+0A93: end_custom_thread
