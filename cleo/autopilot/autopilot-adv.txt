@@ -1,0 +1,202 @@
+{$CLEO .cs}
+{$NOSOURCE} 
+
+03A4: name_thread 'AUTOPIL'
+
+// 0xB73458 pad
+// thiscall short CPad::GetSteeringUpDown(void) 0x53FBD0   
+// thiscall short CPad::GetAccelerate(void) 0x5403F0
+// thiscall short CPad::GetSteeringLeftRight(void) 0x53FB80
+
+const
+    ENABLED = 10@
+    CAR = 0@
+    TEMP1 = 1@
+    TEMP2 = 2@
+    TEMP3 = 3@
+    CX = 4@
+    CY = 5@
+    ANG = 6@
+end
+
+:MAIN_LOOP
+0001: wait 0
+
+0449:   actor $PLAYER_ACTOR in_a_car
+004D: jump_if_false @MAIN_LOOP
+03C0: CAR = actor $PLAYER_ACTOR car
+0050: gosub @KEY
+
+0019:   ENABLED > 0 // LOCALVAR CMP INT
+004D: jump_if_false @MAIN_LOOP
+
+/*
+00AA: store_car 0@ position_to 3@ 4@ 5@
+03F0: enable_text_draw 0
+0340: set_text_draw_RGBA 255 255 255 255
+033F: set_text_draw_letter_size 0.15 0.95
+0342: set_text_draw_centered 0
+081C: draw_text_outline 0 RGBA 0 0 0 255
+060D: draw_text_shadow 0 rgba 0 0 0 255
+0092: 6@ = float 5@ to_integer
+0348: enable_text_draw_proportional 0
+045A: draw_text_1number 320.0 290.0 'NUMBER' number 6@ // ~1~
+*/
+
+077D: ANG = car CAR x_angle
+
+0021:   ANG > 180.0 // LOCALVAR CMP FLOAT
+004D: jump_if_false @NOCORRECT
+000F: ANG -= 360.0 // LOCALVAR MINUS FLOAT
+:NOCORRECT
+00AA: store_car CAR position_to TEMP1 TEMP1 TEMP3
+0023:   200.0 > TEMP3 // LOCALVAR CMP FLOAT
+004D: jump_if_false @HIGHENOUGH
+000F: ANG -= 10.0 // LOCALVAR MINUS FLOAT
+:HIGHENOUGH
+
+0021:   ANG > -2.0 // LOCALVAR CMP FLOAT
+004D: jump_if_false @GOUP
+0050: gosub @DOWN  
+0002: jump @FINISHUPDOWN
+:GOUP    
+0023:   -5.0 > ANG // LOCALVAR CMP FLOAT
+004D: jump_if_false @FINISHUPDOWN
+0050: gosub @UP
+:FINISHUPDOWN
+
+06BE: ANG = car CAR y_angle
+
+0050: gosub @GETCP
+8043:   not CX == 0.0 // LOCALVAR EQ FLOAT
+004D: jump_if_false @NOCP
+00A0: store_actor $PLAYER_ACTOR position_to TEMP1 TEMP2 TEMP3
+0063: TEMP1 -= CX  // (float)
+0063: TEMP2 -= CY  // (float)
+0604: get_Z_angle_for_point TEMP1 TEMP2 store_to TEMP3
+0174: TEMP2 = car CAR Z_angle
+0063: TEMP2 -= TEMP3  // (float)
+000B: TEMP2 += 180.0 // LOCALVAR PLUS FLOAT    
+0656: get_angle TEMP2 absolute_degrees_to TEMP2
+8043:   not TEMP2 == 0.0 // LOCALVAR EQ FLOAT
+004D: jump_if_false @NOCP
+0021:   TEMP2 > 180.0 // LOCALVAR CMP FLOAT
+004D: jump_if_false @NOMINUS
+000F: TEMP2 -= 360.0 // LOCALVAR MINUS FLOAT
+:NOMINUS
+// 35 as initial angle, it is limited by the updaterate & simulated pad value
+0007: TEMP3 = 35.0 // LOCALVAR ASSIGNMENT FLOAT
+0087: TEMP1 = TEMP2 // (float) GLOCALVAR ASSIGNMENT FLOAT
+0097: make TEMP1 absolute_float
+0023:   10.0 > TEMP1 // LOCALVAR CMP FLOAT
+004D: jump_if_false @MAXBANK
+0087: TEMP3 = TEMP1 // (float) GLOCALVAR ASSIGNMENT FLOAT
+0017: TEMP3 /= 2.0 // LOCALVAR DIVIDE FLOAT
+:MAXBANK
+0023:   0.0 > TEMP2 // LOCALVAR CMP FLOAT
+004D: jump_if_false @ADJUST  
+0063: ANG -= TEMP3  // (float) LOCALVAR MIN FLOAT
+0002: jump @NOCP
+:ADJUST    
+005B: ANG += TEMP3 // (float) LOCALVAR PLUS FLOAT
+:NOCP
+
+8043:   not ANG == 0.0 // LOCALVAR EQ FLOAT
+004D: jump_if_false @FINISHLEFTRIGHT
+0021:   ANG > 0.0 // LOCALVAR CMP FLOAT
+004D: jump_if_false @GOLEFT
+0050: gosub @RIGHT  
+0002: jump @FINISHLEFTRIGHT
+:GOLEFT    
+0050: gosub @LEFT
+:FINISHLEFTRIGHT
+
+0001: wait 0             
+0050: gosub @RESTOREUPDOWN
+0050: gosub @RESTORELEFTRIGHT
+0006: 32@ = 0 // LOCALVAR ASSIGNMENT INT
+:WAIT_LOOP
+0001: wait 0
+0050: gosub @KEY
+0019:   32@ > 50 // LOCALVAR CMP INT
+004D: jump_if_false @WAIT_LOOP
+
+0002: jump @MAIN_LOOP
+
+:GETCP
+0006: TEMP1 = 0xC7F158
+0006: TEMP2 = 0
+0007: CX = 0.0
+:NEXTCP
+001B:   32 > TEMP2 // LOCALVAR CMP INT
+004D: jump_if_false @RET
+000A: TEMP2 += 1 // LOCALVAR PLUS INT
+000A: TEMP1 += 2 // LOCALVAR PLUS INT
+0A8D: TEMP3 = read_memory TEMP1 size 1 virtual_protect 0
+000A: TEMP1 += 0x36 // LOCALVAR PLUS INT
+0039:   TEMP3 == 1 // LOCALVAR EQ INT
+004D: jump_if_false @NEXTCP
+000E: TEMP1 -= 0x38 // LOCALVAR MINUS INT
+000A: TEMP1 += 0x10 // LOCALVAR PLUS INT
+0A8D: CX = read_memory TEMP1 size 4 virtual_protect 0
+000A: TEMP1 += 4 // LOCALVAR PLUS INT
+0A8D: CY = read_memory TEMP1 size 4 virtual_protect 0
+:RET
+0051: return
+
+:KEY
+0AB0:   key_pressed 0x7B // F12
+004D: jump_if_false @SKIPKEY
+0001: wait 200
+0019:   ENABLED > 0 // LOCALVAR CMP INT
+004D: jump_if_false @ENABLE
+0006: ENABLED = 0
+0050: gosub @RESTOREACCEL 
+0002: jump @SKIPKEY
+:ENABLE
+0006: ENABLED = 1                                                     
+0050: gosub @ACCELERATE
+:SKIPKEY
+0051: return
+
+:RESTOREACCEL
+0A8C: write_memory 0x5403FA size 4 value 0x0A81B70F virtual_protect 0
+0A8C: write_memory 0x5403FE size 1 value 0x01 virtual_protect 0
+0051: return
+
+:RESTOREUPDOWN
+0A8C: write_memory 0x53FBDA size 4 value 0x0A81B70F virtual_protect 0
+0A8C: write_memory 0x53FBDE size 1 value 0x01 virtual_protect 0
+0051: return
+
+:RESTORELEFTRIGHT
+0A8C: write_memory 0x53FB8A size 4 value 0x0A81B70F virtual_protect 0
+0A8C: write_memory 0x53FB8E size 1 value 0x01 virtual_protect 0
+0051: return
+
+:ACCELERATE
+0A8C: write_memory 0x5403FA size 4 value 0x00FFB866 virtual_protect 0 // mov ax, ff
+0A8C: write_memory 0x5403FE size 1 value 0xC3 virtual_protect 0 // retn
+0051: return
+
+:DOWN
+0A8C: write_memory 0x53FBDA size 4 value 0xFFA0B866 virtual_protect 0 // mov ax, ff80
+0A8C: write_memory 0x53FBDE size 1 value 0xC3 virtual_protect 0 // retn
+0051: return
+
+:UP
+0A8C: write_memory 0x53FBDA size 4 value 0x000BB866 virtual_protect 0 // mov ax, 80
+0A8C: write_memory 0x53FBDE size 1 value 0xC3 virtual_protect 0 // retn
+0051: return
+
+:LEFT
+0A8C: write_memory 0x53FB8A size 4 value 0xFFF0B866 virtual_protect 0 // mov ax, ff80
+0A8C: write_memory 0x53FB8E size 1 value 0xC3 virtual_protect 0 // retn
+0051: return
+
+:RIGHT
+0A8C: write_memory 0x53FB8A size 4 value 0x000BB866 virtual_protect 0 // mov ax, 80
+0A8C: write_memory 0x53FB8E size 1 value 0xC3 virtual_protect 0 // retn
+0051: return
+
+0A93: end_custom_thread  
