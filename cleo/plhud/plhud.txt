@@ -537,7 +537,7 @@ end
 
 :INFOSTRING
 hex
-    "runways_loaded pl_runway_helper_v5" 00
+    "runways_loaded pl_runway_helper_v6" 00
 end
 :INFOSTRING2
 hex
