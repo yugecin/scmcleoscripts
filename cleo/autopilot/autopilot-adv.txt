@@ -17,6 +17,9 @@ const
     CX = 4@
     CY = 5@
     ANG = 6@
+    CPDIST = 7@
+    PX = 8@
+    PY = 9@
 end
 
 :MAIN_LOOP
@@ -43,6 +46,10 @@ end
 045A: draw_text_1number 320.0 290.0 'NUMBER' number 6@ // ~1~
 */
 
+0050: gosub @GETCP
+00A0: store_actor $PLAYER_ACTOR position_to PX PY TEMP3
+0509: CPDIST = distance_between_XY CX CY and_XY PX PY
+
 077D: ANG = car CAR x_angle
 
 0021:   ANG > 180.0 // LOCALVAR CMP FLOAT
@@ -50,6 +57,13 @@ end
 000F: ANG -= 360.0 // LOCALVAR MINUS FLOAT
 :NOCORRECT
 00AA: store_car CAR position_to TEMP1 TEMP1 TEMP3
+0023:   1250.0 > CPDIST // LOCALVAR CMP FLOAT
+004D: jump_if_false @CHECKALT
+0021:   TEMP3 > 100.0 // LOCALVAR CMP FLOAT
+004D: jump_if_false @HIGHENOUGH
+000B: ANG += 10.0 // LOCALVAR PLUS FLOAT
+0002: jump @HIGHENOUGH
+:CHECKALT
 0023:   200.0 > TEMP3 // LOCALVAR CMP FLOAT
 004D: jump_if_false @HIGHENOUGH
 000F: ANG -= 10.0 // LOCALVAR MINUS FLOAT
@@ -67,13 +81,11 @@ end
 
 06BE: ANG = car CAR y_angle
 
-0050: gosub @GETCP
 8043:   not CX == 0.0 // LOCALVAR EQ FLOAT
 004D: jump_if_false @NOCP
-00A0: store_actor $PLAYER_ACTOR position_to TEMP1 TEMP2 TEMP3
-0063: TEMP1 -= CX  // (float)
-0063: TEMP2 -= CY  // (float)
-0604: get_Z_angle_for_point TEMP1 TEMP2 store_to TEMP3
+0063: PX -= CX  // (float)
+0063: PY -= CY  // (float)
+0604: get_Z_angle_for_point PX PY store_to TEMP3
 0174: TEMP2 = car CAR Z_angle
 0063: TEMP2 -= TEMP3  // (float)
 000B: TEMP2 += 180.0 // LOCALVAR PLUS FLOAT    
