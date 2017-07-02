@@ -13,6 +13,7 @@
 [pilot's life runways hud](/cleo/plhud)  
 [pilot's life runways radar](/cleo/plradar)  
 [autopilot](/cleo/autopilot)  
+[objsniffer](/cleo/objsniffer)  
 
 ### SCM scripts
 [train editing](/scm/trains)  
