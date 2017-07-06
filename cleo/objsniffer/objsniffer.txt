@@ -3,7 +3,8 @@
 
 03A4: name_thread 'OBJSNIF'
 
-0AC6: 1@ = label @HH offset
+// 0107
+0AC6: 1@ = label @HH0107 offset
 000E: 1@ -= 0x469779
 000E: 1@ -= 0x4
 0A8C: write_memory 0x469778 size 1 value 0xE9 vp 0 // jmp near 
@@ -22,14 +23,36 @@
 0AC6: 1@ = label @OBJS offset
 0A8C: write_memory 0@ size 4 value 1@ vp 0
 
+// 0453
+0AC6: 1@ = label @HH0453 offset
+000E: 1@ -= 0x48A35A
+000E: 1@ -= 0x4
+0A8C: write_memory 0x48A359 size 1 value 0xE9 vp 0 // jmp near 
+0A8C: write_memory 0x48A35A size 4 value 1@ vp 0
+0A8C: write_memory 0x48A35E size 1 value 0x90 vp 0 
+
+0AC6: 0@ = label @HRRJ offset
+0006: 1@ = 0x48A35A
+0062: 1@ -= 0@  // (int)
+0A8C: write_memory 0@ size 4 value 1@ vp 0
+
+0AC6: 0@ = label @OBJP offset
+0AC6: 1@ = label @HHOBJP0453 offset
+0A8C: write_memory 1@ size 4 value 0@ vp 0
+
 0002: jump @HD
 // M A43C78 78 3C A4 00
 // X A43C7C 7C 3C A4 00
 // Y A43C80 80 3C A4 00
 // Z A43C84 84 3C A4 00
-:HH
+
+// R A43C7C 7C 3C A4 00
+// S A43C80 80 3C A4 00
+// T A43C84 84 3C A4 00
+:HH0107
+// 0107
 hex
-    8B 1D        // mov eax, moffs32
+    8B 1D        // mov ebx, moffs32
 end
 :HHOBJP
 hex
@@ -38,7 +61,7 @@ hex
     A1          // mov eax, moffs32
     78 3C A4 00 //          _opcodeParameters+0: M
     
-    85 C0       // text eax, eax
+    85 C0       // test eax, eax
     7D 0C       // jge short
     6B C0 1C    // imul eax, 0x1C
     B9          // mov ecx, imm32
@@ -60,6 +83,15 @@ hex
     84 3C A4 00 //          _opcodeParameters+C: Z
     89 03       // mov DWORD PTR [ebx], eax
     83 c3 04    // add ebx, 0x4
+    c7 03       // mov DWORD PTR [ebx], imm32    // R
+    00 00 00 00 //                      0x0
+    83 c3 04    // add ebx, 0x4
+    c7 03       // mov DWORD PTR [ebx], imm32    // S
+    00 00 00 00 //                      0x0
+    83 c3 04    // add ebx, 0x4
+    c7 03       // mov DWORD PTR [ebx], imm32    // T
+    00 00 00 00 //                      0x0
+    83 c3 04    // add ebx, 0x4
     c7 03       // mov DWORD PTR [ebx], imm32
     00 00 00 00 //                      0x0  
 
@@ -69,7 +101,8 @@ end
 hex
     00 00 00 00 //          @OBJP
     89 18       // mov DWORD PTR [eax], ebx
-                                
+        
+    // overridden stuff                                
     A1          // mov eax, moffs32
     78 3C A4 00 //          _opcodeParameters
     
@@ -79,9 +112,41 @@ end
 hex
     00 00 00 00
 end
+
+:HH0453
+// 0453
+hex
+    8B 0D        // mov ecx, moffs32
+end
+:HHOBJP0453
+hex
+    00 00 00 00 //          @OBJP
+    83 E9 0C    // sub ecx, 0xc (12)
+    A1          // mov eax, moffs32
+    7C 3C A4 00 //          _opcodeParameters+4: R
+    89 01       // mov DWORD PTR [ecx], eax
+    83 c1 04    // add ecx, 0x4
+    A1          // mov eax, moffs32
+    80 3C A4 00 //          _opcodeParameters+8: S
+    89 01       // mov DWORD PTR [ecx], eax
+    83 c1 04    // add ecx, 0x4
+    A1          // mov eax, moffs32
+    84 3C A4 00 //          _opcodeParameters+C: T
+    89 01       // mov DWORD PTR [ecx], eax
+    
+    // overridden stuff
+    8B 0D       // mov ecx, 
+    78 3C A4 00 //           _opcodeParameters
+    
+    E9          // jmp near
+end
+:HRRJ    
+hex
+    00 00 00 00
+end
 :HD
 
-0006: 5@ = 0
+0006: 10@ = 0
 
 :MAIN_LOOP
 0001: wait 0
@@ -94,7 +159,7 @@ end
 0A8D: 0@ = read_memory 20@ size 4 virtual_protect 0
 0019:   0@ > 0 // LOCALVAR CMP INT
 004D: jump_if_false @NOBJ
-000A: 5@ += 1 // LOCALVAR PLUS INT
+000A: 10@ += 1 // LOCALVAR PLUS INT
 000A: 20@ += 4 // LOCALVAR PLUS INT
 0A8D: 1@ = read_memory 20@ size 4 virtual_protect 0
 000A: 20@ += 4 // LOCALVAR PLUS INT
@@ -102,15 +167,27 @@ end
 000A: 20@ += 4 // LOCALVAR PLUS INT
 0A8D: 3@ = read_memory 20@ size 4 virtual_protect 0
 000A: 20@ += 4 // LOCALVAR PLUS INT
+0A8D: 4@ = read_memory 20@ size 4 virtual_protect 0
+000A: 20@ += 4 // LOCALVAR PLUS INT
+0A8D: 5@ = read_memory 20@ size 4 virtual_protect 0
+000A: 20@ += 4 // LOCALVAR PLUS INT
+0A8D: 6@ = read_memory 20@ size 4 virtual_protect 0
+000A: 20@ += 4 // LOCALVAR PLUS INT
 //0AD9: write_formatted_text "OBJ %.4X %.4X %.4X %.4X" in_file 30@ 0@ 1@ 2@ 3@
-0AD3: string_format 21@v format "%.4XO" 5@
+0AD3: string_format 21@v format "%.4XO" 10@
 0AF1: write_int_to_ini_file 0@ path "objss.ini" section "SectionName" key 21@v  
-0AD3: string_format 21@v format "%.4XX" 5@
+0AD3: string_format 21@v format "%.4XX" 10@
 0AF3: write_float_to_ini_file 1@ path "objss.ini" section "SectionName" key 21@v  
-0AD3: string_format 21@v format "%.4XY" 5@
+0AD3: string_format 21@v format "%.4XY" 10@
 0AF3: write_float_to_ini_file 2@ path "objss.ini" section "SectionName" key 21@v  
-0AD3: string_format 21@v format "%.4XZ" 5@
-0AF3: write_float_to_ini_file 3@ path "objss.ini" section "SectionName" key 21@v
+0AD3: string_format 21@v format "%.4XZ" 10@
+0AF3: write_float_to_ini_file 3@ path "objss.ini" section "SectionName" key 21@v 
+0AD3: string_format 21@v format "%.4XR" 10@
+0AF3: write_float_to_ini_file 4@ path "objss.ini" section "SectionName" key 21@v 
+0AD3: string_format 21@v format "%.4XS" 10@
+0AF3: write_float_to_ini_file 5@ path "objss.ini" section "SectionName" key 21@v 
+0AD3: string_format 21@v format "%.4XT" 10@
+0AF3: write_float_to_ini_file 6@ path "objss.ini" section "SectionName" key 21@v
 0002: jump @NEOBJ
 :NOBJ
 0AC6: 20@ = label @OBJS offset
