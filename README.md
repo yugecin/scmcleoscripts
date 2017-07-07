@@ -14,6 +14,7 @@
 [pilot's life runways radar](/cleo/plradar)  
 [autopilot](/cleo/autopilot)  
 [objsniffer](/cleo/objsniffer)  
+[objsniffer - fast version](/cleo/objsniffer-plugin)  
 
 ### SCM scripts
 [train editing](/scm/trains)  
