@@ -1,0 +1,10 @@
+{$INCLUDE objs20.txt}
+{$INCLUDE objs20.txt}
+{$INCLUDE objs20.txt}
+{$INCLUDE objs20.txt}
+{$INCLUDE objs20.txt}
+{$INCLUDE objs20.txt}
+{$INCLUDE objs20.txt}
+{$INCLUDE objs20.txt}
+{$INCLUDE objs20.txt}
+{$INCLUDE objs20.txt}
