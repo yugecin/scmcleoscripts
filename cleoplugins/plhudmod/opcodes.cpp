@@ -35,23 +35,23 @@ void savetd(stTextdraw *td)
 			y %x\n\
 			\n\n",
 			td->szString,
-			td->fLetterWidth,
-			td->fLetterHeight,
-			td->dwLetterColor,
-			td->byteCenter,
-			td->byteBox,
-			td->fBoxSizeX,
-			td->fBoxSizeY,
-			td->dwBoxColor,
-			td->byteProportional,
-			td->dwShadowColor,
-			td->byteShadowSize,
-			td->byteOutline,
-			td->byteLeft,
-			td->byteRight,
-			td->iStyle,
-			td->fX,
-			td->fY);
+			*(unsigned int*)&td->fLetterWidth,
+			*(unsigned int*)&td->fLetterHeight,
+			*(unsigned int*)&td->dwLetterColor,
+			*(unsigned char*)&td->byteCenter,
+			*(unsigned char*)&td->byteBox,
+			*(unsigned int*)&td->fBoxSizeX,
+			*(unsigned int*)&td->fBoxSizeY,
+			*(unsigned int*)&td->dwBoxColor,
+			*(unsigned char*)&td->byteProportional,
+			*(unsigned int*)&td->dwShadowColor,
+			*(unsigned char*)&td->byteShadowSize,
+			*(unsigned char*)&td->byteOutline,
+			*(unsigned char*)&td->byteLeft,
+			*(unsigned char*)&td->byteRight,
+			*(unsigned int*)&td->iStyle,
+			*(unsigned int*)&td->fX,
+			*(unsigned int*)&td->fY);
 	DWORD w;
 	WriteFile(hFile, buf, strlen(buf), &w, NULL);
 }
@@ -101,7 +101,7 @@ OpcodeResult WINAPI op0C36(CScriptThread *thread)
 	return OR_CONTINUE;
 }
 
-OpcodeResult WINAPI op0C36(CScriptThread *thread)
+OpcodeResult WINAPI op0C37(CScriptThread *thread)
 {
 
 	return OR_CONTINUE;
