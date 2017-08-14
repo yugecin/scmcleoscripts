@@ -1,0 +1,14 @@
+{$CLEO}
+{$NOSOURCE}
+
+03A4: name_thread 'PLHUDMO'
+
+:MAIN_LOOP
+0001: wait 0
+0AB0:   key_pressed 0x74 // F5
+004D: jump_if_false @MAIN_LOOP
+{$O 0C36=0,}
+0C36:
+0002: jump @MAIN_LOOP
+
+0A93: end_custom_thread
