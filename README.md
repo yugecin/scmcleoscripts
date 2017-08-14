@@ -32,5 +32,5 @@
 [hook drawhud and draw a polygon](/snippets/hookdrawpoly.txt)  
 
 ### License
-[MIT](/LICENSE)  
+[GPLv3](/LICENSE)  
 
