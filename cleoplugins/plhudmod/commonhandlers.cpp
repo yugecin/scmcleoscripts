@@ -52,3 +52,40 @@ void carspeedtdhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, in
 	memcpy(&samptd->szString[13], carspeedstring, 10);
 }
 
+void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("progressbarpatchhandler\n");
+	REPOSITION_ON_ATTACH();
+	samptd->szText[0] = '_';
+	samptd->szString[0] = '_';
+	if (!INCAR) {
+		samptd->dwBoxColor &= 0x00ffffff;
+	} else {
+		samptd->dwBoxColor |= 0xff000000;
+	}
+}
+
+void damagebarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagebarhandler\n");
+	REPOSITION_ON_ATTACH();
+	progressbarpatchhandler(hxtd, samptd, reason);
+	if (!INCAR) {
+		return;
+	}
+	samptd->fBoxSizeX = 569.0f + (float) gamedata.carhp * 63.0f / 1000.0f;
+}
+
+void damagepatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagepatchhandler\n");
+	REPOSITION_ON_ATTACH();
+	if (!INCAR) {
+		return;
+	}
+	char str[12];
+	sprintf(str, "  Health");
+	memcpy(samptd->szText, str, 12);
+	memcpy(samptd->szString, str, 12);
+}
+

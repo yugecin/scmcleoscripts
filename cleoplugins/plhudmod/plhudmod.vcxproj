@@ -88,18 +88,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="commonhandlers.h" />
     <ClInclude Include="SRaceCheckpoint.h" />
     <ClInclude Include="opcodes.h" />
     <ClInclude Include="samp.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="stuff.h" />
+    <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="commonhandlers.cpp" />
     <ClCompile Include="Dllmain.cpp" />
     <ClCompile Include="opcodes.cpp" />
     <ClCompile Include="samp.cpp" />
     <ClCompile Include="snoop.cpp" />
+    <ClCompile Include="theme_classic.cpp" />
     <ClCompile Include="theme_standard.cpp" />
+    <ClCompile Include="util.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

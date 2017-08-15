@@ -19,14 +19,14 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread);
 
 // ----------------------
 
-#define THEME			THEME_STANDARD
-#define SNOOP 1
+#define THEME			THEME_CLASSIC
+//#define SNOOP 1
 #define DOTRACE 1
 
 // ----------------------
 
 #if DOTRACE
-#define TRACE1(x,y) {char dbgStr[100];sprintf(dbgStr, x, y);trace(dbgStr);}
+#define TRACE1(x,y) {char dbgStr[200];sprintf(dbgStr, x, y);trace(dbgStr);}
 #define TRACE(x) TRACE1(x,0)
 #else
 #define TRACE(x)
@@ -84,9 +84,11 @@ struct SGAMEDATA
 	float		carz;
 	float		carspeed;
 	int		missiondistance;
+	int		isplane;
 };
 
 #define INCAR (gamedata.carhp != -1)
+#define ISPLANE (gamedata.isplane)
 
 void setupTD(int tdidx, unsigned int x, unsigned int y, unsigned int targetX, unsigned int targetY, TDHANDLER handler);
 void trace(const char *f);

@@ -217,6 +217,7 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread)
 	gamedata.carx = CLEO_GetFloatOpcodeParam(thread);
 	gamedata.cary = CLEO_GetFloatOpcodeParam(thread);
 	gamedata.carz = CLEO_GetFloatOpcodeParam(thread);
+	gamedata.isplane = CLEO_GetIntOpcodeParam(thread);
 
 	if (g_SAMP == NULL) {
 		g_SAMP = getSamp();

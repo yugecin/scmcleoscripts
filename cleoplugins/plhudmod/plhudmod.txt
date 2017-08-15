@@ -6,7 +6,8 @@
 :MAIN_LOOP
 0001: wait 0
 
-0006: 0@ = -1 // LOCALVAR ASSIGNMENT INT
+0006: 0@ = -1 // LOCALVAR ASSIGNMENT INT  
+0006: 8@ = 0 // LOCALVAR ASSIGNMENT INT
 00DF:   actor $PLAYER_ACTOR driving 
 004D: jf @NOCAR
  03C0: 33@ = actor $PLAYER_ACTOR car
@@ -14,6 +15,12 @@
 004D: jf @NOCAR
 056E:   car 33@ defined
 004D: jf @NOCAR
+00D6: if or
+04A9:   actor $PLAYER_ACTOR driving_heli
+04AB:   actor $PLAYER_ACTOR driving_plane
+004D: jf @NOPLANE 
+0006: 8@ = 1 // LOCALVAR ASSIGNMENT INT
+:NOPLANE
 0A97: 0@ = car 33@ struct
 000A: 0@ += 0x4C0
 0A8D: 0@ = read_memory 0@ size 4 virtual_protect 0  
@@ -24,8 +31,8 @@
 00AA: store_car 33@ position_to 5@ 6@ 7@
 :NOCAR
 
-{$O 0C37=10,%1d% %2d% %3d% %4d% %5d% %6d% %7d% %8d% %9d% %10d%}
-0C37: carhp 0@ carheading 1@ carspeedx 2@ carspeedy 3@ carspeedz 4@ carx 5@ cary 6@ carz 7@ rewriteaddr 0@ changestuff 1@
+{$O 0C37=11,%1d% %2d% %3d% %4d% %5d% %6d% %7d% %8d% %9d% %10d% %11d%}
+0C37: carhp 0@ carheading 1@ carspeedx 2@ carspeedy 3@ carspeedz 4@ carx 5@ cary 6@ carz 7@ isplane 8@ rewriteaddr 0@ changestuff 1@
 0019:   0@ > 0 // LOCALVAR CMP INT
 004D: jump_if_false @NOREWRITE
 0A8C: write_memory 0@ size 1 value 0xE8 virtual_protect 1

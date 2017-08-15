@@ -86,43 +86,6 @@ void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 	memcpy(&samptd->szString[14], altitudestring, 10);
 }
 
-void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("progressbarpatchhandler\n");
-	REPOSITION_ON_ATTACH();
-	samptd->szText[0] = '_';
-	samptd->szString[0] = '_';
-	if (!INCAR) {
-		samptd->dwBoxColor &= 0x00ffffff;
-	} else {
-		samptd->dwBoxColor |= 0xff000000;
-	}
-}
-
-void damagebarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("damagebarhandler\n");
-	REPOSITION_ON_ATTACH();
-	progressbarpatchhandler(hxtd, samptd, reason);
-	if (!INCAR) {
-		return;
-	}
-	samptd->fBoxSizeX = 569.0f + (float) gamedata.carhp * 63.0f / 1000.0f;
-}
-
-void damagepatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("damagepatchhandler\n");
-	REPOSITION_ON_ATTACH();
-	if (!INCAR) {
-		return;
-	}
-	char str[10];
-	sprintf(str, "Health");
-	memcpy(&samptd->szText[14], str, 10);
-	memcpy(&samptd->szString[14], str, 10);
-}
-
 BOOL setupTextdraws()
 {
 	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0, 0, NULL);
@@ -132,7 +95,7 @@ BOOL setupTextdraws()
 	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0, 0, NULL);
 	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, NULL);
 	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandler);
-	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0, 0, 0);
+	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0, 0, NULL);
 	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &damagebarhandler);
 	setupTD(PLTD_ODO, 0x43FA8000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x43E38000, 0x43C80148, &airspeedhandler);
@@ -142,7 +105,6 @@ BOOL setupTextdraws()
 	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0, 0, NULL);
 	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x44128000, 0x43CD0148, &damagepcthandler);
 	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
-	//setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, NULL);
 	return TRUE;
 }
 
