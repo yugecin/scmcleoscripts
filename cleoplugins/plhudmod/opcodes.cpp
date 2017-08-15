@@ -146,8 +146,8 @@ BOOL setupTextdraws()
 {
 	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0, 0, NULL);
 	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0, 0, NULL);
-	setupTD(PLTD_BOX0, 0x43A00000, 0x43D60000, 0, 0, &boxremovehandler);
-	setupTD(PLTD_BOX1, 0x4403C000, 0x43C48000, 0, 0, &boxremovehandler);
+	setupTD(PLTD_STATUSBARBOX, 0x43A00000, 0x43D60000, 0, 0, NULL);
+	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0, 0, NULL);
 	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0, 0, NULL);
 	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, NULL);
 	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandler);
@@ -309,6 +309,7 @@ void __cdecl stuff()
 #endif
 
 	gamedata.carspeed = (int) (14.5f * sqrt(gamedata.carspeedx * gamedata.carspeedx + gamedata.carspeedy * gamedata.carspeedy + gamedata.carspeedz * gamedata.carspeedz) / 7.5f);
+	if (gamedata.carhp == 999) gamedata.carhp = 1000; // adjust anticheat hp
 
 	TRACE("updating toupdate\n");
 	int tdstoupdate[PLTDCOUNT];
