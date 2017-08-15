@@ -14,12 +14,11 @@
 0174: 1@ = car 33@ Z_angle
 0092: 1@ = float 1@ to_integer
 06A2: get_car 33@ velocity_in_direction_XYZ 2@ 3@ 4@
-00AA: store_car 33@ position_to 32@ 32@ 5@
-0092: 5@ = float 5@ to_integer
+00AA: store_car 33@ position_to 5@ 6@ 7@
 :NOCAR
 
-{$O 0C37=8,%1d% %2d% %3d% %4d% %5d% %6d% %7d% %8d%}
-0C37: carhp 0@ carheading 1@ carspeedx 2@ carspeedy 3@ carspeedz 4@ altitude 5@ rewriteaddr 0@ changestuff 1@
+{$O 0C37=10,%1d% %2d% %3d% %4d% %5d% %6d% %7d% %8d% %9d% %10d%}
+0C37: carhp 0@ carheading 1@ carspeedx 2@ carspeedy 3@ carspeedz 4@ carx 5@ cary 6@ carz 7@ rewriteaddr 0@ changestuff 1@
 0019:   0@ > 0 // LOCALVAR CMP INT
 004D: jump_if_false @NOREWRITE
 0A8C: write_memory 0@ size 1 value 0xE8 virtual_protect 1

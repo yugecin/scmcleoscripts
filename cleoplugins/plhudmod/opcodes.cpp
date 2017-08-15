@@ -1,4 +1,5 @@
 #include "opcodes.h"
+#include "SRaceCheckpoint.h"
 #include <math.h>
 
 BOOL InitOpcodes()
@@ -61,10 +62,6 @@ void __cdecl update_textdraws()
 	}
 #endif
 
-	gamedata.carspeed = (int) (14.5f * sqrt(gamedata.carspeedx * gamedata.carspeedx + gamedata.carspeedy * gamedata.carspeedy + gamedata.carspeedz * gamedata.carspeedz) / 7.5f);
-	if (gamedata.carhp == 999.0f) gamedata.carhp = 1000.0f; // adjust anticheat hp
-	gamedata.carhp /= 1000.0f;
-
 	TRACE("updating toupdate\n");
 	int tdstoupdate[PLTDCOUNT];
 	int tdstoupdatecount = 0;
@@ -88,6 +85,22 @@ void __cdecl update_textdraws()
 				hxtd->iHandle = j;
 				hxtd->handler(hxtd, tdpool->textdraw[hxtd->iHandle], TDHANDLER_ATTACH);
 				break;
+			}
+		}
+	}
+
+	gamedata.carspeed = (int) (14.5f * sqrt(gamedata.carspeedx * gamedata.carspeedx + gamedata.carspeedy * gamedata.carspeedy + gamedata.carspeedz * gamedata.carspeedz) / 7.5f);
+	if (gamedata.carhp == 999.0f) gamedata.carhp = 1000.0f; // adjust anticheat hp
+	gamedata.carhp /= 1000.0f;
+	int destinationtdhandle = pltextdraws[PLTD_DESTNEAREST].iHandle;
+	struct SRaceCheckpoint *racecheckpoint = (SRaceCheckpoint*)(SA_RACECHECKPOINTS);
+	if (destinationtdhandle != INVALID_TEXTDRAW && tdpool->textdraw[destinationtdhandle]->szString[0] == 'D') {
+		for (int i = 0; i < MAX_RACECHECKPOINTS; i++) {
+			if (racecheckpoint[i].byteUsed) {
+				float dx = gamedata.carx - racecheckpoint[i].fX;
+				float dy = gamedata.cary - racecheckpoint[i].fY;
+				float dz = gamedata.carz - racecheckpoint[i].fZ;
+				gamedata.missiondistance = (int) sqrt(dx * dx + dy * dy + dz * dz);
 			}
 		}
 	}
@@ -132,12 +145,14 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread)
 {
 	static struct stSAMP *g_SAMP = NULL;
 
-	gamedata.carhp = CLEO_GetIntOpcodeParam(thread);
+	gamedata.carhp = CLEO_GetFloatOpcodeParam(thread);
 	gamedata.carheading = CLEO_GetIntOpcodeParam(thread);
 	gamedata.carspeedx = CLEO_GetFloatOpcodeParam(thread);
 	gamedata.carspeedy = CLEO_GetFloatOpcodeParam(thread);
 	gamedata.carspeedz = CLEO_GetFloatOpcodeParam(thread);
-	gamedata.altitude = CLEO_GetIntOpcodeParam(thread);
+	gamedata.carx = CLEO_GetFloatOpcodeParam(thread);
+	gamedata.cary = CLEO_GetFloatOpcodeParam(thread);
+	gamedata.carz = CLEO_GetFloatOpcodeParam(thread);
 
 	if (g_SAMP == NULL) {
 		g_SAMP = getSamp();

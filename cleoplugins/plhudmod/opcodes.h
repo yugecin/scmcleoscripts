@@ -47,6 +47,7 @@ struct SPLHXTEXTDRAW
 	TDHANDLER		handler;
 };
 
+void destnearesthandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void removehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void damagepcthandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void airspeedhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
@@ -86,8 +87,11 @@ struct SGAMEDATA
 	float		carspeedx;
 	float		carspeedy;
 	float		carspeedz;
+	float		carx;
+	float		cary;
+	float		carz;
 	int		carspeed;
-	int		altitude;
+	int		missiondistance;
 };
 
 #define INCAR (gamedata.carhp != -1)

@@ -18,12 +18,43 @@ BOOL setupTextdraws()
 	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x43E38000, 0x43C80148, &airspeedhandler);
 	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x43CC0000, 0x43C80148, &altitudehandler);
 	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0, 0, NULL);
-	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0, 0, NULL);
+	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, &destnearesthandler);
 	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0, 0, NULL);
 	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0, 0, &damagepcthandler);
 	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
 	//setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, NULL);
 	return TRUE;
+}
+
+void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("destnearesthandler\n");
+	if (reason == TDHANDLER_ATTACH) {
+		samptd->fX = hxtd->fTargetX;
+		samptd->fY = hxtd->fTargetY;
+		return;
+	}
+	if (!INCAR) {
+		return;
+	}
+	if (samptd->szString[0] == 'D') {
+		int destinationidx = 0;
+		char c = 0;
+		while (true) {
+			c = samptd->szText[destinationidx];
+			if (c == '~' || c == 0) {
+				break;
+			}
+		}
+		char destinationstring[100];
+		if (c == 0) {
+			sprintf(destinationstring, "Destination (%d M)", gamedata.missiondistance);
+		} else {
+			sprintf(destinationstring, "Destination (%d M)%s", gamedata.missiondistance, &(samptd->szString[destinationidx]));
+		}
+		memcpy(samptd->szText, destinationstring, strlen(destinationstring + 1));
+		memcpy(samptd->szString, destinationstring, strlen(destinationstring + 1));
+	}
 }
 
 void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -113,7 +144,7 @@ void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 		return;
 	}
 	char altitudestring[10];
-	sprintf(altitudestring, "%d FT", gamedata.altitude);
+	sprintf(altitudestring, "%d FT", (int) gamedata.carz);
 	memcpy(&samptd->szText[14], altitudestring, strlen(altitudestring + 1));
 	memcpy(&samptd->szString[14], altitudestring, strlen(altitudestring + 1));
 }
