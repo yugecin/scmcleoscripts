@@ -97,6 +97,8 @@
     <ClCompile Include="Dllmain.cpp" />
     <ClCompile Include="opcodes.cpp" />
     <ClCompile Include="samp.cpp" />
+    <ClCompile Include="snoop.cpp" />
+    <ClCompile Include="theme_standard.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

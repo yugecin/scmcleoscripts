@@ -12,6 +12,29 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread);
 #define TDHANDLER_ATTACH	(1)
 #define TDHANDLER_UPDATE	(2)
 
+#define THEME_STANDARD		1
+#define THEME_CLASSIC		2
+#define THEME_ROBIN		3
+
+// ----------------------
+
+#define THEME			THEME_STANDARD
+#define SNOOP 1
+//#define DOTRACE 1
+
+// ----------------------
+
+#if DOTRACE
+char gDbgStr[100];
+DWORD gDbgW;
+HANDLE hDbgFile = NULL;
+#define TRACE1(x,y) sprintf(gDbgStr, x, y);WriteFile(hDbgFile, gDbgStr, strlen(gDbgStr), &gDbgW, NULL);
+#define TRACE(x) TRACE1(x,0)
+#else
+#define TRACE(x)
+#define TRACE1(x,y)
+#endif
+
 typedef void (*TDHANDLER)(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason);
 
 struct SPLHXTEXTDRAW
@@ -65,3 +88,10 @@ struct SGAMEDATA
 	int		carspeed;
 	int		altitude;
 };
+
+#define INCAR (gamedata.carhp != -1)
+
+void setupTD(int tdidx, unsigned int x, unsigned int y, unsigned int targetX, unsigned int targetY, TDHANDLER handler);
+
+extern SGAMEDATA gamedata;
+extern stSAMP *g_SAMP;
