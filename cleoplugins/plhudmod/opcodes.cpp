@@ -1,8 +1,6 @@
 #include "opcodes.h"
 #include <math.h>
 
-struct stSAMP *g_SAMP;
-
 BOOL InitOpcodes()
 {
 	return
@@ -12,20 +10,21 @@ BOOL InitOpcodes()
 }
 
 struct SPLHXTEXTDRAW pltextdraws[PLTDCOUNT];
-SGAMEDATA gamedata;
+struct SGAMEDATA gamedata;
+struct stTextdrawPool *tdpool;
 
 int isTextdrawValid(SPLHXTEXTDRAW *hxtd)
 {
-	if (hxtd->iHandle == INVALID_TEXTDRAW || !g_SAMP->pPools->pTextdraw->iIsListed[hxtd->iHandle]) {
+	if (hxtd->iHandle == INVALID_TEXTDRAW || !tdpool->iIsListed[hxtd->iHandle]) {
 		return 0;
 	}
-	if (g_SAMP->pPools->pTextdraw->textdraw[hxtd->iHandle]->fX == hxtd->fTargetX &&
-			g_SAMP->pPools->pTextdraw->textdraw[hxtd->iHandle]->fY == hxtd->fTargetY) {
+	if (tdpool->textdraw[hxtd->iHandle]->fX == hxtd->fTargetX &&
+			tdpool->textdraw[hxtd->iHandle]->fY == hxtd->fTargetY) {
 		return 1;
 	}
-	if (g_SAMP->pPools->pTextdraw->textdraw[hxtd->iHandle]->fX == hxtd->fX &&
-			g_SAMP->pPools->pTextdraw->textdraw[hxtd->iHandle]->fY == hxtd->fY) {
-		hxtd->handler(hxtd, g_SAMP->pPools->pTextdraw->textdraw[hxtd->iHandle], TDHANDLER_ATTACH);
+	if (tdpool->textdraw[hxtd->iHandle]->fX == hxtd->fX &&
+			tdpool->textdraw[hxtd->iHandle]->fY == hxtd->fY) {
+		hxtd->handler(hxtd, tdpool->textdraw[hxtd->iHandle], TDHANDLER_ATTACH);
 		return 1;
 	}
 	return 0;
@@ -79,14 +78,14 @@ void __cdecl update_textdraws()
 	for (int i = 0; i < tdstoupdatecount; i++) {
 		SPLHXTEXTDRAW *hxtd = &pltextdraws[tdstoupdate[i]];
 		for (int j = 0; j < SAMP_MAX_TEXTDRAWS; j++) {
-			if (!g_SAMP->pPools->pTextdraw->iIsListed[j]) {
+			if (!tdpool->iIsListed[j]) {
 				continue;
 			}
-			if (g_SAMP->pPools->pTextdraw->textdraw[j]->fX == hxtd->fX &&
-					g_SAMP->pPools->pTextdraw->textdraw[j]->fY == hxtd->fY) {
+			if (tdpool->textdraw[j]->fX == hxtd->fX &&
+					tdpool->textdraw[j]->fY == hxtd->fY) {
 				TRACE1("assigned a handle to a textdraw %d\n", tdstoupdate[i]);
 				hxtd->iHandle = j;
-				hxtd->handler(hxtd, g_SAMP->pPools->pTextdraw->textdraw[hxtd->iHandle], TDHANDLER_ATTACH);
+				hxtd->handler(hxtd, tdpool->textdraw[hxtd->iHandle], TDHANDLER_ATTACH);
 				break;
 			}
 		}
@@ -97,7 +96,7 @@ void __cdecl update_textdraws()
 		SPLHXTEXTDRAW *hxtd = &pltextdraws[i];
 		if (hxtd->iHandle != INVALID_TEXTDRAW && hxtd->handler != NULL) {
 			TRACE1("textdraw with a handle %d\n", i);
-			hxtd->handler(hxtd, g_SAMP->pPools->pTextdraw->textdraw[hxtd->iHandle], TDHANDLER_UPDATE);
+			hxtd->handler(hxtd, tdpool->textdraw[hxtd->iHandle], TDHANDLER_UPDATE);
 		}
 	}
 }
@@ -130,6 +129,8 @@ void __declspec(naked) hookstuff()
 
 OpcodeResult WINAPI op0C37(CScriptThread *thread)
 {
+	static struct stSAMP *g_SAMP = NULL;
+
 	gamedata.carhp = CLEO_GetIntOpcodeParam(thread);
 	gamedata.carheading = CLEO_GetIntOpcodeParam(thread);
 	gamedata.carspeedx = CLEO_GetFloatOpcodeParam(thread);
@@ -152,6 +153,8 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread)
 	if (g_SAMP->ulPort != 7777 || strcmp("142.44.161.46", g_SAMP->szIP) != 0) {
 		goto exitzero;
 	}
+
+	tdpool = g_SAMP->pPools->pTextdraw;
 
 	if (hookedcall) {
 		goto exitzero;

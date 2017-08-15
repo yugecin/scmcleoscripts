@@ -94,4 +94,3 @@ struct SGAMEDATA
 void setupTD(int tdidx, unsigned int x, unsigned int y, unsigned int targetX, unsigned int targetY, TDHANDLER handler);
 
 extern SGAMEDATA gamedata;
-extern stSAMP *g_SAMP;

@@ -52,6 +52,8 @@ void savetd(stTextdraw *td)
 OpcodeResult WINAPI op0C36(CScriptThread *thread)
 {
 #if SNOOP
+	static struct stSAMP *g_SAMP = NULL;
+
 	if (g_SAMP == NULL) {
 		g_SAMP = getSamp();
 		if (g_SAMP == NULL) {
