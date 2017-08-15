@@ -3,37 +3,10 @@
 
 #if THEME == THEME_STANDARD
 
-BOOL setupTextdraws()
-{
-	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0, 0, NULL);
-	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0, 0, NULL);
-	setupTD(PLTD_STATUSBARBOX, 0x43A00000, 0x43D60000, 0, 0, NULL);
-	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0, 0, NULL);
-	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0, 0, NULL);
-	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, NULL);
-	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandler);
-	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0, 0, 0);
-	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &damagebarhandler);
-	setupTD(PLTD_ODO, 0x43FA8000, 0x43C80000, 0, 0, NULL);
-	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x43E38000, 0x43C80148, &airspeedhandler);
-	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x43CC0000, 0x43C80148, &altitudehandler);
-	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0, 0, NULL);
-	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, &destnearesthandler);
-	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0, 0, NULL);
-	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x44128000, 0x43CD0148, &damagepcthandler);
-	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
-	//setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, NULL);
-	return TRUE;
-}
-
 void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("destnearesthandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
+	REPOSITION_ON_ATTACH();
 	if (!INCAR) {
 		return;
 	}
@@ -64,11 +37,7 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("damagepcthandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
+	REPOSITION_ON_ATTACH();
 	if (!INCAR) {
 		return;
 	}
@@ -81,21 +50,13 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("fuelpricehandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
+	REPOSITION_ON_ATTACH();
 }
 
 void removehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("removehandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
+	REPOSITION_ON_ATTACH();
 }
 
 void boxremovehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -112,38 +73,13 @@ void boxremovehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("gpshandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
-}
-
-void carspeedtdhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("carspeedtdhandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
-	if (!INCAR) {
-		return;
-	}
-	char carspeedstring[10];
-	sprintf(carspeedstring, "%d KPH", (int) (100.0f * gamedata.carspeed / 27.8f));
-	memcpy(&samptd->szText[13], carspeedstring, 10);
-	memcpy(&samptd->szString[13], carspeedstring, 10);
+	REPOSITION_ON_ATTACH();
 }
 
 void airspeedhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("airspeedhandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
+	REPOSITION_ON_ATTACH();
 	if (!INCAR) {
 		return;
 	}
@@ -156,11 +92,7 @@ void airspeedhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("altitudehandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
+	REPOSITION_ON_ATTACH();
 	if (!INCAR) {
 		return;
 	}
@@ -173,11 +105,7 @@ void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("headinghandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
+	REPOSITION_ON_ATTACH();
 	if (!INCAR) {
 		return;
 	}
@@ -195,29 +123,10 @@ void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 #undef HEADINGSTRLEN
 }
 
-void damagebarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("damagebarhandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
-	if (!INCAR) {
-		return;
-	}
-	progressbarpatchhandler(hxtd, samptd, reason);
-	samptd->fBoxSizeX = 569.0f + (float) gamedata.carhp * 63.0f / 1000.0f;
-}
-
 void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("progressbarpatchhandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
+	REPOSITION_ON_ATTACH();
 	samptd->szText[0] = '_';
 	samptd->szString[0] = '_';
 	if (!INCAR) {
@@ -225,6 +134,40 @@ void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samp
 	} else {
 		samptd->dwBoxColor |= 0xff000000;
 	}
+}
+
+void damagebarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagebarhandler\n");
+	REPOSITION_ON_ATTACH();
+	if (!INCAR) {
+		return;
+	}
+	progressbarpatchhandler(hxtd, samptd, reason);
+	samptd->fBoxSizeX = 569.0f + (float) gamedata.carhp * 63.0f / 1000.0f;
+}
+
+BOOL setupTextdraws()
+{
+	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0, 0, NULL);
+	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0, 0, NULL);
+	setupTD(PLTD_STATUSBARBOX, 0x43A00000, 0x43D60000, 0, 0, NULL);
+	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0, 0, NULL);
+	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0, 0, NULL);
+	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, NULL);
+	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandler);
+	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0, 0, 0);
+	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &damagebarhandler);
+	setupTD(PLTD_ODO, 0x43FA8000, 0x43C80000, 0, 0, NULL);
+	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x43E38000, 0x43C80148, &airspeedhandler);
+	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x43CC0000, 0x43C80148, &altitudehandler);
+	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0, 0, NULL);
+	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, &destnearesthandler);
+	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0, 0, NULL);
+	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x44128000, 0x43CD0148, &damagepcthandler);
+	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
+	//setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, NULL);
+	return TRUE;
 }
 
 #endif

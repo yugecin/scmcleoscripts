@@ -45,18 +45,7 @@ struct SPLHXTEXTDRAW
 	TDHANDLER		handler;
 };
 
-void destnearesthandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void removehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void damagepcthandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void damagebarhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void airspeedhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void boxremovehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void fuelpricehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void gpshandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void headinghandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void altitudehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
-void carspeedtdhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
+#define REPOSITION_ON_ATTACH() if(reason==TDHANDLER_ATTACH){samptd->fX=hxtd->fTargetX;samptd->fY=hxtd->fTargetY;return;}
 
 enum PLTEXTDRAWS
 {

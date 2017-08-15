@@ -44,6 +44,19 @@ int isTextdrawValid(SPLHXTEXTDRAW *hxtd)
 	return 0;
 }
 
+void carspeedtdhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("carspeedtdhandler\n");
+	REPOSITION_ON_ATTACH();
+	if (!INCAR) {
+		return;
+	}
+	char carspeedstring[10];
+	sprintf(carspeedstring, "%d KPH", (int) (100.0f * gamedata.carspeed / 27.8f));
+	memcpy(&samptd->szText[13], carspeedstring, 10);
+	memcpy(&samptd->szString[13], carspeedstring, 10);
+}
+
 BOOL setupPlayerTextdraws()
 {
 	carspeedtd.iHandle = INVALID_TEXTDRAW;
