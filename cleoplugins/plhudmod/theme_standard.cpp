@@ -147,10 +147,23 @@ void damagebarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 	samptd->fBoxSizeX = 569.0f + (float) gamedata.carhp * 63.0f / 1000.0f;
 }
 
+void damagepatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagepatchhandler\n");
+	REPOSITION_ON_ATTACH();
+	if (!INCAR) {
+		return;
+	}
+	char str[10];
+	sprintf(str, "Health");
+	memcpy(&samptd->szText[14], str, 10);
+	memcpy(&samptd->szString[14], str, 10);
+}
+
 BOOL setupTextdraws()
 {
 	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0, 0, NULL);
-	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0, 0, NULL);
+	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0, 0, &damagepatchhandler);
 	setupTD(PLTD_STATUSBARBOX, 0x43A00000, 0x43D60000, 0, 0, NULL);
 	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0, 0, NULL);
 	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0, 0, NULL);
