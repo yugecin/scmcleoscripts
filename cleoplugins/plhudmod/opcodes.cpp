@@ -94,8 +94,7 @@ void __cdecl update_textdraws()
 	}
 
 	gamedata.carspeed = (int) (14.5f * sqrt(gamedata.carspeedx * gamedata.carspeedx + gamedata.carspeedy * gamedata.carspeedy + gamedata.carspeedz * gamedata.carspeedz) / 7.5f);
-	if (gamedata.carhp == 999.0f) gamedata.carhp = 1000.0f; // adjust anticheat hp
-	gamedata.carhp /= 1000.0f;
+	if (gamedata.carhp == 999) gamedata.carhp = 1000; // adjust anticheat hp
 	int destinationtdhandle = pltextdraws[PLTD_DESTNEAREST].iHandle;
 	struct SRaceCheckpoint *racecheckpoint = (SRaceCheckpoint*)(SA_RACECHECKPOINTS);
 	if (destinationtdhandle != INVALID_TEXTDRAW && tdpool->textdraw[destinationtdhandle]->szString[0] == 'D') {

@@ -13,14 +13,14 @@ BOOL setupTextdraws()
 	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, NULL);
 	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandler);
 	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0, 0, 0);
-	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &progressbarpatchhandler);
+	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &damagebarhandler);
 	setupTD(PLTD_ODO, 0x43FA8000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x43E38000, 0x43C80148, &airspeedhandler);
 	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x43CC0000, 0x43C80148, &altitudehandler);
 	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, &destnearesthandler);
 	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0, 0, NULL);
-	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x33128000, 0x43CD0148, &damagepcthandler);
+	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x44128000, 0x43CD0148, &damagepcthandler);
 	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
 	//setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, NULL);
 	return TRUE;
@@ -72,7 +72,7 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 		return;
 	}
 	char airspeedstring[6];
-	sprintf(airspeedstring, "%d%%", (int) gamedata.carhp);
+	sprintf(airspeedstring, "%.0f%%", (float) gamedata.carhp / 10.0f);
 	memcpy(samptd->szText, airspeedstring, strlen(airspeedstring + 1));
 	memcpy(samptd->szString, airspeedstring, strlen(airspeedstring + 1));
 }
@@ -173,6 +173,18 @@ void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 	sprintf(headingstring, "%03d %03d %03d [%03d] %03d %03d %03d", n[0], n[1], n[2], n[3], n[4], n[5], n[6]);
 	memcpy(samptd->szText, headingstring, strlen(headingstring + 1));
 	memcpy(samptd->szString, headingstring, strlen(headingstring + 1));
+}
+
+void damagebarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagebarhandler\n");
+	if (reason == TDHANDLER_ATTACH) {
+		samptd->fX = hxtd->fTargetX;
+		samptd->fY = hxtd->fTargetY;
+		return;
+	}
+	progressbarpatchhandler(hxtd, samptd, reason);
+	samptd->fBoxSizeX = 569.0f + (float) gamedata.carhp / 1000.0f * 63.0f;
 }
 
 void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)

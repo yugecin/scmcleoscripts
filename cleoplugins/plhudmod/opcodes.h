@@ -20,7 +20,7 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread);
 
 #define THEME			THEME_STANDARD
 #define SNOOP 1
-#define DOTRACE 1
+//#define DOTRACE 1
 
 // ----------------------
 
@@ -47,6 +47,7 @@ struct SPLHXTEXTDRAW
 void destnearesthandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void removehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void damagepcthandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
+void damagebarhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void airspeedhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void boxremovehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void fuelpricehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
@@ -79,7 +80,7 @@ enum PLTEXTDRAWS
 
 struct SGAMEDATA
 {
-	float		carhp;
+	int		carhp;
 	int		carheading;
 	float		carspeedx;
 	float		carspeedy;
