@@ -308,7 +308,7 @@ void __cdecl stuff()
 	}
 #endif
 
-	gamedata.carspeed = (int) (145.0f * sqrt(gamedata.carspeedx * gamedata.carspeedx + gamedata.carspeedy * gamedata.carspeedy + gamedata.carspeedz * gamedata.carspeedz) / 7.5f);
+	gamedata.carspeed = (int) (14.5f * sqrt(gamedata.carspeedx * gamedata.carspeedx + gamedata.carspeedy * gamedata.carspeedy + gamedata.carspeedz * gamedata.carspeedz) / 7.5f);
 
 	TRACE("updating toupdate\n");
 	int tdstoupdate[PLTDCOUNT];
