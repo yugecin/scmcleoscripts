@@ -103,10 +103,10 @@ void damagebarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 {
 	TRACE("damagebarhandler\n");
 	REPOSITION_ON_ATTACH();
+	progressbarpatchhandler(hxtd, samptd, reason);
 	if (!INCAR) {
 		return;
 	}
-	progressbarpatchhandler(hxtd, samptd, reason);
 	samptd->fBoxSizeX = 569.0f + (float) gamedata.carhp * 63.0f / 1000.0f;
 }
 
