@@ -132,6 +132,7 @@ void __cdecl update_textdraws()
 	if (gamedata.carhp == 999) gamedata.carhp = 1000; // adjust anticheat hp
 	int destinationtdhandle = pltextdraws[PLTD_DESTNEAREST].iHandle;
 	struct SRaceCheckpoint *racecheckpoint = (SRaceCheckpoint*)(SA_RACECHECKPOINTS);
+	gamedata.missiondistance = -1;
 	if (destinationtdhandle != INVALID_TEXTDRAW && tdpool->textdraw[destinationtdhandle]->szString[0] == 'D') {
 		for (int i = 0; i < MAX_RACECHECKPOINTS; i++) {
 			if (racecheckpoint[i].byteUsed) {

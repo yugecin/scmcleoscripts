@@ -37,27 +37,28 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 	if (!INCAR) {
 		return;
 	}
-	if (samptd->szString[0] == 'D') {
-		int destinationidx = 0;
-		char c = 0;
-		while (true) {
-			c = samptd->szText[destinationidx];
-			if (c == '~' || c == 0) {
-				break;
-			}
-			if (++destinationidx > 150) {
-				break;
-			}
-		}
-		char destinationstring[100];
-		if (c == 0) {
-			sprintf(destinationstring, "Destination (%d M)", gamedata.missiondistance);
-		} else {
-			sprintf(destinationstring, "Destination (%d M)%s", gamedata.missiondistance, &(samptd->szText[destinationidx]));
-		}
-		memcpy(samptd->szText, destinationstring, 100);
-		memcpy(samptd->szString, destinationstring, 100);
+	if (gamedata.missiondistance == -1 || samptd->szString[0] != 'D') {
+		return;
 	}
+	int destinationidx = 0;
+	char c = 0;
+	while (true) {
+		c = samptd->szText[destinationidx];
+		if (c == '~' || c == 0) {
+			break;
+		}
+		if (++destinationidx > 150) {
+			break;
+		}
+	}
+	char destinationstring[100];
+	if (c == 0) {
+		sprintf(destinationstring, "Destination (%d M)", gamedata.missiondistance);
+	} else {
+		sprintf(destinationstring, "Destination (%d M)%s", gamedata.missiondistance, &(samptd->szText[destinationidx]));
+	}
+	memcpy(samptd->szText, destinationstring, 100);
+	memcpy(samptd->szString, destinationstring, 100);
 }
 
 void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
