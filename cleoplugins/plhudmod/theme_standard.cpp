@@ -20,7 +20,7 @@ BOOL setupTextdraws()
 	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, &destnearesthandler);
 	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0, 0, NULL);
-	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0, 0, &damagepcthandler);
+	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x33128000, 0x43CD0148, &damagepcthandler);
 	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
 	//setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, NULL);
 	return TRUE;
@@ -45,12 +45,15 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 			if (c == '~' || c == 0) {
 				break;
 			}
+			if (++destinationidx > 150) {
+				break;
+			}
 		}
 		char destinationstring[100];
 		if (c == 0) {
 			sprintf(destinationstring, "Destination (%d M)", gamedata.missiondistance);
 		} else {
-			sprintf(destinationstring, "Destination (%d M)%s", gamedata.missiondistance, &(samptd->szString[destinationidx]));
+			sprintf(destinationstring, "Destination (%d M)%s", gamedata.missiondistance, &(samptd->szText[destinationidx]));
 		}
 		memcpy(samptd->szText, destinationstring, strlen(destinationstring + 1));
 		memcpy(samptd->szString, destinationstring, strlen(destinationstring + 1));
