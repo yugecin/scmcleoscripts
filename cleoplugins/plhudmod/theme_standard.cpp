@@ -55,8 +55,8 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 		} else {
 			sprintf(destinationstring, "Destination (%d M)%s", gamedata.missiondistance, &(samptd->szText[destinationidx]));
 		}
-		memcpy(samptd->szText, destinationstring, strlen(destinationstring + 1));
-		memcpy(samptd->szString, destinationstring, strlen(destinationstring + 1));
+		memcpy(samptd->szText, destinationstring, 100);
+		memcpy(samptd->szString, destinationstring, 100);
 	}
 }
 
@@ -71,10 +71,11 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 	if (!INCAR) {
 		return;
 	}
-	char airspeedstring[6];
-	sprintf(airspeedstring, "%.0f%%", (float) gamedata.carhp / 10.0f);
-	memcpy(samptd->szText, airspeedstring, strlen(airspeedstring + 1));
-	memcpy(samptd->szString, airspeedstring, strlen(airspeedstring + 1));
+	char damagepctstring[7];
+	sprintf(damagepctstring, "%d", gamedata.carhp);
+	//sprintf(damagepctstring, "%.0f%%", (float) gamedata.carhp / 10.0f);
+	memcpy(samptd->szText, damagepctstring, 7);
+	memcpy(samptd->szString, damagepctstring, 7);
 }
 
 void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -118,6 +119,23 @@ void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reaso
 	}
 }
 
+void carspeedtdhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("carspeedtdhandler\n");
+	if (reason == TDHANDLER_ATTACH) {
+		samptd->fX = hxtd->fTargetX;
+		samptd->fY = hxtd->fTargetY;
+		return;
+	}
+	if (!INCAR) {
+		return;
+	}
+	char carspeedstring[10];
+	sprintf(carspeedstring, "%d KPH", (int) (100.0f * gamedata.carspeed / 27.8f));
+	memcpy(&samptd->szText[13], carspeedstring, 10);
+	memcpy(&samptd->szString[13], carspeedstring, 10);
+}
+
 void airspeedhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("airspeedhandler\n");
@@ -130,9 +148,9 @@ void airspeedhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 		return;
 	}
 	char airspeedstring[10];
-	sprintf(airspeedstring, "%d KTS", gamedata.carspeed);
-	memcpy(&samptd->szText[14], airspeedstring, strlen(airspeedstring + 1));
-	memcpy(&samptd->szString[14], airspeedstring, strlen(airspeedstring + 1));
+	sprintf(airspeedstring, "%d KTS", (int) (14.5f * gamedata.carspeed / 7.5f));
+	memcpy(&samptd->szText[14], airspeedstring, 10);
+	memcpy(&samptd->szString[14], airspeedstring, 10);
 }
 
 void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -148,8 +166,8 @@ void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 	}
 	char altitudestring[10];
 	sprintf(altitudestring, "%d FT", (int) gamedata.carz);
-	memcpy(&samptd->szText[14], altitudestring, strlen(altitudestring + 1));
-	memcpy(&samptd->szString[14], altitudestring, strlen(altitudestring + 1));
+	memcpy(&samptd->szText[14], altitudestring, 10);
+	memcpy(&samptd->szString[14], altitudestring, 10);
 }
 
 void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -163,7 +181,8 @@ void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 	if (!INCAR) {
 		return;
 	}
-	char headingstring[3 + 1 + 3 + 1 + 3 + 1 + 5 + 1 + 3 + 1 + 3 + 1 + 3 + 1];
+#define HEADINGSTRLEN (3 + 1 + 3 + 1 + 3 + 1 + 5 + 1 + 3 + 1 + 3 + 1 + 3 + 1)
+	char headingstring[HEADINGSTRLEN];
 	int n[7];
 	for (int i = 0; i < 7; i++) {
 		n[i] = (360 - gamedata.carheading) - 3 + i;
@@ -171,8 +190,9 @@ void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 		if (n[i] > 360) n[i] -= 360;
 	}
 	sprintf(headingstring, "%03d %03d %03d [%03d] %03d %03d %03d", n[0], n[1], n[2], n[3], n[4], n[5], n[6]);
-	memcpy(samptd->szText, headingstring, strlen(headingstring + 1));
-	memcpy(samptd->szString, headingstring, strlen(headingstring + 1));
+	memcpy(samptd->szText, headingstring, HEADINGSTRLEN);
+	memcpy(samptd->szString, headingstring, HEADINGSTRLEN);
+#undef HEADINGSTRLEN
 }
 
 void damagebarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -183,8 +203,11 @@ void damagebarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 		samptd->fY = hxtd->fTargetY;
 		return;
 	}
+	if (!INCAR) {
+		return;
+	}
 	progressbarpatchhandler(hxtd, samptd, reason);
-	samptd->fBoxSizeX = 569.0f + (float) gamedata.carhp / 1000.0f * 63.0f;
+	samptd->fBoxSizeX = 569.0f + (float) gamedata.carhp * 63.0f / 1000.0f;
 }
 
 void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)

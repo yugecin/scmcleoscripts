@@ -7,6 +7,7 @@ BOOL InitOpcodes()
 	return
 			CLEO_RegisterOpcode(0x0C36, &op0C36) &&
 			CLEO_RegisterOpcode(0x0C37, &op0C37) &&
+			setupPlayerTextdraws() &&
 			setupTextdraws();
 }
 
@@ -22,6 +23,7 @@ void trace(const char *f)
 }
 
 struct SPLHXTEXTDRAW pltextdraws[PLTDCOUNT];
+struct SPLHXTEXTDRAW carspeedtd;
 struct SGAMEDATA gamedata;
 struct stTextdrawPool *tdpool;
 
@@ -40,6 +42,22 @@ int isTextdrawValid(SPLHXTEXTDRAW *hxtd)
 		return 1;
 	}
 	return 0;
+}
+
+BOOL setupPlayerTextdraws()
+{
+	carspeedtd.iHandle = INVALID_TEXTDRAW;
+	carspeedtd.handler = &carspeedtdhandler;
+	unsigned int f;
+	f = 0x44108000;
+	memcpy(&(carspeedtd.fX), &f, 4);
+	f = 0x43B58000;
+	memcpy(&(carspeedtd.fY), &f, 4);
+	f = 0x44108000;
+	memcpy(&(carspeedtd.fTargetX), &f, 4);
+	f = 0x43B58148;
+	memcpy(&(carspeedtd.fTargetY), &f, 4);
+	return TRUE;
 }
 
 void setupTD(int tdidx, unsigned int x, unsigned int y, unsigned int targetX, unsigned int targetY, TDHANDLER handler)
@@ -93,7 +111,24 @@ void __cdecl update_textdraws()
 		}
 	}
 
-	gamedata.carspeed = (int) (14.5f * sqrt(gamedata.carspeedx * gamedata.carspeedx + gamedata.carspeedy * gamedata.carspeedy + gamedata.carspeedz * gamedata.carspeedz) / 7.5f);
+	TRACE("updating carspeedhandle\n");
+	if (carspeedtd.handler != NULL && !isTextdrawValid(&carspeedtd)) {
+		SPLHXTEXTDRAW *hxtd = &carspeedtd;
+		for (int j = 0; j < SAMP_MAX_PLAYERTEXTDRAWS; j++) {
+			if (!tdpool->iPlayerTextDraw[j]) {
+				continue;
+			}
+			if (tdpool->playerTextdraw[j]->fX == hxtd->fX &&
+					tdpool->playerTextdraw[j]->fY == hxtd->fY) {
+				TRACE("assigned a handle to a player textdraw\n");
+				hxtd->iHandle = j;
+				hxtd->handler(hxtd, tdpool->playerTextdraw[hxtd->iHandle], TDHANDLER_ATTACH);
+				break;
+			}
+		}
+	}
+
+	gamedata.carspeed = sqrt(gamedata.carspeedx * gamedata.carspeedx + gamedata.carspeedy * gamedata.carspeedy + gamedata.carspeedz * gamedata.carspeedz);
 	if (gamedata.carhp == 999) gamedata.carhp = 1000; // adjust anticheat hp
 	int destinationtdhandle = pltextdraws[PLTD_DESTNEAREST].iHandle;
 	struct SRaceCheckpoint *racecheckpoint = (SRaceCheckpoint*)(SA_RACECHECKPOINTS);
@@ -115,6 +150,12 @@ void __cdecl update_textdraws()
 			TRACE1("textdraw with a handle %d\n", i);
 			hxtd->handler(hxtd, tdpool->textdraw[hxtd->iHandle], TDHANDLER_UPDATE);
 		}
+	}
+
+	SPLHXTEXTDRAW *hxtd = &carspeedtd;
+	if (hxtd->iHandle != INVALID_TEXTDRAW && hxtd->handler != NULL) {
+		TRACE("invoking carspeed handler\n");
+		hxtd->handler(hxtd, tdpool->playerTextdraw[hxtd->iHandle], TDHANDLER_UPDATE);
 	}
 }
 
@@ -148,7 +189,7 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread)
 {
 	static struct stSAMP *g_SAMP = NULL;
 
-	gamedata.carhp = CLEO_GetFloatOpcodeParam(thread);
+	gamedata.carhp = CLEO_GetIntOpcodeParam(thread);
 	gamedata.carheading = CLEO_GetIntOpcodeParam(thread);
 	gamedata.carspeedx = CLEO_GetFloatOpcodeParam(thread);
 	gamedata.carspeedy = CLEO_GetFloatOpcodeParam(thread);

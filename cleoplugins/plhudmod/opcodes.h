@@ -4,6 +4,7 @@
 #include "samp.h"
 
 BOOL setupTextdraws();
+BOOL setupPlayerTextdraws();
 BOOL InitOpcodes();
 OpcodeResult WINAPI op0C36(CScriptThread *thread);
 OpcodeResult WINAPI op0C37(CScriptThread *thread);
@@ -55,6 +56,7 @@ void gpshandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason
 void headinghandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void altitudehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
+void carspeedtdhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 
 enum PLTEXTDRAWS
 {
@@ -88,7 +90,7 @@ struct SGAMEDATA
 	float		carx;
 	float		cary;
 	float		carz;
-	int		carspeed;
+	float		carspeed;
 	int		missiondistance;
 };
 
