@@ -5,6 +5,20 @@
 
 :MAIN_LOOP
 0001: wait 0
+
+0006: 0@ = -1 // LOCALVAR ASSIGNMENT INT
+00DF:   actor $PLAYER_ACTOR driving 
+004D: jf @NOCAR 
+03C0: 33@ = actor $PLAYER_ACTOR car
+0227: 0@ = car 33@ health
+0174: 1@ = car 33@ Z_angle
+0092: 1@ = float 1@ to_integer
+06A2: get_car 33@ velocity_in_direction_XYZ 2@ 3@ 4@
+:NOCAR
+
+{$O 0C37=5,%1d% %2d% %3d% %4d% %5d%}
+0C37: carhp 0@ carheading 1@ carspeedx 2@ carspeedy 3@ carspeedz 4@
+
 0AB0:   key_pressed 0x74 // F5
 004D: jump_if_false @MAIN_LOOP
 {$O 0C36=0,}
