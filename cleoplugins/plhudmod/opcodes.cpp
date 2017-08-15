@@ -11,6 +11,8 @@ BOOL InitOpcodes()
 			setupTextdraws();
 }
 
+#define SNOOP 1
+
 #if SNOOP
 HANDLE hFile = NULL;
 
@@ -148,18 +150,18 @@ BOOL setupTextdraws()
 	setupTD(PLTD_BOX1, 0x4403C000, 0x43C48000, 0, 0, &boxremovehandler);
 	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0, 0, NULL);
 	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, NULL);
-	setupTD(PLTD_BOX2, 0x440E4000, 0x43C78000, 0, 0, &boxremovehandler);
+	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandler);
 	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0, 0, 0);
-	setupTD(PLTD_BOX3, 0x440E4000, 0x43CE8000, 0, 0, &boxremovehandler);
+	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &progressbarpatchhandler);
 	setupTD(PLTD_ODO, 0x43FA8000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x43E38000, 0x43C80148, &airspeedhandler);
-	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0, 0, NULL);
+	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x43CC0000, 0x43C80148, &altitudehandler);
 	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0, 0, NULL);
 	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0, 0, NULL);
-	//setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
-	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, NULL);
+	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
+	//setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, NULL);
 	return TRUE;
 }
 
@@ -216,9 +218,26 @@ void airspeedhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 		return;
 	}
 	char airspeedstring[10];
-	sprintf(airspeedstring, "~p~%d", gamedata.carspeed);
-	memcpy(samptd->szText, airspeedstring, strlen(airspeedstring + 1));
-	memcpy(samptd->szString, airspeedstring, strlen(airspeedstring + 1));
+	sprintf(airspeedstring, "%d KTS", gamedata.carspeed);
+	memcpy(&samptd->szText[14], airspeedstring, strlen(airspeedstring + 1));
+	memcpy(&samptd->szString[14], airspeedstring, strlen(airspeedstring + 1));
+}
+
+void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("altitudehandler\n");
+	if (reason == TDHANDLER_ATTACH) {
+		samptd->fX = hxtd->fTargetX;
+		samptd->fY = hxtd->fTargetY;
+		return;
+	}
+	if (!INCAR) {
+		return;
+	}
+	char altitudestring[10];
+	sprintf(altitudestring, "%d FT", gamedata.altitude);
+	memcpy(&samptd->szText[14], altitudestring, strlen(altitudestring + 1));
+	memcpy(&samptd->szString[14], altitudestring, strlen(altitudestring + 1));
 }
 
 void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -244,6 +263,18 @@ void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 	memcpy(samptd->szString, headingstring, strlen(headingstring + 1));
 }
 
+void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("progressbarpatchhandler\n");
+	if (reason == TDHANDLER_ATTACH) {
+		samptd->fX = hxtd->fTargetX;
+		samptd->fY = hxtd->fTargetY;
+		return;
+	}
+	samptd->szText[0] = '_';
+	samptd->szString[0] = '_';
+}
+
 //int isTextdrawValid(int idx)
 int isTextdrawValid(SPLHXTEXTDRAW *hxtd)
 {
@@ -262,31 +293,13 @@ int isTextdrawValid(SPLHXTEXTDRAW *hxtd)
 	return 0;
 }
 
-OpcodeResult WINAPI op0C37(CScriptThread *thread)
+DWORD hookedcall = NULL;
+DWORD *samp_21A0B4 = NULL;
+DWORD samp_21A0B4_val;
+
+void __cdecl stuff()
 {
-	gamedata.carhp = CLEO_GetIntOpcodeParam(thread);
-	gamedata.carheading = CLEO_GetIntOpcodeParam(thread);
-	gamedata.carspeedx = CLEO_GetFloatOpcodeParam(thread);
-	gamedata.carspeedy = CLEO_GetFloatOpcodeParam(thread);
-	gamedata.carspeedz = CLEO_GetFloatOpcodeParam(thread);
-
-	if (g_SAMP == NULL) {
-		g_SAMP = getSamp();
-		if (g_SAMP == NULL) {
-			return OR_CONTINUE;
-		}
-	}
-
-	if (g_SAMP->pPools == NULL ||
-			g_SAMP->pPools->pTextdraw == NULL) {
-		return OR_CONTINUE;
-	}
-
-	/*
-	if (g_SAMP->ulPort != 7777 || strcmp("142.44.161.46", g_SAMP->szIP) != 0) {
-		return OR_CONTINUE;
-	}
-	*/
+	DWORD samp_21A0B4_val = *samp_21A0B4;
 
 #if DOTRACE
 	if (hDbgFile == NULL) {
@@ -332,6 +345,77 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread)
 			hxtd->handler(hxtd, g_SAMP->pPools->pTextdraw->textdraw[hxtd->iHandle], TDHANDLER_UPDATE);
 		}
 	}
+}
 
+void __declspec(naked) Changestuff()
+{
+	_asm {
+		push ebx
+		push ecx
+		push edx
+		push esi
+		push edi
+		push ebp
+	}
+
+	stuff();
+
+	_asm {
+		xor eax, eax
+		pop ebp
+		pop edi
+		pop esi
+		pop edx
+		pop ecx
+		pop ebx
+		mov eax, samp_21A0B4_val
+		ret
+	}
+}
+
+OpcodeResult WINAPI op0C37(CScriptThread *thread)
+{
+	gamedata.carhp = CLEO_GetIntOpcodeParam(thread);
+	gamedata.carheading = CLEO_GetIntOpcodeParam(thread);
+	gamedata.carspeedx = CLEO_GetFloatOpcodeParam(thread);
+	gamedata.carspeedy = CLEO_GetFloatOpcodeParam(thread);
+	gamedata.carspeedz = CLEO_GetFloatOpcodeParam(thread);
+	gamedata.altitude = CLEO_GetIntOpcodeParam(thread);
+
+	if (g_SAMP == NULL) {
+		g_SAMP = getSamp();
+		if (g_SAMP == NULL) {
+			goto exitzero;
+		}
+	}
+
+	if (g_SAMP->pPools == NULL ||
+			g_SAMP->pPools->pTextdraw == NULL) {
+		goto exitzero;
+	}
+
+	/*
+	if (g_SAMP->ulPort != 7777 || strcmp("142.44.161.46", g_SAMP->szIP) != 0) {
+		goto exitzero;
+	}
+	*/
+
+	if (hookedcall) {
+		goto exitzero;
+	}
+
+	HMODULE samp_dll = GetModuleHandle("samp.dll");
+	DWORD mem = (DWORD)samp_dll + 0x1AD40;
+	DWORD *sub = (DWORD*)(mem);
+	hookedcall = *sub;
+	hookedcall += mem + 5;
+	samp_21A0B4 = (DWORD*)((DWORD)samp_dll + 0x21A0B4);
+
+	CLEO_SetIntOpcodeParam(thread, mem);
+	CLEO_SetIntOpcodeParam(thread, ((DWORD) &Changestuff) - mem + 1 - 4 - 2);
+	return OR_CONTINUE;
+exitzero:
+	CLEO_SetIntOpcodeParam(thread, 0);
+	CLEO_SetIntOpcodeParam(thread, 0);
 	return OR_CONTINUE;
 }

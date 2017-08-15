@@ -7,6 +7,10 @@ struct stSAMP *getSamp(void)
 {
 	HMODULE samp_dll = GetModuleHandle("samp.dll");
 
+	if (samp_dll == NULL) {
+		return NULL;
+	}
+
 	DWORD& adr = *(DWORD*)(((DWORD)samp_dll + SAMP_INFO_OFFSET));
 
 	return (stSAMP*)(adr);

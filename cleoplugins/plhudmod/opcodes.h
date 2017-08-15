@@ -30,6 +30,8 @@ void boxremovehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int 
 void fuelpricehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void gpshandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void headinghandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
+void altitudehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
+void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 
 enum PLTEXTDRAWS
 {
@@ -39,9 +41,9 @@ enum PLTEXTDRAWS
 	PLTD_BOX1,
 	PLTD_FUELPRICE,
 	PLTD_SATISF,
-	PLTD_BOX2,
+	PLTD_FUELBAR,
 	PLTD_STATUSBAR,
-	PLTD_BOX3,
+	PLTD_DMGBAR,
 	PLTD_ODO,
 	PLTD_AIRSPEED,
 	PLTD_ALTITUDE,
@@ -61,4 +63,5 @@ struct SGAMEDATA
 	float		carspeedy;
 	float		carspeedz;
 	int		carspeed;
+	int		altitude;
 };
