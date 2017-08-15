@@ -254,7 +254,7 @@ void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 	char headingstring[3 + 1 + 3 + 1 + 3 + 1 + 5 + 1 + 3 + 1 + 3 + 1 + 3 + 1];
 	int n[7];
 	for (int i = 0; i < 7; i++) {
-		n[i] = gamedata.carheading + 3 - i;
+		n[i] = (360 - gamedata.carheading) - 3 + i;
 		if (n[i] < 1) n[i] += 360;
 		if (n[i] > 360) n[i] -= 360;
 	}
