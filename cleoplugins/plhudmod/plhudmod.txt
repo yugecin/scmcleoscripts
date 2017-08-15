@@ -10,7 +10,9 @@
 00DF:   actor $PLAYER_ACTOR driving 
 004D: jf @NOCAR 
 03C0: 33@ = actor $PLAYER_ACTOR car
-0227: 0@ = car 33@ health
+0A97: 0@ = car 33@ struct
+000A: 0@ += 0x4C0
+0A8D: 0@ = read_memory 0@ size 4 virtual_protect 0  
 0092: 0@ = float 0@ to_integer
 0174: 1@ = car 33@ Z_angle
 0092: 1@ = float 1@ to_integer

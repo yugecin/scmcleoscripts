@@ -72,8 +72,7 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 		return;
 	}
 	char damagepctstring[7];
-	sprintf(damagepctstring, "%d", gamedata.carhp);
-	//sprintf(damagepctstring, "%.0f%%", (float) gamedata.carhp / 10.0f);
+	sprintf(damagepctstring, "%.0f%%", (float) gamedata.carhp / 10.0f);
 	memcpy(samptd->szText, damagepctstring, 7);
 	memcpy(samptd->szString, damagepctstring, 7);
 }
@@ -220,6 +219,11 @@ void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samp
 	}
 	samptd->szText[0] = '_';
 	samptd->szString[0] = '_';
+	if (!INCAR) {
+		samptd->dwBoxColor &= 0x00ffffff;
+	} else {
+		samptd->dwBoxColor |= 0xff000000;
+	}
 }
 
 #endif
