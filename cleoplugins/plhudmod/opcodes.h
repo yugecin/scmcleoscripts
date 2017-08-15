@@ -20,15 +20,12 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread);
 
 #define THEME			THEME_STANDARD
 #define SNOOP 1
-//#define DOTRACE 1
+#define DOTRACE 1
 
 // ----------------------
 
 #if DOTRACE
-char gDbgStr[100];
-DWORD gDbgW;
-HANDLE hDbgFile = NULL;
-#define TRACE1(x,y) sprintf(gDbgStr, x, y);WriteFile(hDbgFile, gDbgStr, strlen(gDbgStr), &gDbgW, NULL);
+#define TRACE1(x,y) {char dbgStr[100];sprintf(dbgStr, x, y);trace(dbgStr);}
 #define TRACE(x) TRACE1(x,0)
 #else
 #define TRACE(x)
@@ -97,5 +94,6 @@ struct SGAMEDATA
 #define INCAR (gamedata.carhp != -1)
 
 void setupTD(int tdidx, unsigned int x, unsigned int y, unsigned int targetX, unsigned int targetY, TDHANDLER handler);
+void trace(const char *f);
 
 extern SGAMEDATA gamedata;

@@ -10,6 +10,17 @@ BOOL InitOpcodes()
 			setupTextdraws();
 }
 
+void trace(const char *f)
+{
+	static HANDLE hDbgFile = NULL;
+	if (hDbgFile == NULL) {
+		hDbgFile = CreateFileA("tddbg.txt", FILE_GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+		SetFilePointer(hDbgFile, 0, NULL, FILE_END);
+	}
+	DWORD gDbgW;
+	WriteFile(hDbgFile, f, strlen(f), &gDbgW, NULL);
+}
+
 struct SPLHXTEXTDRAW pltextdraws[PLTDCOUNT];
 struct SGAMEDATA gamedata;
 struct stTextdrawPool *tdpool;
@@ -54,13 +65,6 @@ DWORD samp_21A0B4_val;
 void __cdecl update_textdraws()
 {
 	DWORD samp_21A0B4_val = *samp_21A0B4;
-
-#if DOTRACE
-	if (hDbgFile == NULL) {
-		hDbgFile = CreateFileA("tddbg.txt", FILE_GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-		SetFilePointer(hDbgFile, 0, NULL, FILE_END);
-	}
-#endif
 
 	TRACE("updating toupdate\n");
 	int tdstoupdate[PLTDCOUNT];
