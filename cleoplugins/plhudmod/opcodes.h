@@ -21,7 +21,7 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread);
 
 #define THEME			THEME_STANDARD
 #define SNOOP 1
-//#define DOTRACE 1
+#define DOTRACE 1
 
 // ----------------------
 
@@ -32,6 +32,9 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread);
 #define TRACE(x)
 #define TRACE1(x,y)
 #endif
+
+#define AIRSPEED(x)		(int)(14.5f*x/7.5f)
+#define GROUNDSPEED(x)		(int)(100.0f*x/27.8f)
 
 typedef void (*TDHANDLER)(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason);
 

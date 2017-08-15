@@ -1,5 +1,6 @@
 
 #include "opcodes.h"
+#include "commonhandlers.h"
 
 #if THEME == THEME_STANDARD
 
@@ -53,23 +54,6 @@ void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 	REPOSITION_ON_ATTACH();
 }
 
-void removehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("removehandler\n");
-	REPOSITION_ON_ATTACH();
-}
-
-void boxremovehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("boxremovehandler\n");
-	if (reason == TDHANDLER_ATTACH) {
-		samptd->dwBoxColor = 0;
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		return;
-	}
-}
-
 void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("gpshandler\n");
@@ -84,7 +68,7 @@ void airspeedhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 		return;
 	}
 	char airspeedstring[10];
-	sprintf(airspeedstring, "%d KTS", (int) (14.5f * gamedata.carspeed / 7.5f));
+	sprintf(airspeedstring, "%d KTS", AIRSPEED(gamedata.carspeed));
 	memcpy(&samptd->szText[14], airspeedstring, 10);
 	memcpy(&samptd->szString[14], airspeedstring, 10);
 }
@@ -100,27 +84,6 @@ void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 	sprintf(altitudestring, "%d FT", (int) gamedata.carz);
 	memcpy(&samptd->szText[14], altitudestring, 10);
 	memcpy(&samptd->szString[14], altitudestring, 10);
-}
-
-void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("headinghandler\n");
-	REPOSITION_ON_ATTACH();
-	if (!INCAR) {
-		return;
-	}
-#define HEADINGSTRLEN (3 + 1 + 3 + 1 + 3 + 1 + 5 + 1 + 3 + 1 + 3 + 1 + 3 + 1)
-	char headingstring[HEADINGSTRLEN];
-	int n[7];
-	for (int i = 0; i < 7; i++) {
-		n[i] = (360 - gamedata.carheading) - 3 + i;
-		if (n[i] < 1) n[i] += 360;
-		if (n[i] > 360) n[i] -= 360;
-	}
-	sprintf(headingstring, "%03d %03d %03d [%03d] %03d %03d %03d", n[0], n[1], n[2], n[3], n[4], n[5], n[6]);
-	memcpy(samptd->szText, headingstring, HEADINGSTRLEN);
-	memcpy(samptd->szString, headingstring, HEADINGSTRLEN);
-#undef HEADINGSTRLEN
 }
 
 void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)

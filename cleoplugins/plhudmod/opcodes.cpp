@@ -1,4 +1,5 @@
 #include "opcodes.h"
+#include "commonhandlers.h"
 #include "SRaceCheckpoint.h"
 #include <math.h>
 
@@ -44,17 +45,21 @@ int isTextdrawValid(SPLHXTEXTDRAW *hxtd)
 	return 0;
 }
 
-void carspeedtdhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+int isPTextdrawValid(SPLHXTEXTDRAW *hxtd)
 {
-	TRACE("carspeedtdhandler\n");
-	REPOSITION_ON_ATTACH();
-	if (!INCAR) {
-		return;
+	if (hxtd->iHandle == INVALID_TEXTDRAW || !tdpool->iPlayerTextDraw[hxtd->iHandle]) {
+		return 0;
 	}
-	char carspeedstring[10];
-	sprintf(carspeedstring, "%d KPH", (int) (100.0f * gamedata.carspeed / 27.8f));
-	memcpy(&samptd->szText[13], carspeedstring, 10);
-	memcpy(&samptd->szString[13], carspeedstring, 10);
+	if (tdpool->playerTextdraw[hxtd->iHandle]->fX == hxtd->fTargetX &&
+			tdpool->playerTextdraw[hxtd->iHandle]->fY == hxtd->fTargetY) {
+		return 1;
+	}
+	if (tdpool->playerTextdraw[hxtd->iHandle]->fX == hxtd->fX &&
+			tdpool->playerTextdraw[hxtd->iHandle]->fY == hxtd->fY) {
+		hxtd->handler(hxtd, tdpool->playerTextdraw[hxtd->iHandle], TDHANDLER_ATTACH);
+		return 1;
+	}
+	return 0;
 }
 
 BOOL setupPlayerTextdraws()
@@ -125,7 +130,8 @@ void __cdecl update_textdraws()
 	}
 
 	TRACE("updating carspeedhandle\n");
-	if (carspeedtd.handler != NULL && !isTextdrawValid(&carspeedtd)) {
+	if (carspeedtd.handler != NULL && !isPTextdrawValid(&carspeedtd)) {
+		carspeedtd.iHandle = INVALID_TEXTDRAW;
 		SPLHXTEXTDRAW *hxtd = &carspeedtd;
 		for (int j = 0; j < SAMP_MAX_PLAYERTEXTDRAWS; j++) {
 			if (!tdpool->iPlayerTextDraw[j]) {
