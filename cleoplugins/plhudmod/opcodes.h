@@ -48,6 +48,7 @@ struct SPLHXTEXTDRAW
 };
 
 void removehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
+void damagepcthandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void airspeedhandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void boxremovehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
 void fuelpricehandler(struct SPLHXTEXTDRAW *hxd, struct stTextdraw *samptd, int reason);
@@ -80,7 +81,7 @@ enum PLTEXTDRAWS
 
 struct SGAMEDATA
 {
-	int		carhp;
+	float		carhp;
 	int		carheading;
 	float		carspeedx;
 	float		carspeedy;

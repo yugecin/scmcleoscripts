@@ -20,10 +20,27 @@ BOOL setupTextdraws()
 	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0, 0, NULL);
-	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0, 0, NULL);
+	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0, 0, &damagepcthandler);
 	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
 	//setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, NULL);
 	return TRUE;
+}
+
+void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagepcthandler\n");
+	if (reason == TDHANDLER_ATTACH) {
+		samptd->fX = hxtd->fTargetX;
+		samptd->fY = hxtd->fTargetY;
+		return;
+	}
+	if (!INCAR) {
+		return;
+	}
+	char airspeedstring[6];
+	sprintf(airspeedstring, "%d%%", (int) gamedata.carhp);
+	memcpy(samptd->szText, airspeedstring, strlen(airspeedstring + 1));
+	memcpy(samptd->szString, airspeedstring, strlen(airspeedstring + 1));
 }
 
 void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)

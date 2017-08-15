@@ -62,7 +62,8 @@ void __cdecl update_textdraws()
 #endif
 
 	gamedata.carspeed = (int) (14.5f * sqrt(gamedata.carspeedx * gamedata.carspeedx + gamedata.carspeedy * gamedata.carspeedy + gamedata.carspeedz * gamedata.carspeedz) / 7.5f);
-	if (gamedata.carhp == 999) gamedata.carhp = 1000; // adjust anticheat hp
+	if (gamedata.carhp == 999.0f) gamedata.carhp = 1000.0f; // adjust anticheat hp
+	gamedata.carhp /= 1000.0f;
 
 	TRACE("updating toupdate\n");
 	int tdstoupdate[PLTDCOUNT];
