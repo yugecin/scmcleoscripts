@@ -94,6 +94,7 @@
     <ClInclude Include="samp.h" />
     <ClInclude Include="Stdafx.h" />
     <ClInclude Include="stuff.h" />
+    <ClInclude Include="theme_robin.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +104,7 @@
     <ClCompile Include="samp.cpp" />
     <ClCompile Include="snoop.cpp" />
     <ClCompile Include="theme_classic.cpp" />
+    <ClCompile Include="theme_robin.cpp" />
     <ClCompile Include="theme_standard.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>

@@ -1,0 +1,408 @@
+
+#include "opcodes.h"
+#include "commonhandlers.h"
+#include "util.h"
+#include "theme_robin.h"
+
+#if THEME == THEME_ROBIN
+
+int fuelval;
+int fuelprice;
+int satisfval;
+int odoval;
+char destnearstr[120];
+
+// ==== dmgboxstuff v
+
+void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("fuelpcthandler\n");
+	REPOSITION_ON_ATTACH();
+	if (ISPLANE) {
+		fuelval = simplestrval(samptd->szText, 0);
+		samptd->fLetterWidth = 0.0f;
+		return;
+	}
+	samptd->fLetterWidth = 0.27f;
+}
+
+void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagepcthandler\n");
+	REPOSITION_ON_ATTACH();
+	if (ISPLANE) {
+		samptd->fLetterWidth = 0.0f;
+		return;
+	}
+	samptd->fLetterWidth = 0.27f;
+	char damagepctstring[7];
+	sprintf(damagepctstring, "%.0f%%", (float)gamedata.carhp / 10.0f);
+	memcpy(samptd->szText, damagepctstring, 7);
+	memcpy(samptd->szString, damagepctstring, 7);
+}
+
+void damagepatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagepatchhandlerex\n");
+	REPOSITION_ON_ATTACH();
+	if (ISPLANE) {
+		samptd->fLetterWidth = 0.0f;
+		return;
+	}
+	samptd->fLetterWidth = 0.259999f;
+	damagepatchhandler(hxtd, samptd, reason);
+}
+
+void fuelhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("fuelhandler\n");
+	REPOSITION_ON_ATTACH();
+	if (ISPLANE) {
+		samptd->fLetterWidth = 0.0f;
+		return;
+	}
+	samptd->fLetterWidth = 0.289999f;
+}
+
+void fueldmgboxhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("fueldmgboxhandler\n");
+	REPOSITION_ON_ATTACH();
+	if (ISPLANE) {
+		samptd->byteBox = 0;
+		return;
+	}
+	samptd->byteBox = 1;
+}
+
+void damagebarhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagebarhandlerex\n");
+	REPOSITION_ON_ATTACH();
+	samptd->szText[0] = '_';
+	samptd->szString[0] = '_';
+	if (ISPLANE) {
+		samptd->byteBox = 0;
+		return;
+	}
+	samptd->byteBox = 1;
+	damagebarhandler(hxtd, samptd, reason);
+}
+
+void progressbarpatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("progressbarpatchhandler\n");
+	REPOSITION_ON_ATTACH();
+	samptd->szText[0] = '_';
+	samptd->szString[0] = '_';
+	samptd->byteBox = 0;
+	if (ISPLANE) {
+		return;
+	}
+	if (INCAR) {
+		samptd->byteBox = 1;
+	}
+}
+
+// ==== dmgboxstuff ^
+
+void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("gpshandler\n");
+	REPOSITION_ON_ATTACH();
+	samptd->fX = 85.0f;
+	samptd->fY = 320.0f;
+	samptd->fLetterWidth = 0.3f;
+	samptd->fLetterHeight = 1.0f;
+	samptd->byteBox = 0;
+	samptd->byteOutline = 1;
+	samptd->fBoxSizeY = 0x44200000;
+	TRACE1("gpshandler %s\n", samptd->szString);
+	if (samptd->szString[0] == 'G' || samptd->szText[0] == 'G') {
+		char gpsstring[100];
+		sprintf(gpsstring, "%s", &(samptd->szText[9]));
+		memcpy(samptd->szText, gpsstring, 100);
+		memcpy(samptd->szString, gpsstring, 100);
+	}
+}
+
+void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("destnearesthandler\n");
+	REPOSITION_ON_ATTACH();
+	if (!INCAR) {
+		return;
+	}
+	samptd->byteLeft = 1;
+	samptd->byteRight = 0;
+	samptd->byteCenter = 0;
+	samptd->fLetterWidth = 0.3f;
+	samptd->fLetterHeight = 1.0f;
+	samptd->byteOutline = 1;
+	samptd->byteBox = 0;
+	samptd->fBoxSizeX = 1280.0f;
+	samptd->fBoxSizeY = 1280.0f;
+	if (gamedata.missiondistance != -1) {
+		sprintf(samptd->szString, "~b~Distance~b~ ~w~%d M", gamedata.missiondistance);
+		memcpy(samptd->szText, samptd->szString, 27);
+		return;
+	}
+	if (samptd->szString[0] != 'N') {
+		goto useprevious;
+	}
+	int idx = 18;
+	int chars = 0;
+	while (true) {
+		if (samptd->szString[idx] == 'M') {
+			chars = sprintf(destnearstr, "~b~%s ", &(samptd->szText[idx + 8]));
+			break;
+		}
+		idx++;
+		if (idx > 23) {
+			goto useprevious;
+		}
+	}
+	if (chars == -1) {
+		goto useprevious;
+	}
+	int srcidx = 16;
+	if (samptd->szText[srcidx] != '(') {
+		goto useprevious;
+	}
+	while (true) {
+		char c = samptd->szText[srcidx++];
+		destnearstr[chars++] = c;
+		if (c == ')' || srcidx > 25) {
+			break;
+		}
+	}
+	destnearstr[chars] = 0;
+	memcpy(samptd->szText, destnearstr, chars + 1);
+	memcpy(samptd->szString, destnearstr, chars + 1);
+	return;
+useprevious:
+	memcpy(samptd->szText, destnearstr, 120);
+	memcpy(samptd->szString, destnearstr, 120);
+}
+
+void odohandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("odohandler\n");
+	REPOSITION_ON_ATTACH();
+	odoval = simplestrval(&(samptd->szString[9]), 0);
+	int idx = 10;
+	char c;
+	do {
+		c = samptd->szString[idx];
+		if (c == 'K') {
+			return;
+		}
+		if (c == 'M') {
+			odoval = 0;
+			return;
+		}
+		idx++;
+	} while (c != 0);
+}
+
+void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("fuelpricehandler\n");
+	REPOSITION_ON_ATTACH();
+	if (samptd->szString[11] == '$') {
+		fuelprice = simplestrval(samptd->szString, 12);
+	}
+}
+
+void satisfhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	satisfval = -1;
+	TRACE("satisfhandler\n");
+	REPOSITION_ON_ATTACH();
+	if (samptd->szString[22] == ':') {
+		satisfval = simplestrval(samptd->szString, 24);
+	}
+}
+
+void statusbarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("statusbarhandler\n");
+	REPOSITION_ON_ATTACH();
+	// statusbar & statusbarbox have the same position
+	if (samptd->byteBox) {
+		samptd->dwBoxColor = 0x6AA00200;
+		samptd->fLetterHeight = 1.0f;
+	} else {
+		samptd->iStyle = 2;
+		samptd->fLetterWidth = 0.25f;
+		samptd->fLetterHeight = 1.0f;
+		samptd->byteShadowSize = 1;
+	}
+}
+
+void hijackhandler1(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("hijackhandler1\n");
+	REPOSITION_ON_ATTACH();
+	if (!INCAR) {
+		samptd->byteBox = 0;
+		samptd->dwLetterColor = 0;
+		samptd->dwShadowColor = 0;
+		return;
+	}
+	samptd->fLetterWidth = 0.26f;
+	samptd->fLetterHeight = 1.0f;
+	samptd->dwLetterColor = 0xffffffff;
+	samptd->byteCenter = 0;
+	samptd->byteBox = 0;
+	samptd->fBoxSizeX = 1280.0f;
+	samptd->fBoxSizeY = 1280.0f;
+	samptd->byteProportional = 1;
+	samptd->dwShadowColor = 0xff000000;
+	samptd->byteShadowSize = 1;
+	samptd->byteOutline = 0;
+	samptd->byteLeft = 0;
+	samptd->byteRight = 1;
+	samptd->iStyle = 1;
+	char satisfstr[20];
+	satisfstr[0] = 0;
+	if (satisfval != -1) {
+		sprintf(satisfstr, "Satisfaction");
+	}
+	sprintf(samptd->szText, "%s~n~Airspeed~n~Altitude~n~ODO~n~Fuel ($%d/l)~n~Health", satisfstr, fuelprice);
+	memcpy(samptd->szString, samptd->szText, 200);
+	fuelprice = -1;
+}
+
+void hijackhandler2(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("hijackhandler2\n");
+	REPOSITION_ON_ATTACH();
+	if (!INCAR) {
+		samptd->byteBox = 0;
+		samptd->dwLetterColor = 0;
+		samptd->dwShadowColor = 0;
+		return;
+	}
+	samptd->fLetterWidth = 0.26f;
+	samptd->fLetterHeight = 1.0f;
+	samptd->dwLetterColor = 0xffffffff;
+	samptd->byteCenter = 0;
+	samptd->byteBox = 0;
+	samptd->fBoxSizeX = 1280.0f;
+	samptd->fBoxSizeY = 1280.0f;
+	samptd->byteProportional = 1;
+	samptd->dwShadowColor = 0xff000000;
+	samptd->byteShadowSize = 1;
+	samptd->byteOutline = 0;
+	samptd->byteLeft = 1;
+	samptd->byteRight = 0;
+	samptd->iStyle = 1;
+	char satisfstr[20];
+	satisfstr[0] = 0;
+	if (satisfval != -1) {
+		sprintf(satisfstr, "%d%%", satisfval);
+	}
+	sprintf(samptd->szText, "%s~n~%d KTS~n~%d FT~n~%d KM~n~%d%%~n~%d%%", satisfstr, AIRSPEED(gamedata.carspeed), (int) gamedata.carz, odoval,
+			fuelval, gamedata.carhp / 10);
+	memcpy(samptd->szString, samptd->szText, 230);
+}
+
+BOOL setupTextdraws()
+{
+	satisfval = -1;
+	destnearstr[0] = 0;
+	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0x44078000, 0x43C48148, &fuelhandler);
+	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0x44044000, 0x43CB0148, &damagepatchhandlerex);
+	setupTD(PLTD_STATUSBARBOX, 0x43A00000, 0x43D60000, 0x43A00000, 0x43D70000, &statusbarhandler);
+	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0x4403C000, 0x43C48148, &fueldmgboxhandler);
+	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0, 0, &fuelpricehandler);
+	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, &satisfhandler);
+	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandlerex);
+	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0x43A00000, 0x43D70000, &statusbarhandler);
+	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &damagebarhandlerex);
+	setupTD(PLTD_ODO, 0x43FA8000, 0x43C80000, 0, 0, &odohandler);
+	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x44070000, 0x43B18000, &hijackhandler1);
+	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x44160000, 0x43B18000, &hijackhandler2);
+	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0x42AA0000, 0x43A00000, &gpshandler);
+	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x431B0000, 0x43C80000, &destnearesthandler);
+	//setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, NULL);
+	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0x44124000, 0x43C60148, &fuelpcthandler);
+	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x44128000, 0x43CD0148, &damagepcthandler);
+	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
+	return TRUE;
+}
+
+void __cdecl drawbars()
+{
+	if (!ISPLANE) {
+		return;
+	}
+	float WIDTHMP = (float)(*(DWORD*)(0xC17044)) / 640.0f;
+	float HEIGHTMP = (float)(*(DWORD*)(0xC17048)) / 480.0f;
+
+	float BARPOSITIONX = 546.0f * WIDTHMP;
+	int BARWIDTH = (int) (50.0f * WIDTHMP);
+	int BARHEIGHT = (int)(9.2f * HEIGHTMP);
+	int DBARPOSITIONY = (int) (9.0f * HEIGHTMP);
+
+	int barpositiony = (int) (385.0f * HEIGHTMP);
+
+#define MIN(x,y) (x>y?y:x)
+#define NO0(x) (x<0?0:x)
+
+	float pct;
+
+	// satisfaction
+	if (satisfval != -1) {
+		pct = (float)satisfval;
+		DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFF00FFFF, 0);
+	}
+	barpositiony += DBARPOSITIONY;
+	// speed
+	pct = AIRSPEEDF(gamedata.carspeed) * 100.0f / 145.0f;
+	DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFF00FF, 0);
+	barpositiony += DBARPOSITIONY;
+	// altitude
+	pct = (float) gamedata.carz / 10.0f;
+	DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFF00FF, 0);
+	barpositiony += DBARPOSITIONY;
+	// odo
+	pct = (float) odoval / 5.0f;
+	DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFFFF00, 0);
+	barpositiony += DBARPOSITIONY;
+	// fuel
+	pct = (float) fuelval;
+	DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFF00FF00, 0);
+	barpositiony += DBARPOSITIONY;
+	// health
+	pct = (float) gamedata.carhp / 10.0f;
+	DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFF0000, 0);
+}
+
+void __declspec(naked) robindrawhookstuff()
+{
+	_asm {
+		push ebx
+		push ecx
+		push edx
+		push esi
+		push edi
+		push ebp
+	}
+
+	drawbars();
+
+	_asm {
+		pop ebp
+		pop edi
+		pop esi
+		pop edx
+		pop ecx
+		pop ebx
+		mov eax, ds:0xB7CF28
+		ret
+	}
+}
+
+#endif

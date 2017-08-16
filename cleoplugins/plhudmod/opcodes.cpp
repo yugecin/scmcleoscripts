@@ -1,6 +1,7 @@
 #include "opcodes.h"
 #include "commonhandlers.h"
 #include "SRaceCheckpoint.h"
+#include "theme_robin.h"
 #include <math.h>
 
 BOOL InitOpcodes()
@@ -231,9 +232,11 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread)
 		goto exitzero;
 	}
 
+	/*
 	if (g_SAMP->ulPort != 7777 || strcmp("142.44.161.46", g_SAMP->szIP) != 0) {
 		goto exitzero;
 	}
+	*/
 
 	tdpool = g_SAMP->pPools->pTextdraw;
 
@@ -250,8 +253,10 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread)
 
 	CLEO_SetIntOpcodeParam(thread, mem);
 	CLEO_SetIntOpcodeParam(thread, ((DWORD) &hookstuff) - mem + 1 - 4 - 2);
+	CLEO_SetIntOpcodeParam(thread, ROBINHOOKADDR);
 	return OR_CONTINUE;
 exitzero:
+	CLEO_SetIntOpcodeParam(thread, 0);
 	CLEO_SetIntOpcodeParam(thread, 0);
 	CLEO_SetIntOpcodeParam(thread, 0);
 	return OR_CONTINUE;

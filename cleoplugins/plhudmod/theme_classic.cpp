@@ -167,14 +167,14 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 	TRACE("damagepcthandler\n");
 	REPOSITION_ON_ATTACH();
 	if (ISPLANE) {
-		char damagepctstring[7];
-		sprintf(damagepctstring, "%.0f%%", (float)gamedata.carhp / 10.0f);
-		memcpy(samptd->szText, damagepctstring, 7);
-		memcpy(samptd->szString, damagepctstring, 7);
 		samptd->fLetterWidth = 0.0f;
 		return;
 	}
 	samptd->fLetterWidth = 0.27f;
+	char damagepctstring[7];
+	sprintf(damagepctstring, "%.0f%%", (float)gamedata.carhp / 10.0f);
+	memcpy(samptd->szText, damagepctstring, 7);
+	memcpy(samptd->szString, damagepctstring, 7);
 }
 
 void damagepatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
