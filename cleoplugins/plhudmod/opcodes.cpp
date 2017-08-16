@@ -193,7 +193,6 @@ void __declspec(naked) hookstuff()
 	update_textdraws();
 
 	_asm {
-		xor eax, eax
 		pop ebp
 		pop edi
 		pop esi
