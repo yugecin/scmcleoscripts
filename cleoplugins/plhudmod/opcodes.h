@@ -85,6 +85,7 @@ struct SGAMEDATA
 	float		carspeed;
 	int		missiondistance;
 	int		isplane;
+	int		blinkstatus;
 };
 
 #define INCAR (gamedata.carhp != -1)

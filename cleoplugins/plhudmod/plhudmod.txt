@@ -7,13 +7,24 @@
 0001: wait 0
 
 0006: 0@ = -1 // LOCALVAR ASSIGNMENT INT  
-0006: 8@ = 0 // LOCALVAR ASSIGNMENT INT
+0006: 8@ = 0 // LOCALVAR ASSIGNMENT INT 
+0006: 9@ = 0 // LOCALVAR ASSIGNMENT INT
+001B:   1000 > 32@ // LOCALVAR CMP INT 
+004D: jf @RESETBLINK
+0019:   32@ > 500 // LOCALVAR CMP INT
+004D: jf @SKIPBLINK
+0006: 9@ = 1 // LOCALVAR ASSIGNMENT INT
+0002: jump @SKIPBLINK
+:RESETBLINK
+0006: 32@ = 0 // LOCALVAR ASSIGNMENT INT
+:SKIPBLINK
+
 00DF:   actor $PLAYER_ACTOR driving 
 004D: jf @NOCAR
- 03C0: 33@ = actor $PLAYER_ACTOR car
-8119:   not car 33@ wrecked
+ 03C0: 30@ = actor $PLAYER_ACTOR car
+8119:   not car 30@ wrecked
 004D: jf @NOCAR
-056E:   car 33@ defined
+056E:   car 30@ defined
 004D: jf @NOCAR
 00D6: if or
 04A9:   actor $PLAYER_ACTOR driving_heli
@@ -21,18 +32,18 @@
 004D: jf @NOPLANE 
 0006: 8@ = 1 // LOCALVAR ASSIGNMENT INT
 :NOPLANE
-0A97: 0@ = car 33@ struct
+0A97: 0@ = car 30@ struct
 000A: 0@ += 0x4C0
 0A8D: 0@ = read_memory 0@ size 4 virtual_protect 0  
 0092: 0@ = float 0@ to_integer
-0174: 1@ = car 33@ Z_angle
+0174: 1@ = car 30@ Z_angle
 0092: 1@ = float 1@ to_integer
-06A2: get_car 33@ velocity_in_direction_XYZ 2@ 3@ 4@
-00AA: store_car 33@ position_to 5@ 6@ 7@
+06A2: get_car 30@ velocity_in_direction_XYZ 2@ 3@ 4@
+00AA: store_car 30@ position_to 5@ 6@ 7@
 :NOCAR
 
-{$O 0C37=11,%1d% %2d% %3d% %4d% %5d% %6d% %7d% %8d% %9d% %10d% %11d%}
-0C37: carhp 0@ carheading 1@ carspeedx 2@ carspeedy 3@ carspeedz 4@ carx 5@ cary 6@ carz 7@ isplane 8@ rewriteaddr 0@ changestuff 1@
+{$O 0C37=12,%1d% %2d% %3d% %4d% %5d% %6d% %7d% %8d% %9d% %10d% %11d% %12d%}
+0C37: carhp 0@ carheading 1@ carspeedx 2@ carspeedy 3@ carspeedz 4@ carx 5@ cary 6@ carz 7@ isplane 8@ blink 9@ rewriteaddr 0@ changestuff 1@
 0019:   0@ > 0 // LOCALVAR CMP INT
 004D: jump_if_false @NOREWRITE
 0A8C: write_memory 0@ size 1 value 0xE8 virtual_protect 1

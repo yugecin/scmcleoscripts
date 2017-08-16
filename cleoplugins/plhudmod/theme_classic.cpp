@@ -9,7 +9,6 @@ char fuel[5];
 char odo[15];
 char destnearstr[120];
 char satisfstr[22];
-char fuelcolor[2];
 char odocolor[2];
 
 void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -18,11 +17,6 @@ void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 	REPOSITION_ON_ATTACH();
 	if (ISPLANE) {
 		sprintf(fuel, "%s", samptd->szString);
-		if (simplestrval(fuel, 0) < 20) {
-			fuelcolor[0] = 'r';
-		} else {
-			fuelcolor[0] = 'w';
-		}
 		samptd->fLetterWidth = 0.0f;
 		return;
 	}
@@ -156,8 +150,10 @@ void hijackhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int re
 	samptd->iStyle = 1;
 	char mainstring[700];
 	float hp = (float)gamedata.carhp / 10.0f;
+	int fuelvalue = simplestrval(fuel, 0);
 	sprintf(mainstring, "~b~Airspeed: ~w~%d       ~b~Altitude: ~w~%d~n~~b~Fuel: ~w~~%s~%s       ~b~ODO: ~%s~%s~n~~b~Health: ~%s~%.0f%%    ~w~%s~n~%s",
-		AIRSPEED(gamedata.carspeed), (int) gamedata.carz, fuelcolor, fuel, odocolor, odo, hp < 35.0f ? "y" : "w", hp, satisfstr, destnearstr);
+		AIRSPEED(gamedata.carspeed), (int) gamedata.carz, (fuelvalue < 20 && gamedata.blinkstatus ? "y" : "w"), fuel, odocolor, odo,
+		(hp < 35.0f && gamedata.blinkstatus ? "y" : "w"), hp, satisfstr, destnearstr);
 	memcpy(samptd->szText, mainstring, 700);
 	memcpy(samptd->szString, mainstring, 700);
 	fuel[0] = 0;
@@ -250,8 +246,6 @@ BOOL setupTextdraws()
 	destnearstr[0] = 0;
 	satisfstr[0] = 0;
 	odo[0] = 0;
-	fuelcolor[0] = 'w';
-	fuelcolor[1] = 0;
 	odocolor[0] = 'w';
 	odocolor[1] = 0;
 	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0x44078000, 0x43C48148, &fuelhandler);
