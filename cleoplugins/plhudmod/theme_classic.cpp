@@ -23,7 +23,10 @@ void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 		} else {
 			fuelcolor[0] = 'w';
 		}
+		samptd->fLetterWidth = 0.0f;
+		return;
 	}
+	samptd->fLetterWidth = 0.27f;
 }
 
 void odohandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -93,27 +96,37 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 		sprintf(destnearstr, "~b~Distance~b~ ~w~%d", gamedata.missiondistance);
 		return;
 	}
-	int idx = 0;
-	int occurences = 0;
-	while (idx < 50) {
-		if (samptd->szString[idx++] == '~') {
-			occurences++;
-		}
-		if (occurences == 4) {
-			sprintf_s(destnearstr, "%s ", &(samptd->szText[idx]));
+	if (samptd->szString[0] != 'N') {
+		return;
+	}
+	int idx = 18;
+	int chars = 0;
+	while (true) {
+		if (samptd->szString[idx] == 'M') {
+			chars = sprintf(destnearstr, "~b~%s ", &(samptd->szText[idx + 8]));
 			break;
 		}
+		idx++;
+		if (idx > 23) {
+			return;
+		}
 	}
-	idx = strlen(destnearstr);
+	if (chars == -1) {
+		destnearstr[0] = 0;
+		return;
+	}
 	int srcidx = 16;
+	if (samptd->szText[srcidx] != '(') {
+		return;
+	}
 	while (true) {
 		char c = samptd->szText[srcidx++];
-		destnearstr[idx++] = c;
-		if (c == ')' || srcidx > 50) {
+		destnearstr[chars++] = c;
+		if (c == ')' || srcidx > 25) {
 			break;
 		}
 	}
-	destnearstr[idx] = 0;
+	destnearstr[chars] = 0;
 }
 
 void hijackhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -144,7 +157,7 @@ void hijackhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int re
 	char mainstring[700];
 	float hp = (float)gamedata.carhp / 10.0f;
 	sprintf(mainstring, "~b~Airspeed: ~w~%d       ~b~Altitude: ~w~%d~n~~b~Fuel: ~w~~%s~%s       ~b~ODO: ~%s~%s~n~~b~Health: ~%s~%.0f%%    ~w~%s~n~%s",
-		AIRSPEED(gamedata.carspeed), (int) gamedata.carz, fuelcolor, fuel, odocolor, odo, hp < 30.0f ? "y" : "w", hp, satisfstr, destnearstr);
+		AIRSPEED(gamedata.carspeed), (int) gamedata.carz, fuelcolor, fuel, odocolor, odo, hp < 35.0f ? "y" : "w", hp, satisfstr, destnearstr);
 	memcpy(samptd->szText, mainstring, 700);
 	memcpy(samptd->szString, mainstring, 700);
 	fuel[0] = 0;
@@ -162,43 +175,73 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 		sprintf(damagepctstring, "%.0f%%", (float)gamedata.carhp / 10.0f);
 		memcpy(samptd->szText, damagepctstring, 7);
 		memcpy(samptd->szString, damagepctstring, 7);
+		samptd->fLetterWidth = 0.0f;
+		return;
 	}
+	samptd->fLetterWidth = 0.27f;
 }
 
 void damagepatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("damagepatchhandlerex\n");
 	REPOSITION_ON_ATTACH();
-	if (!INCAR) {
+	if (ISPLANE) {
+		samptd->fLetterWidth = 0.0f;
 		return;
 	}
-	char str[12];
-	sprintf(str, "  ~b~Health");
-	memcpy(samptd->szText, str, 12);
-	memcpy(samptd->szString, str, 12);
+	samptd->fLetterWidth = 0.259999f;
+	damagepatchhandler(hxtd, samptd, reason);
 }
 
 void fuelhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("fuelhandler\n");
 	REPOSITION_ON_ATTACH();
-	if (!INCAR) {
+	if (ISPLANE) {
+		samptd->fLetterWidth = 0.0f;
 		return;
 	}
-	char str[10];
-	sprintf(str, "~b~Fuel");
-	memcpy(samptd->szText, str, 10);
-	memcpy(samptd->szString, str, 10);
+	samptd->fLetterWidth = 0.289999f;
 }
 
 void fueldmgboxhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("fueldmgboxhandler\n");
 	REPOSITION_ON_ATTACH();
-	if (!INCAR) {
+	if (ISPLANE) {
+		samptd->byteBox = 0;
 		return;
 	}
-	samptd->dwBoxColor = 0x6f370000;
+	samptd->byteBox = 1;
+}
+
+void damagebarhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagebarhandlerex\n");
+	REPOSITION_ON_ATTACH();
+	samptd->szText[0] = '_';
+	samptd->szString[0] = '_';
+	if (ISPLANE) {
+		samptd->byteBox = 0;
+		return;
+	}
+	samptd->byteBox = 1;
+	damagebarhandler(hxtd, samptd, reason);
+}
+
+void progressbarpatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("progressbarpatchhandler\n");
+	REPOSITION_ON_ATTACH();
+	samptd->szText[0] = '_';
+	samptd->szString[0] = '_';
+	samptd->byteBox = 0;
+	if (ISPLANE) {
+		return;
+	}
+	if (INCAR) {
+		samptd->byteBox = 1;
+	}
 }
 
 BOOL setupTextdraws()
@@ -217,9 +260,9 @@ BOOL setupTextdraws()
 	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0x4403C000, 0x43C48148, &fueldmgboxhandler);
 	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0, 0, NULL);
 	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, &satisfhandler);
-	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandler);
+	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandlerex);
 	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0x43A00000, 0x43D70000, &statusbarhandler);
-	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &damagebarhandler);
+	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &damagebarhandlerex);
 	setupTD(PLTD_ODO, 0x43FA8000, 0x43C80000, 0, 0, &odohandler);
 	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x43520000, 0x43B40000, &hijackhandler);
 	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0, 0, &boxremovehandler);
