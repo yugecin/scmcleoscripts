@@ -9,6 +9,7 @@
 int fuelval;
 int fuelprice;
 int satisfval;
+int satisflastseen;
 int odoval;
 char destnearstr[120];
 
@@ -58,10 +59,34 @@ void fuelhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reas
 	TRACE("fuelhandler\n");
 	REPOSITION_ON_ATTACH();
 	if (ISPLANE) {
-		samptd->fLetterWidth = 0.0f;
+		samptd->fLetterWidth = 0.3f;
+		samptd->fLetterHeight = 1.0f;
+		samptd->dwLetterColor = -1;
+		samptd->byteCenter = 0;
+		samptd->byteLeft = 1;
+		samptd->byteRight = 0;
+		samptd->byteOutline = 1;
+		samptd->fX = 155.0f;
+		samptd->fY = 400.0f;
+		hxtd->fTargetX = samptd->fX;
+		hxtd->fTargetY = samptd->fY;
+		memcpy(samptd->szString, destnearstr, 120);
+		memcpy(samptd->szText, destnearstr, 120);
 		return;
 	}
 	samptd->fLetterWidth = 0.289999f;
+	samptd->fLetterHeight = 1.5f;
+	samptd->dwLetterColor = -1;
+	samptd->byteCenter = 0;
+	samptd->byteLeft = 0;
+	samptd->byteRight = 0;
+	samptd->byteOutline = 0;
+	samptd->fX = 542.0f;
+	samptd->fY = 393.1f;
+	hxtd->fTargetX = samptd->fX;
+	hxtd->fTargetY = samptd->fY;
+	sprintf(samptd->szText, "Fuel");
+	memcpy(samptd->szString, samptd->szText, 5);
 }
 
 void fueldmgboxhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -118,7 +143,7 @@ void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reaso
 	samptd->byteOutline = 1;
 	samptd->fBoxSizeY = 0x44200000;
 	TRACE1("gpshandler %s\n", samptd->szString);
-	if (samptd->szString[0] == 'G' || samptd->szText[0] == 'G') {
+	if (strncmp(samptd->szString, "GPS~n~", 6) == 0 || strncmp(samptd->szText, "GPS~n~", 6) == 0) {
 		char gpsstring[100];
 		sprintf(gpsstring, "%s", &(samptd->szText[9]));
 		memcpy(samptd->szText, gpsstring, 100);
@@ -128,46 +153,38 @@ void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reaso
 
 void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
+	destnearstr[0] = 0;
 	TRACE("destnearesthandler\n");
 	REPOSITION_ON_ATTACH();
 	if (!INCAR) {
 		return;
 	}
-	samptd->byteLeft = 1;
-	samptd->byteRight = 0;
-	samptd->byteCenter = 0;
-	samptd->fLetterWidth = 0.3f;
-	samptd->fLetterHeight = 1.0f;
-	samptd->byteOutline = 1;
-	samptd->byteBox = 0;
-	samptd->fBoxSizeX = 1280.0f;
-	samptd->fBoxSizeY = 1280.0f;
 	if (gamedata.missiondistance != -1) {
-		sprintf(samptd->szString, "~b~Distance~b~ ~w~%d M", gamedata.missiondistance);
-		memcpy(samptd->szText, samptd->szString, 27);
+		sprintf(destnearstr, "Distance: %d", gamedata.missiondistance);
 		return;
 	}
-	if (samptd->szString[0] != 'N') {
-		goto useprevious;
+	if (strncmp(samptd->szText, "Nearest Airport (", 17) != 0) {
+		return;
 	}
 	int idx = 18;
 	int chars = 0;
 	while (true) {
-		if (samptd->szString[idx] == 'M') {
-			chars = sprintf(destnearstr, "~b~%s ", &(samptd->szText[idx + 8]));
+		if (samptd->szText[idx] == 'M') {
+			chars = sprintf(destnearstr, "%s ", &(samptd->szText[idx + 8]));
 			break;
 		}
 		idx++;
 		if (idx > 23) {
-			goto useprevious;
+			return;
 		}
 	}
 	if (chars == -1) {
-		goto useprevious;
+		destnearstr[0] = 0;
+		return;
 	}
 	int srcidx = 16;
 	if (samptd->szText[srcidx] != '(') {
-		goto useprevious;
+		return;
 	}
 	while (true) {
 		char c = samptd->szText[srcidx++];
@@ -177,12 +194,6 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 		}
 	}
 	destnearstr[chars] = 0;
-	memcpy(samptd->szText, destnearstr, chars + 1);
-	memcpy(samptd->szString, destnearstr, chars + 1);
-	return;
-useprevious:
-	memcpy(samptd->szText, destnearstr, 120);
-	memcpy(samptd->szString, destnearstr, 120);
 }
 
 void odohandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -216,7 +227,7 @@ void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 
 void satisfhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
-	satisfval = -1;
+	satisflastseen = 0;
 	TRACE("satisfhandler\n");
 	REPOSITION_ON_ATTACH();
 	if (samptd->szString[22] == ':') {
@@ -306,6 +317,10 @@ void hijackhandler2(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 	sprintf(samptd->szText, "%s~n~%d KTS~n~%d FT~n~%d KM~n~%d%%~n~%d%%", satisfstr, AIRSPEED(gamedata.carspeed), (int) gamedata.carz, odoval,
 			fuelval, gamedata.carhp / 10);
 	memcpy(samptd->szString, samptd->szText, 230);
+	satisflastseen++;
+	if (satisflastseen >= 2) {
+		satisfval = -1;
+	}
 }
 
 BOOL setupTextdraws()
@@ -325,7 +340,7 @@ BOOL setupTextdraws()
 	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x44070000, 0x43B18000, &hijackhandler1);
 	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x44160000, 0x43B18000, &hijackhandler2);
 	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0x42AA0000, 0x43A00000, &gpshandler);
-	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x431B0000, 0x43C80000, &destnearesthandler);
+	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0, 0, &destnearesthandler);
 	//setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, NULL);
 	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0x44124000, 0x43C60148, &fuelpcthandler);
 	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x44128000, 0x43CD0148, &damagepcthandler);
@@ -341,12 +356,12 @@ void __cdecl drawbars()
 	float WIDTHMP = (float)(*(DWORD*)(0xC17044)) / 640.0f;
 	float HEIGHTMP = (float)(*(DWORD*)(0xC17048)) / 480.0f;
 
-	float BARPOSITIONX = 546.0f * WIDTHMP;
+	float BARPOSITIONX = 547.0f * WIDTHMP;
 	int BARWIDTH = (int) (50.0f * WIDTHMP);
 	int BARHEIGHT = (int)(9.2f * HEIGHTMP);
-	int DBARPOSITIONY = (int) (9.0f * HEIGHTMP);
+	float DBARPOSITIONY = (9.0f * HEIGHTMP);
 
-	int barpositiony = (int) (385.0f * HEIGHTMP);
+	float barpositiony = (383.0f * HEIGHTMP);
 
 #define MIN(x,y) (x>y?y:x)
 #define NO0(x) (x<0?0:x)
@@ -356,28 +371,34 @@ void __cdecl drawbars()
 	// satisfaction
 	if (satisfval != -1) {
 		pct = (float)satisfval;
-		DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFF00FFFF, 0);
+		DrawBarChart(BARPOSITIONX, barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFF00FFFF, 0);
 	}
 	barpositiony += DBARPOSITIONY;
 	// speed
 	pct = AIRSPEEDF(gamedata.carspeed) * 100.0f / 145.0f;
-	DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFF00FF, 0);
+	DrawBarChart(BARPOSITIONX, barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFF00FF, 0);
 	barpositiony += DBARPOSITIONY;
 	// altitude
 	pct = (float) gamedata.carz / 10.0f;
-	DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFF00FF, 0);
+	DrawBarChart(BARPOSITIONX, barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFF00FF, 0);
 	barpositiony += DBARPOSITIONY;
 	// odo
-	pct = (float) odoval / 5.0f;
-	DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFFFF00, 0);
+	if (odoval < 480 || gamedata.blinkstatus) {
+		pct = (float)odoval / 5.0f;
+		DrawBarChart(BARPOSITIONX, barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFFFF00, 0);
+	}
 	barpositiony += DBARPOSITIONY;
 	// fuel
-	pct = (float) fuelval;
-	DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFF00FF00, 0);
+	if (fuelval > 20 || gamedata.blinkstatus) {
+		pct = (float)fuelval;
+		DrawBarChart(BARPOSITIONX, barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFF00FF00, 0);
+	}
 	barpositiony += DBARPOSITIONY;
 	// health
-	pct = (float) gamedata.carhp / 10.0f;
-	DrawBarChart(BARPOSITIONX, (float) barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFF0000, 0);
+	if (gamedata.carhp > 350 || gamedata.blinkstatus) {
+		pct = (float)gamedata.carhp / 10.0f;
+		DrawBarChart(BARPOSITIONX, barpositiony, BARWIDTH, BARHEIGHT, pct, 0, 0, 1, 0xFFFF0000, 0);
+	}
 }
 
 void __declspec(naked) robindrawhookstuff()

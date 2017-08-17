@@ -70,7 +70,7 @@ void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reaso
 	samptd->byteOutline = 1;
 	samptd->fBoxSizeY = 0x44200000;
 	TRACE1("gpshandler %s\n", samptd->szString);
-	if (samptd->szString[0] == 'G' || samptd->szText[0] == 'G') {
+	if (strncmp(samptd->szString, "GPS~n~", 6) == 0 || strncmp(samptd->szText, "GPS~n~", 6) == 0) {
 		char gpsstring[100];
 		sprintf(gpsstring, "%s", &(samptd->szText[9]));
 		memcpy(samptd->szText, gpsstring, 100);
@@ -90,13 +90,13 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 		sprintf(destnearstr, "~b~Distance~b~ ~w~%d", gamedata.missiondistance);
 		return;
 	}
-	if (samptd->szString[0] != 'N') {
+	if (strncmp(samptd->szText, "Nearest Airport (", 17) != 0) {
 		return;
 	}
 	int idx = 18;
 	int chars = 0;
 	while (true) {
-		if (samptd->szString[idx] == 'M') {
+		if (samptd->szText[idx] == 'M') {
 			chars = sprintf(destnearstr, "~b~%s ", &(samptd->szText[idx + 8]));
 			break;
 		}
