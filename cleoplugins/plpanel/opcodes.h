@@ -19,7 +19,9 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread);
 
 // ----------------------
 
+#if !defined THEME
 #define THEME			THEME_STANDARD
+#endif
 //#define SNOOP 1
 //#define DOTRACE 1
 
@@ -28,6 +30,7 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread);
 #if DOTRACE
 #define TRACE1(x,y) {char dbgStr[200];sprintf(dbgStr, x, y);trace(dbgStr);}
 #define TRACE(x) TRACE1(x,0)
+void trace(const char *f);
 #else
 #define TRACE(x)
 #define TRACE1(x,y)
@@ -93,6 +96,5 @@ struct SGAMEDATA
 #define ISPLANE (gamedata.isplane)
 
 void setupTD(int tdidx, unsigned int x, unsigned int y, unsigned int targetX, unsigned int targetY, TDHANDLER handler);
-void trace(const char *f);
 
 extern SGAMEDATA gamedata;

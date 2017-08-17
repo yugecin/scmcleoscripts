@@ -13,6 +13,7 @@ BOOL InitOpcodes()
 			setupTextdraws();
 }
 
+#if DOTRACE
 void trace(const char *f)
 {
 	static HANDLE hDbgFile = NULL;
@@ -23,6 +24,7 @@ void trace(const char *f)
 	DWORD gDbgW;
 	WriteFile(hDbgFile, f, strlen(f), &gDbgW, NULL);
 }
+#endif
 
 struct SPLHXTEXTDRAW pltextdraws[PLTDCOUNT];
 struct SPLHXTEXTDRAW carspeedtd;
@@ -232,11 +234,9 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread)
 		goto exitzero;
 	}
 
-	/*
 	if (g_SAMP->ulPort != 7777 || strcmp("142.44.161.46", g_SAMP->szIP) != 0) {
 		goto exitzero;
 	}
-	*/
 
 	tdpool = g_SAMP->pPools->pTextdraw;
 
