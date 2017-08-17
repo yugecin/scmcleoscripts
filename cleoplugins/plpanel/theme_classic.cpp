@@ -5,18 +5,17 @@
 
 #if THEME == THEME_CLASSIC
 
-char fuel[5];
-char odo[15];
+int fuelval;
+int odoval;
 char destnearstr[120];
 char satisfstr[22];
-char odocolor[2];
 
 void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("fuelpcthandler\n");
 	REPOSITION_ON_ATTACH();
 	if (ISPLANE) {
-		sprintf(fuel, "%s", samptd->szString);
+		fuelval = simplestrval(samptd->szText, 0);
 		samptd->fLetterWidth = 0.0f;
 		return;
 	}
@@ -27,19 +26,27 @@ void odohandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reaso
 {
 	TRACE("odohandler\n");
 	REPOSITION_ON_ATTACH();
-	sprintf(odo, "%s", &(samptd->szString[9]));
-	if (simplestrval(odo, 0) > 480) {
-		odocolor[0] = 'r';
-	} else {
-		odocolor[0] = 'w';
-	}
+	odoval = simplestrval(&(samptd->szText[9]), 0);
+	int idx = 10;
+	char c;
+	do {
+		c = samptd->szText[idx];
+		if (c == 'K') {
+			return;
+		}
+		if (c == 'M') {
+			odoval = 0;
+			return;
+		}
+		idx++;
+	} while (c != 0);
 }
 
 void satisfhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("satisfhandler\n");
 	REPOSITION_ON_ATTACH();
-	sprintf(satisfstr, "~b~Satisf: ~w~%s", &(samptd->szString[24]));
+	sprintf(satisfstr, "~b~Satisf: ~w~%s", &(samptd->szText[24]));
 }
 
 void statusbarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -70,11 +77,9 @@ void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reaso
 	samptd->byteOutline = 1;
 	samptd->fBoxSizeY = 0x44200000;
 	TRACE1("gpshandler %s\n", samptd->szString);
-	if (strncmp(samptd->szString, "GPS~n~", 6) == 0 || strncmp(samptd->szText, "GPS~n~", 6) == 0) {
-		char gpsstring[100];
-		sprintf(gpsstring, "%s", &(samptd->szText[9]));
-		memcpy(samptd->szText, gpsstring, 100);
-		memcpy(samptd->szString, gpsstring, 100);
+	if (strncmp(samptd->szText, "GPS~n~", 6) == 0) {
+		sprintf(samptd->szString, "%s", &(samptd->szText[9]));
+		memcpy(samptd->szText, samptd->szString, 100);
 	}
 }
 
@@ -148,18 +153,15 @@ void hijackhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int re
 	samptd->byteLeft = 0;
 	samptd->byteRight = 0;
 	samptd->iStyle = 1;
-	char mainstring[700];
 	float hp = (float)gamedata.carhp / 10.0f;
-	int fuelvalue = simplestrval(fuel, 0);
-	sprintf(mainstring, "~b~Airspeed: ~w~%d       ~b~Altitude: ~w~%d~n~~b~Fuel: ~%s~%s       ~b~ODO: ~%s~%s~n~~b~Health: ~%s~%.0f%%    ~w~%s~n~%s",
-		AIRSPEED(gamedata.carspeed), (int) gamedata.carz, (fuelvalue < 20 && gamedata.blinkstatus ? "y" : "w"), fuel, odocolor, odo,
-		(hp < 35.0f && gamedata.blinkstatus ? "y" : "w"), hp, satisfstr, destnearstr);
-	memcpy(samptd->szText, mainstring, 700);
-	memcpy(samptd->szString, mainstring, 700);
-	fuel[0] = 0;
+	sprintf(samptd->szText, "~b~Airspeed: ~w~%d       ~b~Altitude: ~w~%d~n~~b~Fuel: ~%s~%d       ~b~ODO: ~%s~%d KM~n~~b~Health: ~%s~%.0f%%    ~w~%s~n~%s",
+		AIRSPEED(gamedata.carspeed), (int) gamedata.carz, (fuelval < 20 && gamedata.blinkstatus ? "y" : "w"), fuelval,
+		(odoval > 480 && gamedata.blinkstatus ? "y" : "w"), odoval, (hp < 35.0f && gamedata.blinkstatus ? "y" : "w"), hp,
+		satisfstr, destnearstr);
+	memcpy(samptd->szString, samptd->szText, 700);
 	destnearstr[0] = 0;
 	satisfstr[0] = 0;
-	odo[0] = 0;
+	odoval = 0;
 }
 
 void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -171,10 +173,8 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 		return;
 	}
 	samptd->fLetterWidth = 0.27f;
-	char damagepctstring[7];
-	sprintf(damagepctstring, "%.0f%%", (float)gamedata.carhp / 10.0f);
-	memcpy(samptd->szText, damagepctstring, 7);
-	memcpy(samptd->szString, damagepctstring, 7);
+	sprintf(samptd->szText, "%.0f%%", (float)gamedata.carhp / 10.0f);
+	memcpy(samptd->szString, samptd->szText, 7);
 }
 
 void damagepatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -242,12 +242,10 @@ void progressbarpatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *sa
 
 BOOL setupTextdraws()
 {
-	fuel[0] = 0;
 	destnearstr[0] = 0;
 	satisfstr[0] = 0;
-	odo[0] = 0;
-	odocolor[0] = 'w';
-	odocolor[1] = 0;
+	odoval = 0;
+	fuelval = 0;
 	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0x44078000, 0x43C48148, &fuelhandler);
 	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0x44044000, 0x43CB0148, &damagepatchhandlerex);
 	setupTD(PLTD_STATUSBARBOX, 0x43A00000, 0x43D60000, 0x43A00000, 0x43D70000, &statusbarhandler);

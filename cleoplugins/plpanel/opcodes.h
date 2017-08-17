@@ -19,7 +19,7 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread);
 
 // ----------------------
 
-#define THEME			THEME_ROBIN
+#define THEME			THEME_STANDARD
 //#define SNOOP 1
 //#define DOTRACE 1
 

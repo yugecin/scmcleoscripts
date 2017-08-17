@@ -36,10 +36,8 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 		return;
 	}
 	samptd->fLetterWidth = 0.27f;
-	char damagepctstring[7];
-	sprintf(damagepctstring, "%.0f%%", (float)gamedata.carhp / 10.0f);
-	memcpy(samptd->szText, damagepctstring, 7);
-	memcpy(samptd->szString, damagepctstring, 7);
+	sprintf(samptd->szText, "%.0f%%", (float)gamedata.carhp / 10.0f);
+	memcpy(samptd->szString, samptd->szText, 7);
 }
 
 void damagepatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -142,12 +140,9 @@ void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reaso
 	samptd->byteBox = 0;
 	samptd->byteOutline = 1;
 	samptd->fBoxSizeY = 0x44200000;
-	TRACE1("gpshandler %s\n", samptd->szString);
-	if (strncmp(samptd->szString, "GPS~n~", 6) == 0 || strncmp(samptd->szText, "GPS~n~", 6) == 0) {
-		char gpsstring[100];
-		sprintf(gpsstring, "%s", &(samptd->szText[9]));
-		memcpy(samptd->szText, gpsstring, 100);
-		memcpy(samptd->szString, gpsstring, 100);
+	if (strncmp(samptd->szText, "GPS~n~", 6) == 0) {
+		sprintf(samptd->szString, "%s", &(samptd->szText[9]));
+		memcpy(samptd->szText, samptd->szString, 100);
 	}
 }
 
@@ -200,11 +195,11 @@ void odohandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reaso
 {
 	TRACE("odohandler\n");
 	REPOSITION_ON_ATTACH();
-	odoval = simplestrval(&(samptd->szString[9]), 0);
+	odoval = simplestrval(&(samptd->szText[9]), 0);
 	int idx = 10;
 	char c;
 	do {
-		c = samptd->szString[idx];
+		c = samptd->szText[idx];
 		if (c == 'K') {
 			return;
 		}
@@ -220,8 +215,8 @@ void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 {
 	TRACE("fuelpricehandler\n");
 	REPOSITION_ON_ATTACH();
-	if (samptd->szString[11] == '$') {
-		fuelprice = simplestrval(samptd->szString, 12);
+	if (samptd->szText[11] == '$') {
+		fuelprice = simplestrval(samptd->szText, 12);
 	}
 }
 
@@ -230,8 +225,8 @@ void satisfhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int re
 	satisflastseen = 0;
 	TRACE("satisfhandler\n");
 	REPOSITION_ON_ATTACH();
-	if (samptd->szString[22] == ':') {
-		satisfval = simplestrval(samptd->szString, 24);
+	if (samptd->szText[22] == ':') {
+		satisfval = simplestrval(samptd->szText, 24);
 	}
 }
 

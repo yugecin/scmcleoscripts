@@ -11,7 +11,7 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 	if (!INCAR) {
 		return;
 	}
-	if (gamedata.missiondistance == -1 || samptd->szString[0] != 'D') {
+	if (gamedata.missiondistance == -1 || samptd->szText[0] != 'D') {
 		return;
 	}
 	int destinationidx = 0;
@@ -25,14 +25,12 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 			break;
 		}
 	}
-	char destinationstring[100];
 	if (c == 0) {
-		sprintf(destinationstring, "Destination (%d M)", gamedata.missiondistance);
+		sprintf(samptd->szString, "Destination (%d M)", gamedata.missiondistance);
 	} else {
-		sprintf(destinationstring, "Destination (%d M)%s", gamedata.missiondistance, &(samptd->szText[destinationidx]));
+		sprintf(samptd->szString, "Destination (%d M)%s", gamedata.missiondistance, &(samptd->szText[destinationidx]));
 	}
-	memcpy(samptd->szText, destinationstring, 100);
-	memcpy(samptd->szString, destinationstring, 100);
+	memcpy(samptd->szText, samptd->szString, 100);
 }
 
 void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -42,21 +40,13 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 	if (!INCAR) {
 		return;
 	}
-	char damagepctstring[7];
-	sprintf(damagepctstring, "%.0f%%", (float) gamedata.carhp / 10.0f);
-	memcpy(samptd->szText, damagepctstring, 7);
-	memcpy(samptd->szString, damagepctstring, 7);
+	sprintf(samptd->szString, "%.0f%%", (float) gamedata.carhp / 10.0f);
+	memcpy(samptd->szString, samptd->szString, 7);
 }
 
 void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("fuelpricehandler\n");
-	REPOSITION_ON_ATTACH();
-}
-
-void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("gpshandler\n");
 	REPOSITION_ON_ATTACH();
 }
 
@@ -67,10 +57,8 @@ void airspeedhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 	if (!INCAR) {
 		return;
 	}
-	char airspeedstring[10];
-	sprintf(airspeedstring, "%d KTS", AIRSPEED(gamedata.carspeed));
-	memcpy(&samptd->szText[14], airspeedstring, 10);
-	memcpy(&samptd->szString[14], airspeedstring, 10);
+	sprintf(&samptd->szText[14], "%d KTS", AIRSPEED(gamedata.carspeed));
+	memcpy(&samptd->szString[14], &samptd->szText[14], 10);
 }
 
 void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -80,10 +68,8 @@ void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 	if (!INCAR) {
 		return;
 	}
-	char altitudestring[10];
-	sprintf(altitudestring, "%d FT", (int) gamedata.carz);
-	memcpy(&samptd->szText[14], altitudestring, 10);
-	memcpy(&samptd->szString[14], altitudestring, 10);
+	sprintf(&samptd->szText[14], "%d FT", (int) gamedata.carz);
+	memcpy(&samptd->szString[14], &samptd->szText[14], 10);
 }
 
 BOOL setupTextdraws()
