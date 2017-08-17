@@ -353,7 +353,7 @@ void __cdecl drawbars()
 
 	float BARPOSITIONX = 547.0f * WIDTHMP;
 	int BARWIDTH = (int) (50.0f * WIDTHMP);
-	float BARHEIGHT = (9.2f * HEIGHTMP);
+	int BARHEIGHT = (int) (9.2f * HEIGHTMP);
 	float DBARPOSITIONY = (9.0f * HEIGHTMP);
 
 	float barpositiony = (383.0f * HEIGHTMP);
