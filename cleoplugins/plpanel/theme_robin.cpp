@@ -358,9 +358,6 @@ void __cdecl drawbars()
 
 	float barpositiony = (383.0f * HEIGHTMP);
 
-#define MIN(x,y) (x>y?y:x)
-#define NO0(x) (x<0?0:x)
-
 	float pct;
 
 	// satisfaction
