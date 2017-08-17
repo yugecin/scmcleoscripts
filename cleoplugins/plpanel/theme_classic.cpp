@@ -92,7 +92,7 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 		return;
 	}
 	if (gamedata.missiondistance != -1) {
-		sprintf(destnearstr, "~b~Distance~b~ ~w~%d", gamedata.missiondistance);
+		sprintf(destnearstr, "~b~Distance~b~ ~w~%d M", gamedata.missiondistance);
 		return;
 	}
 	if (strncmp(samptd->szText, "Nearest Airport (", 17) != 0) {

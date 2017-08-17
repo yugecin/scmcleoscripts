@@ -155,7 +155,7 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 		return;
 	}
 	if (gamedata.missiondistance != -1) {
-		sprintf(destnearstr, "Distance: %d", gamedata.missiondistance);
+		sprintf(destnearstr, "Distance: %d M", gamedata.missiondistance);
 		return;
 	}
 	if (strncmp(samptd->szText, "Nearest Airport (", 17) != 0) {
@@ -353,7 +353,7 @@ void __cdecl drawbars()
 
 	float BARPOSITIONX = 547.0f * WIDTHMP;
 	int BARWIDTH = (int) (50.0f * WIDTHMP);
-	int BARHEIGHT = (int) (9.2f * HEIGHTMP);
+	unsigned char BARHEIGHT = (unsigned char) (9.2f * HEIGHTMP);
 	float DBARPOSITIONY = (9.0f * HEIGHTMP);
 
 	float barpositiony = (383.0f * HEIGHTMP);
