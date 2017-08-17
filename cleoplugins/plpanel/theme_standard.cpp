@@ -40,8 +40,8 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 	if (!INCAR) {
 		return;
 	}
-	sprintf(samptd->szString, "%.0f%%", (float) gamedata.carhp / 10.0f);
-	memcpy(samptd->szString, samptd->szString, 7);
+	sprintf(samptd->szText, "%.0f%%", (float) gamedata.carhp / 10.0f);
+	memcpy(samptd->szString, samptd->szText, 7);
 }
 
 void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
