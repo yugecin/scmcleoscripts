@@ -154,7 +154,7 @@ void hijackhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int re
 	samptd->byteRight = 0;
 	samptd->iStyle = 1;
 	float hp = (float)gamedata.carhp / 10.0f;
-	sprintf(samptd->szText, "~b~Airspeed: ~w~%d       ~b~Altitude: ~w~%d~n~~b~Fuel: ~%s~%d       ~b~ODO: ~%s~%d KM~n~~b~Health: ~%s~%.0f%%    ~w~%s~n~%s",
+	sprintf(samptd->szText, "~b~Airspeed: ~w~%d       ~b~Altitude: ~w~%d~n~~b~Fuel: ~%s~%d%%       ~b~ODO: ~%s~%d KM~n~~b~Health: ~%s~%.0f%%    ~w~%s~n~%s",
 		AIRSPEED(gamedata.carspeed), (int) gamedata.carz, (fuelval < 20 && gamedata.blinkstatus ? "y" : "w"), fuelval,
 		(odoval > 480 && gamedata.blinkstatus ? "y" : "w"), odoval, (hp < 35.0f && gamedata.blinkstatus ? "y" : "w"), hp,
 		satisfstr, destnearstr);
