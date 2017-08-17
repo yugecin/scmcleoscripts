@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6CCEA500-65B2-41EA-9F40-F0F96EB1EDAC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>plhudmod</RootNamespace>
+    <RootNamespace>plpanel</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -64,7 +64,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>$(SolutionDir)bin\plhudmod.cleo</OutputFile>
+      <OutputFile>$(SolutionDir)bin\plpanel.cleo</OutputFile>
       <AdditionalDependencies>../../../CLEO4/cleo_sdk/CLEO.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -84,7 +84,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <OutputFile>$(SolutionDir)bin\plhudmod.cleo</OutputFile>
+      <OutputFile>$(SolutionDir)bin\plpanel.cleo</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
