@@ -50,6 +50,8 @@
 000A: 0@ += 1 // LOCALVAR PLUS INT
 0A8C: write_memory 0@ size 4 value 1@ virtual_protect 1
 
+0019:   2@ > 0 // LOCALVAR CMP INT
+004D: jump_if_false @NOREWRITE
 0A8C: write_memory 0x58EE9F size 1 value 0xE8 virtual_protect 1
 0A8C: write_memory 0x58EEA0 size 4 value 2@ virtual_protect 1
 :NOREWRITE
