@@ -5,7 +5,7 @@
 
 struct stSAMP *getSamp(void)
 {
-	HMODULE samp_dll = GetModuleHandle("samp.dll");
+	static HMODULE samp_dll = GetModuleHandle("samp.dll");
 
 	if (samp_dll == NULL) {
 		return NULL;
