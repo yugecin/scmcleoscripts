@@ -227,34 +227,25 @@ OpcodeResult WINAPI op0C37(CScriptThread *thread)
 		if (g_SAMP == NULL) {
 			goto exitzero;
 		}
+		if (g_SAMP->pPools == NULL || g_SAMP->pPools->pTextdraw == NULL ||
+				g_SAMP->ulPort != 7777 || strcmp("142.44.161.46", g_SAMP->szIP) != 0) {
+			goto exitzero;
+		}
+		tdpool = g_SAMP->pPools->pTextdraw;
+
+		HMODULE samp_dll = GetModuleHandle("samp.dll");
+		DWORD mem = (DWORD)samp_dll + 0x1AD40;
+		DWORD *sub = (DWORD*)(mem);
+		hookedcall = *sub;
+		hookedcall += mem + 5;
+		samp_21A0B4 = (DWORD*)((DWORD)samp_dll + 0x21A0B4);
+
+		CLEO_SetIntOpcodeParam(thread, mem);
+		CLEO_SetIntOpcodeParam(thread, ((DWORD) &hookstuff) - mem + 1 - 4 - 2);
+		CLEO_SetIntOpcodeParam(thread, ROBINHOOKADDR);
+		return OR_CONTINUE;
 	}
 
-	if (g_SAMP->pPools == NULL ||
-			g_SAMP->pPools->pTextdraw == NULL) {
-		goto exitzero;
-	}
-
-	if (g_SAMP->ulPort != 7777 || strcmp("142.44.161.46", g_SAMP->szIP) != 0) {
-		goto exitzero;
-	}
-
-	tdpool = g_SAMP->pPools->pTextdraw;
-
-	if (hookedcall) {
-		goto exitzero;
-	}
-
-	HMODULE samp_dll = GetModuleHandle("samp.dll");
-	DWORD mem = (DWORD)samp_dll + 0x1AD40;
-	DWORD *sub = (DWORD*)(mem);
-	hookedcall = *sub;
-	hookedcall += mem + 5;
-	samp_21A0B4 = (DWORD*)((DWORD)samp_dll + 0x21A0B4);
-
-	CLEO_SetIntOpcodeParam(thread, mem);
-	CLEO_SetIntOpcodeParam(thread, ((DWORD) &hookstuff) - mem + 1 - 4 - 2);
-	CLEO_SetIntOpcodeParam(thread, ROBINHOOKADDR);
-	return OR_CONTINUE;
 exitzero:
 	CLEO_SetIntOpcodeParam(thread, 0);
 	CLEO_SetIntOpcodeParam(thread, 0);
