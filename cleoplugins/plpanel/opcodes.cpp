@@ -162,6 +162,7 @@ void __cdecl update_textdraws()
 				float dy = gamedata.cary - racecheckpoint[i].fY;
 				float dz = gamedata.carz - racecheckpoint[i].fZ;
 				gamedata.missiondistance = (int) sqrt(dx * dx + dy * dy + dz * dz);
+				break;
 			}
 		}
 	}
