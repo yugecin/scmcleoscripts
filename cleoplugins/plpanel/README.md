@@ -19,6 +19,7 @@ Features
 Standard theme
 ----------------
 The normal bar as you probably know it, but with the patches.
+
 ![standard](https://user-images.githubusercontent.com/12662260/29479931-374aebbe-8475-11e7-9cf2-3c5b434d94f4.png)
 
 Classic theme
@@ -27,6 +28,7 @@ Get that sweet 2011 feeling with this remake of the old panel! Extra features fo
 * Passenger satisfaction included in panel instead of a separate textdraw
 * GPS position above radar
 * Blinking fuel/health/odo indicator when critical level almost reached
+
 ![classic](https://user-images.githubusercontent.com/12662260/29479911-24072ae0-8475-11e7-8d50-d816f0a36e38.png)
 
 Robin's theme
@@ -38,6 +40,7 @@ Totally new panel 'design'. Extra features for this theme:
 * Passenger satisfaction has its own bar
 * Blinkings fuel/health/odo bars when critical level almost reached
 * Classic themed status bar
+
 ![robin](https://user-images.githubusercontent.com/12662260/29479937-3b764f26-8475-11e7-947f-cc126c5f81f9.png)
 
 
