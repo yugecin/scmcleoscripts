@@ -19,8 +19,8 @@ void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 {
 	TRACE("fuelpcthandler\n");
 	REPOSITION_ON_ATTACH();
+	fuelval = simplestrval(samptd->szText, 0);
 	if (ISPLANE) {
-		fuelval = simplestrval(samptd->szText, 0);
 		samptd->fLetterWidth = 0.0f;
 		return;
 	}
@@ -109,6 +109,9 @@ void damagebarhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 		return;
 	}
 	samptd->byteBox = 1;
+	if (gamedata.carhp <= 350 && !gamedata.blinkstatus) {
+		samptd->byteBox = 0;
+	}
 	damagebarhandler(hxtd, samptd, reason);
 }
 
@@ -122,7 +125,7 @@ void progressbarpatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *sa
 	if (ISPLANE) {
 		return;
 	}
-	if (INCAR) {
+	if (INCAR && !(fuelval <= 20 && !gamedata.blinkstatus)) {
 		samptd->byteBox = 1;
 	}
 }

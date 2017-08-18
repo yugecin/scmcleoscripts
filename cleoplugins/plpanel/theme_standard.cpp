@@ -1,4 +1,5 @@
 
+#include "util.h"
 #include "opcodes.h"
 #include "commonhandlers.h"
 
@@ -72,6 +73,32 @@ void altitudehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int 
 	memcpy(&samptd->szString[14], &samptd->szText[14], 10);
 }
 
+void damagebarhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("damagebarhandlerex\n");
+	damagebarhandler(hxtd, samptd, reason);
+	if (gamedata.carhp <= 350 && !gamedata.blinkstatus) {
+		samptd->dwBoxColor &= 0x00ffffff;
+	}
+}
+
+int fuelval = 0;
+void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("fuelpcthandler\n");
+	REPOSITION_ON_ATTACH();
+	fuelval = simplestrval(samptd->szText, 0);
+}
+
+void fuelbarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("fuelbarhandler\n");
+	progressbarpatchhandler(hxtd, samptd, reason);
+	if (fuelval <= 20 && !gamedata.blinkstatus) {
+		samptd->dwBoxColor &= 0x00ffffff;
+	}
+}
+
 BOOL setupTextdraws()
 {
 	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0, 0, NULL);
@@ -80,15 +107,15 @@ BOOL setupTextdraws()
 	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0, 0, NULL);
 	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0, 0, NULL);
 	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, NULL);
-	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandler);
+	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &fuelbarhandler);
 	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0, 0, NULL);
-	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &damagebarhandler);
+	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &damagebarhandlerex);
 	setupTD(PLTD_ODO, 0x43FA8000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x43E38000, 0x43C80148, &airspeedhandler);
 	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x43CC0000, 0x43C80148, &altitudehandler);
 	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0, 0, NULL);
 	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, &destnearesthandler);
-	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0, 0, NULL);
+	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0x44124000, 0x43C60008, &fuelpcthandler);
 	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x44128000, 0x43CD0148, &damagepcthandler);
 	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
 	return TRUE;
