@@ -89,3 +89,47 @@ void damagepatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 	memcpy(samptd->szString, str, 12);
 }
 
+void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason, char *destnearstr)
+{
+	destnearstr[0] = 0;
+	TRACE("destnearesthandler\n");
+	REPOSITION_ON_ATTACH();
+	if (!INCAR) {
+		return;
+	}
+	if (gamedata.missiondistance != -1) {
+		sprintf(destnearstr, "~b~Distance~b~ ~w~%d M", gamedata.missiondistance);
+		return;
+	}
+	if (strncmp(samptd->szText, "Nearest Airport (", 17) != 0) {
+		return;
+	}
+	int idx = 18;
+	int chars = 0;
+	while (true) {
+		if (samptd->szText[idx] == 'M') {
+			chars = sprintf(destnearstr, "~b~%s ", &(samptd->szText[idx + 8]));
+			break;
+		}
+		idx++;
+		if (idx > 23) {
+			return;
+		}
+	}
+	if (chars == -1) {
+		destnearstr[0] = 0;
+		return;
+	}
+	int srcidx = 16;
+	if (samptd->szText[srcidx] != '(') {
+		return;
+	}
+	while (true) {
+		char c = samptd->szText[srcidx++];
+		destnearstr[chars++] = c;
+		if (c == ')' || srcidx > 25) {
+			break;
+		}
+	}
+	destnearstr[chars] = 0;
+}

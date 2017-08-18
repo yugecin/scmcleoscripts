@@ -83,49 +83,10 @@ void gpshandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reaso
 	}
 }
 
-void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+void destnearesthandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
-	destnearstr[0] = 0;
-	TRACE("destnearesthandler\n");
-	REPOSITION_ON_ATTACH();
-	if (!INCAR) {
-		return;
-	}
-	if (gamedata.missiondistance != -1) {
-		sprintf(destnearstr, "~b~Distance~b~ ~w~%d M", gamedata.missiondistance);
-		return;
-	}
-	if (strncmp(samptd->szText, "Nearest Airport (", 17) != 0) {
-		return;
-	}
-	int idx = 18;
-	int chars = 0;
-	while (true) {
-		if (samptd->szText[idx] == 'M') {
-			chars = sprintf(destnearstr, "~b~%s ", &(samptd->szText[idx + 8]));
-			break;
-		}
-		idx++;
-		if (idx > 23) {
-			return;
-		}
-	}
-	if (chars == -1) {
-		destnearstr[0] = 0;
-		return;
-	}
-	int srcidx = 16;
-	if (samptd->szText[srcidx] != '(') {
-		return;
-	}
-	while (true) {
-		char c = samptd->szText[srcidx++];
-		destnearstr[chars++] = c;
-		if (c == ')' || srcidx > 25) {
-			break;
-		}
-	}
-	destnearstr[chars] = 0;
+	TRACE("destnearesthandlerex\n");
+	destnearesthandler(hxtd, samptd, reason, destnearstr);
 }
 
 void hijackhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -262,7 +223,7 @@ BOOL setupTextdraws()
 	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x43520000, 0x43B40000, &hijackhandler);
 	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0, 0, &boxremovehandler);
 	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0x42AA0000, 0x43A00000, &gpshandler);
-	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0, 0, &destnearesthandler);
+	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0, 0, &destnearesthandlerex);
 	//setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, NULL);
 	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0x44124000, 0x43C60148, &fuelpcthandler);
 	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x44128000, 0x43CD0148, &damagepcthandler);

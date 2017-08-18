@@ -8,4 +8,4 @@ void carspeedtdhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, in
 void damagebarhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason);
 void progressbarpatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason);
 void damagepatchhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason);
-
+void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason, char *destnearstr);
