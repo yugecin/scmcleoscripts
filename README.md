@@ -24,6 +24,7 @@
 [sign extending floats](/cleoplugins/signext)  
 [world2hud projection](/cleoplugins/world2hud)  
 [yugecodes - contains all my opcodes + extras](/cleoplugins/yugecodes)  
+[plpanel](/cleoplugins/plpanel)  
 
 ### Snippets
 [altering memory without CLEO](/snippets/memorywithoutcleo.txt)  
