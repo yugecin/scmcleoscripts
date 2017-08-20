@@ -6,8 +6,10 @@
 BOOL setupTextdraws();
 BOOL setupPlayerTextdraws();
 BOOL InitOpcodes();
-OpcodeResult WINAPI op0C36(CScriptThread *thread);
-OpcodeResult WINAPI op0C37(CScriptThread *thread);
+#if SNOOP
+OpcodeResult WINAPI op6C36(CScriptThread *thread);
+#endif
+OpcodeResult WINAPI op6C37(CScriptThread *thread);
 
 #define INVALID_TEXTDRAW	(-1)
 #define TDHANDLER_ATTACH	(1)

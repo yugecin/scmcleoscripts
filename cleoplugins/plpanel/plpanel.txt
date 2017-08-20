@@ -42,8 +42,8 @@
 00AA: store_car 30@ position_to 5@ 6@ 7@
 :NOCAR
 
-{$O 0C37=13,%1d% %2d% %3d% %4d% %5d% %6d% %7d% %8d% %9d% %10d% %11d% %12d% %13d%}
-0C37: carhp 0@ carheading 1@ carspeedx 2@ carspeedy 3@ carspeedz 4@ carx 5@ cary 6@ carz 7@ isplane 8@ blink 9@ rewriteaddr 0@ changestuff 1@ hudhook 2@
+{$O 6C37=13,%1d% %2d% %3d% %4d% %5d% %6d% %7d% %8d% %9d% %10d% %11d% %12d% %13d%}
+6C37: carhp 0@ carheading 1@ carspeedx 2@ carspeedy 3@ carspeedz 4@ carx 5@ cary 6@ carz 7@ isplane 8@ blink 9@ rewriteaddr 0@ changestuff 1@ hudhook 2@
 0019:   0@ > 0 // LOCALVAR CMP INT
 004D: jump_if_false @NOREWRITE
 0A8C: write_memory 0@ size 1 value 0xE8 virtual_protect 1
@@ -56,10 +56,12 @@
 0A8C: write_memory 0x58EEA0 size 4 value 2@ virtual_protect 1
 :NOREWRITE
 
+/*
 0AB0:   key_pressed 0x74 // F5
 004D: jump_if_false @MAIN_LOOP
-{$O 0C36=0,}
-0C36:
+{$O 6C36=0,}
+6C36:
+*/
 0002: jump @MAIN_LOOP
 
 0A93: end_custom_thread

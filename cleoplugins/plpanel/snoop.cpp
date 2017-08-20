@@ -47,11 +47,9 @@ void savetd(stTextdraw *td)
 	DWORD w;
 	WriteFile(hFile, buf, strlen(buf), &w, NULL);
 }
-#endif
 
 OpcodeResult WINAPI op0C36(CScriptThread *thread)
 {
-#if SNOOP
 	static struct stSAMP *g_SAMP = NULL;
 
 	if (g_SAMP == NULL) {
@@ -94,6 +92,6 @@ OpcodeResult WINAPI op0C36(CScriptThread *thread)
 		}
 	}
 
-#endif
 	return OR_CONTINUE;
 }
+#endif

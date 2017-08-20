@@ -7,8 +7,10 @@
 BOOL InitOpcodes()
 {
 	return
-			CLEO_RegisterOpcode(0x0C36, &op0C36) &&
-			CLEO_RegisterOpcode(0x0C37, &op0C37) &&
+#if SNOOP
+			CLEO_RegisterOpcode(0x6C36, &op6C36) &&
+#endif
+			CLEO_RegisterOpcode(0x6C37, &op6C37) &&
 			setupPlayerTextdraws() &&
 			setupTextdraws();
 }
@@ -208,7 +210,7 @@ void __declspec(naked) hookstuff()
 	}
 }
 
-OpcodeResult WINAPI op0C37(CScriptThread *thread)
+OpcodeResult WINAPI op6C37(CScriptThread *thread)
 {
 	static struct stSAMP *g_SAMP = NULL;
 
