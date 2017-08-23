@@ -105,7 +105,7 @@ DWORD samp_21A0B4_val;
 
 void __cdecl update_textdraws()
 {
-	DWORD samp_21A0B4_val = *samp_21A0B4;
+	samp_21A0B4_val = *samp_21A0B4;
 
 	TRACE("updating toupdate\n");
 	int tdstoupdate[PLTDCOUNT];
