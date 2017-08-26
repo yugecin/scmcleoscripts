@@ -34,11 +34,11 @@ push 0 ; waterPath
 push 0 ; includeNodesWithoutLinks
 push 0xFFFFFFFF ; forbiddenNodeAddr
 push 0 ; oneSideOnly
-push 0xF0237449 ; (999999.0f) maxUnkLimit
+push 0x497423f0 ; (999999.0f) maxUnkLimit
 push 0 ; targetAttr
-push 0xF0237449 ; (999999.0f) maxSearchDistance
+push 0x497423f0 ; (999999.0f) maxSearchDistance
 push _var04 ; pDistance
-push 2000 ; maxNodesToFind
+push 0x7D0 ; maxNodesToFind
 push _var03 ; pNodesCount
 push _var06 ; pResultNodes
 push [_var05+0x8] ; target.z
