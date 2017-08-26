@@ -13,7 +13,7 @@ lea edi, [eax+0x58C] ; pVehicle
 test edi, edi
 jz nogps2
 mov edi, [eax+0x58C]
-lea eax, [eax+0x46C] ; pedFlags
+mov eax, [eax+0x46C] ; pedFlags
 test eax, 0x100 ; bInVehicle
 jz nogps2
 mov edi, [edi+0x590] ; carType
@@ -22,28 +22,35 @@ jge nogps2
 
 push 0
 push _var01
-call 0x56E010
-add esp, 0x8
+call 0x56E010 ; RwV3D *__cdecl getPlayerCoords(RwV3D *outPoint, int playerIndex)
 
-mov eax, [0x40CA27]
+push [_var05]
+push [_var05+0x4]
+call 0x569660 ; float __cdecl CWorld::findGroundZForCoord(float X, float Y)
+fstp dword ptr [_var05+0x8]
+add esp, 0x10
 
-; push this
-; push 0 ; pathType
-; push _var01 ; origin
-; push _var02 ; originAddr
-; push target
-; push pResultNodes
-; push _var03 ; pNodesCount
-; push 2000 ; maxNodesToFind
-; push _var04 ; pDistance
-; push 0xF0237449 ; (999999.0f) maxSearchDistance
-; push 0 ; targetAttr
-; push 0xF0237449 ; (999999.0f) maxUnkLimit
-; push 0 ; oneSideOnly
-; push _var02 ; forbiddenNodeAddr
-; push 0 ; includeNodesWithoutLinks
-; push 0 ; waterPath
-; call 0x4515D0
+push 0 ; waterPath
+push 0 ; includeNodesWithoutLinks
+push 0xFFFFFFFF ; forbiddenNodeAddr
+push 0 ; oneSideOnly
+push 0xF0237449 ; (999999.0f) maxUnkLimit
+push 0 ; targetAttr
+push 0xF0237449 ; (999999.0f) maxSearchDistance
+push _var04 ; pDistance
+push 2000 ; maxNodesToFind
+push _var03 ; pNodesCount
+push _var06 ; pResultNodes
+push [_var05+0x8] ; target.z
+push [_var05+0x4] ; target.y
+push [_var05] ; target.x
+push 0xFFFFFFFF ; originAddr
+push [_var01+0x8] ; origin.z
+push [_var01+0x4] ; origin.y
+push [_var01] ; origin.x
+push 0x0 ; pathType
+mov ecx, [0x40CA27]
+call 0x4515D0 ; __thiscall!! CPathFind::DoPathSearch
 
 ; void CPathFind::DoPathSearch(unsigned char pathType, CVector origin, CNodeAddress originAddr, 
 		; CVector target, CNodeAddress *pResultNodes, short *pNodesCount, int maxNodesToFind, float *pDistance, 
