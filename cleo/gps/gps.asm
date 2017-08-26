@@ -1,0 +1,7 @@
+;rewritecall 0x5869C0
+
+;0x5759E4 ; map
+;0x5869BF ; radar
+
+call 0x586650 ; _?paintMapZones 0x586650
+jmp 0x5869C4

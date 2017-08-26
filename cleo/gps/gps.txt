@@ -1,0 +1,56 @@
+{$CLEO}
+{$NOSOURCE}
+03A4: name_thread 'GPS'
+
+0AC6: 0@ = label @ENTRY offset
+
+0085: 1@ = 0@ // (int)
+000E: 0@ -= 0xc06957fc
+0A8C: write_memory 0x005869C0 size 4 value 2@ vp 0
+
+0AC6: 1@ = label @OFF0 offset
+0A8D: 2@ = read_memory 1@ size 4 vp 0
+0062: 2@ -= 0@  // (int)
+0A8C: write_memory 1@ size 4 value 2@ vp 0
+0AC6: 1@ = label @OFF1 offset
+0A8D: 2@ = read_memory 1@ size 4 vp 0
+0062: 2@ -= 0@  // (int)
+0A8C: write_memory 1@ size 4 value 2@ vp 0
+
+0A93: end_custom_thread
+
+:entry
+hex
+ff 74 24 04 
+// push   DWORD PTR [esp+0x4]
+e8
+end
+:OFF0
+hex
+4b 66 58 00 
+// call 0x00586650
+58 
+// pop    eax
+83 c4 04 
+// add    esp,0x4
+50 
+// push   eax
+c3 
+// ret
+ff 74 24 04 
+// push   DWORD PTR [esp+0x4]
+e8
+end
+:OFF1
+hex
+3c 66 58 00 
+// call 0x00586650
+58 
+// pop    eax
+83 c4 04 
+// add    esp,0x4
+50 
+// push   eax
+c3 
+// ret
+end
