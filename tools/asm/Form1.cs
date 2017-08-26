@@ -31,6 +31,12 @@ namespace asm {
 			sb.Append(":ENTRY").AppendLine();
 			sb.Append("hex").AppendLine();
 			foreach (var line in lines) {
+				if (line.Trim().EndsWith(":")) {
+					if (checkBox1.Checked) {
+						sb.Append("// ").Append(line.Trim()).AppendLine();
+					}
+					continue;
+				}
 				instrc = 0;
 				int c = 1;
 				while (line[c - 1] != ':') c++;
@@ -43,25 +49,27 @@ namespace asm {
 				string comment = line.Substring(c);
 				
 				int si = 0;
-				if (comment.StartsWith("call") || comment.StartsWith("jmp") || comment.StartsWith("je ") || comment.StartsWith("jne ")) {
+				if (instrc == 5 &&
+						(comment.StartsWith("call") || comment.StartsWith("jmp") || comment.StartsWith("je ") || comment.StartsWith("jne "))) {
 					si = 1;
 					sb.Append(instr[0]).AppendLine();
 					sb.Append("end").AppendLine();
 					sb.Append(":OFF").Append(labels++).AppendLine();
 					sb.Append("hex").AppendLine();
 					instrs++;
-					if (instrc == 5) {
-						int idx = comment.IndexOf(' ') + 1;
-						comment = comment.Substring(0, idx) + "0x" + realaddr(instr);
-						patchinstr(instr, instrs);
-					}
+					int idx = comment.IndexOf(' ') + 1;
+					comment = comment.Substring(0, idx) + "0x" + realaddr(instr);
+					patchinstr(instr, instrs);
 				}
 				comment = comment.Trim();
 				for (; si < instrc; si++) {
 					sb.Append(instr[si]).Append(' ');
 					instrs++;
 				}
-				sb.AppendLine().Append("// ").Append(comment).AppendLine();
+				sb.AppendLine();
+				if (checkBox1.Checked) {
+					sb.Append("// ").Append(comment).AppendLine();
+				}
 			}
 			sb.Append("end").AppendLine();
 			var sb2 = new StringBuilder();
@@ -76,6 +84,7 @@ namespace asm {
 				textBox2.Text.Substring(0, 2),
 			};
 			sb2.Append("000E: 1@ -= 0x").Append(realaddr(hookadrs)).AppendLine();
+			sb2.Append("0A8C: write_memory 0x").Append(i2hs(int.Parse(textBox2.Text, NumberStyles.HexNumber) - 1)).Append(" size 1 value 0xE9 vp 0").AppendLine();
 			sb2.Append("0A8C: write_memory 0x").Append(textBox2.Text).Append(" size 4 value 1@ vp 0").AppendLine();
 			sb2.AppendLine();
 			for (int i = 0; i < labels; i++) {
@@ -91,6 +100,7 @@ namespace asm {
 			sb2.AppendLine();
 			sb.Insert(0, sb2.ToString());
 			textBox1.Text = sb.ToString();
+			Clipboard.SetText(textBox1.Text);
 		}
 
 		private string realaddr(string[] instr) {
@@ -106,6 +116,15 @@ namespace asm {
 			s += ((addr >> 16) & 0xff).ToString("x2");
 			s += ((addr >>  8) & 0xff).ToString("x2");
 			s += ((addr      ) & 0xff).ToString("x2");
+			return s;
+		}
+
+		private string i2hs(int i) {
+			string s = "";
+			s += ((i >> 24) & 0xff).ToString("x2");
+			s += ((i >> 16) & 0xff).ToString("x2");
+			s += ((i >>  8) & 0xff).ToString("x2");
+			s += ((i      ) & 0xff).ToString("x2");
 			return s;
 		}
 
@@ -136,14 +155,22 @@ namespace asm {
 			var lines = textBox1.Text.Split('\n');
 			var sb = new StringBuilder();
 			foreach (var line in lines) {
+				if (line.Trim().Length == 0) {
+					continue;
+				}
 				int i = line.IndexOf(';');
 				if (i == -1) {
 					sb.Append(line).AppendLine();
 					continue;
 				}
-				sb.Append(line.Substring(0, i)).AppendLine();
+				sb.Append(line.Substring(0, i).Trim()).AppendLine();
 			}
 			textBox1.Text = sb.ToString();
+			Clipboard.SetText(textBox1.Text);
+		}
+
+		private void button3_Click(object sender, EventArgs e) {
+			textBox1.Text = "";
 		}
 	}
 }
