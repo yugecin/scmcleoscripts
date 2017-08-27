@@ -18,7 +18,13 @@ test eax, 0x100 ; bInVehicle
 jz nogps2
 mov edi, [edi+0x590] ; carType
 cmp edi, 0x3 ; heli
-jge nogps2
+jl correctcartype
+cmp edi, 0x9
+je correctcartype
+cmp edi, 0xA
+jne nogps2
+
+correctcartype:
 
 ; initialize verts
 mov eax, [_var0B] ; vert
