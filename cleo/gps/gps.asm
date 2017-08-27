@@ -23,6 +23,7 @@ jge nogps2
 push 0
 push _var01
 call 0x56E010 ; RwV3D *__cdecl getPlayerCoords(RwV3D *outPoint, int playerIndex)
+;add esp, 0x8
 
 push [_var05]
 push [_var05+0x4]
@@ -38,7 +39,7 @@ push 0x497423f0 ; (999999.0f) maxUnkLimit
 push 0 ; targetAttr
 push 0x497423f0 ; (999999.0f) maxSearchDistance
 push _var04 ; pDistance
-push 0x7D0 ; maxNodesToFind
+push 0x7D0 ; (2000) maxNodesToFind
 push _var03 ; pNodesCount
 push _var06 ; pResultNodes
 push [_var05+0x8] ; target.z
@@ -49,21 +50,75 @@ push [_var01+0x8] ; origin.z
 push [_var01+0x4] ; origin.y
 push [_var01] ; origin.x
 push 0x0 ; pathType
-mov ecx, [0x40CA27]
-call 0x4515D0 ; __thiscall!! CPathFind::DoPathSearch
+mov ecx, [0x40CA27] ; this
+call 0x4515D0 ; __thiscall CPathFind::DoPathSearch
 
-; void CPathFind::DoPathSearch(unsigned char pathType, CVector origin, CNodeAddress originAddr, 
-		; CVector target, CNodeAddress *pResultNodes, short *pNodesCount, int maxNodesToFind, float *pDistance, 
-		; float maxSearchDistance, CNodeAddress *targetAddr, float maxUnkLimit, bool oneSideOnly, 
-		; CNodeAddress forbiddenNodeAddr, bool includeNodesWithoutLinks, bool waterPath)
-; {
-	; ((void (__thiscall *)(CPathFind *, unsigned char, CVector, CNodeAddress, CVector, CNodeAddress *,
-		; short *, int, float *, float, CNodeAddress *, float, bool, CNodeAddress, bool, bool))0x4515D0)(
-		; this, pathType, origin, originAddr, target, pResultNodes, pNodesCount, maxNodesToFind, pDistance, 
-		; maxSearchDistance, targetAddr, maxUnkLimit, oneSideOnly, forbiddenNodeAddr, includeNodesWithoutLinks, 
-		; waterPath);
-; }
+mov ax, [_var03] ; pNodesCount
+test ax, ax
+jz nogps2
 
+push ebx
+push edx ; changed by 0x420AC0
+mov bx, ax
+
+mov edi, 0
+transformnextnode:
+
+push [edi*4+_var06] ; address
+mov ecx, [0x40CA27] ; this
+call 0x420AC0 ; __thiscall CPathNode *CPathFind::GetPathNode
+push _var07 ; pResult
+mov ecx, eax ; this
+call 0x420A10 ; __thiscall CPathNode::GetNodeCoors
+push _var07 ; pIn
+push _var08 ; pOut
+call 0x583530 ; cdecl void CRadar::TransformRealWorldPointToRadarSpace(CVector2D &out,CVector2D const&in)
+; push _var08 ; pPoint
+call 0x5832F0 ; cdecl float CRadar::LimitRadarPoint(CVector2D &point)
+fstp dword ptr [_var01] ; (origin, junk)
+;push _var08 ; pIn
+lea eax, [edi*8+_var09]
+push eax
+call 0x583480 ; cdecl void CRadar::TransformRadarPointToScreenSpace(CVector2D &out,CVector2D const&in)
+pop eax
+add esp, 0x8
+
+fild dword ptr [edi*8+_var09]
+fild dword ptr [0x9B48D8+0x4] ; RsGlobal.maximumWidth
+fld dword ptr [_var0A] ; (640.0)
+fdivp
+fmulp
+fstp dword ptr [edi*8+_var09]
+
+fild dword ptr [edi*8+_var09+0x4]
+fild dword ptr [0x9B48D8+0x8] ; RsGlobal.maximumWidth
+fld dword ptr [_var0A+0x4] ; (448.0)
+fdivp
+fmulp
+fstp dword ptr [edi*8+_var09+0x4]
+
+lea eax, [edi*8+_var09+0x4]
+push eax ; pY
+sub eax, 0x4
+push eax ; pX
+call 0x583350 ; cdecl void CRadar::LimitToMap(float *pX,float *pY)
+;add esp, 0x8
+
+push 0 ; value
+push 1 ; state (rwRENDERSTATETEXTURERASTER)
+mov eax, [0xC97B24] ; RwEngineInstance
+call [eax+0x20] ; RwBool RwRenderStateSet(RwRenderState state, void* value)
+add esp, 0x10
+
+inc edi
+dec bx
+test bx, bx
+jnz transformnextnode
+
+
+
+pop edx
+pop ebx
 nogps2:
 pop edi
 nogps:
