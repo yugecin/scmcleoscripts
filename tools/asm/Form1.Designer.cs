@@ -1,4 +1,6 @@
-﻿namespace asm {
+﻿using System;
+
+namespace asm {
 	partial class Form1 {
 		/// <summary>
 		/// Required designer variable.
@@ -41,6 +43,7 @@
 			this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.textBox1.Size = new System.Drawing.Size(750, 421);
 			this.textBox1.TabIndex = 0;
+			this.textBox1.Click += new System.EventHandler(this.textBox1_Click);
 			// 
 			// button1
 			// 

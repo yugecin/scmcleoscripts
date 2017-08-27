@@ -33,64 +33,69 @@ namespace asm {
 			sb.Append(":ENTRY").AppendLine();
 			sb.Append("hex").AppendLine();
 			foreach (var line in lines) {
-				if (line.Trim().EndsWith(":")) {
-					if (checkBox1.Checked) {
-						sb.Append("// ").Append(line.Trim()).AppendLine();
-					}
-					continue;
-				}
-				instrc = 0;
-				int c = 1;
-				while (line[c - 1] != ':') c++;
-				while (line[c] == ' ') c++;
-				do {
-					instr[instrc++] = new string(new char[] { line[c], line[c + 1] } );
-					c += 3;
-				} while (line[c] != ' ');
-				while (line[c] == ' ') c++;
-				string comment = line.Substring(c);
-				
-				int si = 0;
-				if (instrc == 5 &&
-						(comment.StartsWith("call") || comment.StartsWith("jmp") || comment.StartsWith("je ") || comment.StartsWith("jne "))) {
-					si = 1;
-					sb.Append(instr[0]).AppendLine();
-					instrs++;
-					stuff.Add(instrs, new JMPCALL());
-					int idx = comment.IndexOf(' ') + 1;
-					comment = comment.Substring(0, idx) + "0x" + realaddr(instr);
-					patchinstr(instr, instrs);
-				}
-				for (int i = 1; i <= instrc - 4; i++) {
-					if (instr[i + 3] != "ee") {
+				try {
+					if (line.Trim().EndsWith(":")) {
+						if (checkBox1.Checked) {
+							sb.Append("// ").Append(line.Trim()).AppendLine();
+						}
 						continue;
 					}
-					for (; si < i; si++) {
+					instrc = 0;
+					int c = 1;
+					while (line[c - 1] != ':') c++;
+					while (line[c] == ' ') c++;
+					do {
+						instr[instrc++] = new string(new char[] { line[c], line[c + 1] } );
+						c += 3;
+					} while (line[c] != ' ');
+					while (line[c] == ' ') c++;
+					string comment = line.Substring(c);
+					
+					int si = 0;
+					if (instrc == 5 &&
+							(comment.StartsWith("call") || comment.StartsWith("jmp") || comment.StartsWith("je ") || comment.StartsWith("jne "))) {
+						si = 1;
+						sb.Append(instr[0]).AppendLine();
+						instrs++;
+						stuff.Add(instrs, new JMPCALL());
+						int idx = comment.IndexOf(' ') + 1;
+						comment = comment.Substring(0, idx) + "0x" + realaddr(instr);
+						patchinstr(instr, instrs);
+					}
+					for (int i = 1; i <= instrc - 4; i++) {
+						if (instr[i + 3] != "ee") {
+							continue;
+						}
+						for (; si < i; si++) {
+							sb.Append(instr[si]).Append(' ');
+							instrs++;
+						}
+						stuff.Add(instrs, new DATA(instr[i + 2], (int.Parse(instr[i + 1], NumberStyles.HexNumber) << 8) | int.Parse(instr[i], NumberStyles.HexNumber)));
+						sb.AppendLine();
+						sb.Append("00 00 00 00 // DATA").Append(instr[i + 2]).AppendLine();
+						instrs += 4;
+						i += 3;
+						si += 3;
+						if (si == instrc - 1) {
+							goto skiptocomment;
+						}
+					}
+					for (; si < instrc; si++) {
 						sb.Append(instr[si]).Append(' ');
 						instrs++;
 					}
-					stuff.Add(instrs, new DATA(instr[i + 2], (int.Parse(instr[i + 1], NumberStyles.HexNumber) << 8) | int.Parse(instr[i], NumberStyles.HexNumber)));
 					sb.AppendLine();
-					sb.Append("00 00 00 00 // DATA").Append(instr[i + 2]).AppendLine();
-					instrs += 4;
-					i += 3;
-					si += 3;
-					if (si == instrc - 1) {
-						goto skiptocomment;
+	skiptocomment:
+					if (checkBox1.Checked) {
+						sb.Append("// ").Append(comment.Trim()).AppendLine();
 					}
-				}
-				for (; si < instrc; si++) {
-					sb.Append(instr[si]).Append(' ');
-					instrs++;
-				}
-				sb.AppendLine();
-skiptocomment:
-				if (checkBox1.Checked) {
-					sb.Append("// ").Append(comment.Trim()).AppendLine();
+				} catch (Exception er) {
+					MessageBox.Show(er.ToString() + "\r\n" + line);
 				}
 			}
 			sb.Append("end").AppendLine();
 			var sb2 = new StringBuilder();
+			sb2.Append(":HOOKER").AppendLine();
 			sb2.Append("0AC6: 0@ = label @ENTRY offset").AppendLine();
 			sb2.AppendLine();
 			sb2.Append("0085: 1@ = 0@ // (int)").AppendLine();
@@ -115,10 +120,7 @@ skiptocomment:
 				s.Value.dostuff(sb2);
 			}
 			sb2.AppendLine();
-			sb2.Append("0A93: end_custom_thread").AppendLine().AppendLine();
-			sb2.Append(":MAIN_LOOP").AppendLine();
-			sb2.Append("0001: wait 250").AppendLine();
-			sb2.Append("0002: jump @MAIN_LOOP").AppendLine();
+			sb2.Append("0002: jump @NOMOREHOOKER").AppendLine().AppendLine();
 			sb2.AppendLine();
 			sb.Insert(0, sb2.ToString());
 			textBox1.Text = sb.ToString();
@@ -247,6 +249,10 @@ dooffset:
 skip:
 				sb.Append("0A8C: write_memory 1@ size 4 value ").Append(var).Append("@ vp 0").AppendLine();
 			}
+		}
+
+		private void textBox1_Click(object sender, EventArgs e) {
+			textBox1.Text = "";
 		}
 	}
 }

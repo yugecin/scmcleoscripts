@@ -92,7 +92,7 @@ mov bx, ax
 mov edi, 0
 transformnextnode:
 
-push [edi*4+_var06] ; address
+push [edi*0x4+_var06] ; address
 mov ecx, [0x40CA27] ; this
 call 0x420AC0 ; __thiscall CPathNode *CPathFind::GetPathNode
 push _var07 ; pResult
@@ -101,35 +101,11 @@ call 0x420A10 ; __thiscall CPathNode::GetNodeCoors
 push _var07 ; pIn
 push _var08 ; pOut
 call 0x583530 ; cdecl void CRadar::TransformRealWorldPointToRadarSpace(CVector2D &out,CVector2D const&in)
-; push _var08 ; pPoint
-call 0x5832F0 ; cdecl float CRadar::LimitRadarPoint(CVector2D &point)
-fstp dword ptr [_var01] ; (origin, junk)
 ;push _var08 ; pIn
-lea eax, [edi*8+_var09]
+lea eax, [edi*0x8+_var09]
 push eax
 call 0x583480 ; cdecl void CRadar::TransformRadarPointToScreenSpace(CVector2D &out,CVector2D const&in)
 pop eax
-add esp, 0x8
-
-; fild dword ptr [edi*8+_var09]
-; fild dword ptr [0x9B48D8+0x4] ; RsGlobal.maximumWidth
-; fld dword ptr [_var0A] ; (640.0)
-; fdivp
-; fmulp
-; fstp dword ptr [edi*8+_var09]
-
-; fild dword ptr [edi*8+_var09+0x4]
-; fild dword ptr [0x9B48D8+0x8] ; RsGlobal.maximumWidth
-; fld dword ptr [_var0A+0x4] ; (448.0)
-; fdivp
-; fmulp
-; fstp dword ptr [edi*8+_var09+0x4]
-
-lea eax, [edi*8+_var09+0x4]
-push eax ; pY
-sub eax, 0x4
-push eax ; pX
-call 0x583350 ; cdecl void CRadar::LimitToMap(float *pX,float *pY)
 ;add esp, 0x8
 
 push 0 ; value
@@ -145,29 +121,55 @@ jnz transformnextnode
 
 
 
+sub esp, 0x18
 mov ebx, 0
 mov eax, [_var0B] ; vert
 mov edx, _var09 ; nodepoint
 nextnodeverts:
 
-mov edi, [edx]
-mov dword ptr [eax], edi ; x
-mov edi, [edx+0x4]
-mov dword ptr [eax+0x4], edi ; y
-
-add eax, 0x1C
+mov dword ptr [esp+0x14], eax
+mov eax, 0x40800000 ; disassm limitation........
+mov dword ptr [esp+0x10], eax ; 4.0f
+fld dword ptr [edx+0x8]
+fld dword ptr [edx]
+fsubp
+fstp dword ptr [esp+0x4] ; dx
+fld dword ptr [edx+0xC]
+fld dword ptr [edx+0x4]
+fsubp
+fstp dword ptr [esp] ; dy
+call 0x53CC70 ; CGeneral__getATanOfXY
+fld ST(0)
+mov dword ptr [esp], 0x3fc90fda ; 1.5707963f
+fadd dword ptr [esp] ; angle + 1.5707963f
+fstp dword ptr [esp+0xC] ; angle + 1.5707963f
+fsub dword ptr [esp] ; angle - 1.5707963f
+fld ST(0)
+fcos
+fmul dword ptr [esp+0x10]
+fstp dword ptr [esp] ; cos(angle - 1.5707963f) * 4.0f
+fsin
+fmul dword ptr [esp+0x10]
+fstp dword ptr [esp+0x4]  ; sin(angle - 1.5707963f) * 4.0f
+fld dword ptr [esp+0xC] ; angle + 1.5707963f
+fld ST(0)
+fcos
+fmul dword ptr [esp+0x10]
+fstp dword ptr[esp+0x8] ; cos(angle + 1.5707963f) * 4.0f
+fsin
+fmul dword ptr [esp+0x10]
+fstp dword ptr[esp+0xC]  ; sin(angle + 1.5707963f) * 4.0f
+mov eax, dword ptr [esp+0x14]
 
 push [edx]
 fld dword ptr [esp]
-fldpi
-faddp ST(1), ST(0)
+fadd dword ptr[esp+0x4]
 fstp dword ptr [esp]
 pop edi
 mov dword ptr [eax], edi ; x
 push [edx+0x4]
 fld dword ptr [esp]
-fldpi
-faddp ST(1), ST(0)
+fadd dword ptr[esp+0x8]
 fstp dword ptr [esp]
 pop edi
 mov dword ptr [eax+0x4], edi ; y
@@ -175,24 +177,31 @@ mov dword ptr [eax+0x4], edi ; y
 add edx, 0x8
 add eax, 0x1C
 
-mov edi, [edx]
-mov dword ptr [eax], edi ; x
-mov edi, [edx+0x4]
-mov dword ptr [eax+0x4], edi ; y
-
-add eax, 0x1C
-
 push [edx]
 fld dword ptr [esp]
-fldpi
-faddp ST(1), ST(0)
+fadd dword ptr[esp+0x4]
 fstp dword ptr [esp]
 pop edi
 mov dword ptr [eax], edi ; x
 push [edx+0x4]
 fld dword ptr [esp]
-fldpi
-faddp ST(1), ST(0)
+fadd dword ptr[esp+0x8]
+fstp dword ptr [esp]
+pop edi
+mov dword ptr [eax+0x4], edi ; y
+
+sub edx, 0x8
+add eax, 0x1C
+
+push [edx]
+fld dword ptr [esp]
+fadd dword ptr[esp+0xC]
+fstp dword ptr [esp]
+pop edi
+mov dword ptr [eax], edi ; x
+push [edx+0x4]
+fld dword ptr [esp]
+fadd dword ptr[esp+0x10]
 fstp dword ptr [esp]
 pop edi
 mov dword ptr [eax+0x4], edi ; y
@@ -200,12 +209,25 @@ mov dword ptr [eax+0x4], edi ; y
 add edx, 0x8
 add eax, 0x1C
 
-add ebx, 2
-cmp ebx, 0x12
-jg enough
+push [edx]
+fld dword ptr [esp]
+fadd dword ptr[esp+0xC]
+fstp dword ptr [esp]
+pop edi
+mov dword ptr [eax], edi ; x
+push [edx+0x4]
+fld dword ptr [esp]
+fadd dword ptr[esp+0x10]
+fstp dword ptr [esp]
+pop edi
+mov dword ptr [eax+0x4], edi ; y
+
+add eax, 0x1C
+
+add ebx, 1
 cmp ebx, [_var03] ; pNodesCount
 jl nextnodeverts
-enough:
+add esp, 0x18
 
 mov eax, [_var03] ; pNodesCount
 dec eax
