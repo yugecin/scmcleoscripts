@@ -19,9 +19,9 @@ jz nogps2
 mov edi, [edi+0x590] ; carType
 cmp edi, 0x3 ; heli
 jl correctcartype
-cmp edi, 0x9
+cmp edi, 0x9 ; bike
 je correctcartype
-cmp edi, 0xA
+cmp edi, 0xA ; bmx
 jne nogps2
 
 correctcartype:
@@ -145,8 +145,7 @@ jnz transformnextnode
 
 
 
-mov ax, [_var03] ; pNodesCount
-mov bx, ax
+mov ebx, 0
 mov eax, [_var0B] ; vert
 mov edx, _var09 ; nodepoint
 nextnodeverts:
@@ -201,11 +200,15 @@ mov dword ptr [eax+0x4], edi ; y
 add edx, 0x8
 add eax, 0x1C
 
-dec bx
-test bx, bx
-jnz nextnodeverts
+add ebx, 2
+cmp ebx, 0x12
+jg enough
+cmp ebx, [_var03] ; pNodesCount
+jl nextnodeverts
+enough:
 
 mov eax, [_var03] ; pNodesCount
+dec eax
 imul eax, 0x4
 push eax ; numVertices
 push [_var0B] ; vertices
