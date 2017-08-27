@@ -20,6 +20,28 @@ mov edi, [edi+0x590] ; carType
 cmp edi, 0x3 ; heli
 jge nogps2
 
+; initialize verts
+mov eax, [_var0B] ; vert
+add eax, 0x8
+cmp dword ptr [eax], 0x38D1B717
+je vertsinitialized
+mov edi, 0x1F40 ; nodecount * 4 (8000)
+initnextvert:
+mov dword ptr [eax], 0x38D1B717 ; 0.0001f NearScreenZ
+add eax, 0x4
+mov dword ptr [eax], 0x40555555 ; 3.333333254f RecipNearClip
+add eax, 0x4
+mov dword ptr [eax], 0xFFB41818 ; col
+add eax, 0x4
+mov dword ptr [eax], 0x0 ; u
+add eax, 0x4
+mov dword ptr [eax], 0x0 ; v
+add eax, 0xC
+dec edi
+test edi, edi
+jnz initnextvert
+
+vertsinitialized:
 push 0
 push _var01
 call 0x56E010 ; RwV3D *__cdecl getPlayerCoords(RwV3D *outPoint, int playerIndex)
@@ -83,19 +105,19 @@ call 0x583480 ; cdecl void CRadar::TransformRadarPointToScreenSpace(CVector2D &o
 pop eax
 add esp, 0x8
 
-fild dword ptr [edi*8+_var09]
-fild dword ptr [0x9B48D8+0x4] ; RsGlobal.maximumWidth
-fld dword ptr [_var0A] ; (640.0)
-fdivp
-fmulp
-fstp dword ptr [edi*8+_var09]
+; fild dword ptr [edi*8+_var09]
+; fild dword ptr [0x9B48D8+0x4] ; RsGlobal.maximumWidth
+; fld dword ptr [_var0A] ; (640.0)
+; fdivp
+; fmulp
+; fstp dword ptr [edi*8+_var09]
 
-fild dword ptr [edi*8+_var09+0x4]
-fild dword ptr [0x9B48D8+0x8] ; RsGlobal.maximumWidth
-fld dword ptr [_var0A+0x4] ; (448.0)
-fdivp
-fmulp
-fstp dword ptr [edi*8+_var09+0x4]
+; fild dword ptr [edi*8+_var09+0x4]
+; fild dword ptr [0x9B48D8+0x8] ; RsGlobal.maximumWidth
+; fld dword ptr [_var0A+0x4] ; (448.0)
+; fdivp
+; fmulp
+; fstp dword ptr [edi*8+_var09+0x4]
 
 lea eax, [edi*8+_var09+0x4]
 push eax ; pY
@@ -115,6 +137,76 @@ dec bx
 test bx, bx
 jnz transformnextnode
 
+
+
+mov ax, [_var03] ; pNodesCount
+mov bx, ax
+mov eax, [_var0B] ; vert
+mov edx, _var09 ; nodepoint
+nextnodeverts:
+
+mov edi, [edx]
+mov dword ptr [eax], edi ; x
+mov edi, [edx+0x4]
+mov dword ptr [eax+0x4], edi ; y
+
+add eax, 0x1C
+
+push [edx]
+fld dword ptr [esp]
+fldpi
+faddp ST(1), ST(0)
+fstp dword ptr [esp]
+pop edi
+mov dword ptr [eax], edi ; x
+push [edx+0x4]
+fld dword ptr [esp]
+fldpi
+faddp ST(1), ST(0)
+fstp dword ptr [esp]
+pop edi
+mov dword ptr [eax+0x4], edi ; y
+
+add edx, 0x8
+add eax, 0x1C
+
+mov edi, [edx]
+mov dword ptr [eax], edi ; x
+mov edi, [edx+0x4]
+mov dword ptr [eax+0x4], edi ; y
+
+add eax, 0x1C
+
+push [edx]
+fld dword ptr [esp]
+fldpi
+faddp ST(1), ST(0)
+fstp dword ptr [esp]
+pop edi
+mov dword ptr [eax], edi ; x
+push [edx+0x4]
+fld dword ptr [esp]
+fldpi
+faddp ST(1), ST(0)
+fstp dword ptr [esp]
+pop edi
+mov dword ptr [eax+0x4], edi ; y
+
+add edx, 0x8
+add eax, 0x1C
+
+dec bx
+test bx, bx
+jnz nextnodeverts
+
+mov eax, [_var03] ; pNodesCount
+imul eax, 0x4
+push eax ; numVertices
+push [_var0B] ; vertices
+push 4 ; primType (rwPRIMTYPETRISTRIP)
+mov eax, [0xC97B24] ; RwEngineInstance
+call [eax+0x30] ; RwBool RwIm2DRenderPrimitiveFunction(RwPrimitiveType primType, RwIm2DVertex *vertices, RwInt32 numVertices);
+add esp, 0xC
 
 
 pop edx
