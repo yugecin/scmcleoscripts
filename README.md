@@ -32,6 +32,9 @@
 [hook](/snippets/hook.txt)  
 [hook drawhud and draw a polygon](/snippets/hookdrawpoly.txt)  
 
+### Tools
+[asm](/tools/asm)  
+
 ### License
 [GPLv3](/LICENSE)  
 

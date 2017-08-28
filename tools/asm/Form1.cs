@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -32,9 +34,20 @@ namespace asm {
 			SortedDictionary<int, A> stuff = new SortedDictionary<int, A>();
 			sb.Append(":ENTRY").AppendLine();
 			sb.Append("hex").AppendLine();
-			foreach (var line in lines) {
+			int _ = 0;
+			if (lines[_].Trim().Replace("\r", "").Length == 0) {
+				do {
+					_++;
+				} while (!lines[_-1].StartsWith("00000000 <_main>"));
+			}
+			for (; _ < lines.Length; _++) {
+				string _line = lines[_];
 				try {
-					if (line.Trim().EndsWith(":")) {
+					string line = _line.Trim().Replace("\r", "");
+					if (line.Length == 0) {
+						continue;
+					}
+					if (line.EndsWith(":")) {
 						if (checkBox1.Checked) {
 							sb.Append("// ").Append(line.Trim()).AppendLine();
 						}
@@ -43,12 +56,12 @@ namespace asm {
 					instrc = 0;
 					int c = 1;
 					while (line[c - 1] != ':') c++;
-					while (line[c] == ' ') c++;
+					while (line[c] == ' ' || line[c] == '\t') c++;
 					do {
 						instr[instrc++] = new string(new char[] { line[c], line[c + 1] } );
 						c += 3;
-					} while (line[c] != ' ');
-					while (line[c] == ' ') c++;
+					} while (line[c] != ' ' && line [c] != '\t');
+					while (line[c] == ' ' || line[c] == '\t') c++;
 					string comment = line.Substring(c);
 					
 					int si = 0;
@@ -90,7 +103,7 @@ namespace asm {
 						sb.Append("// ").Append(comment.Trim()).AppendLine();
 					}
 				} catch (Exception er) {
-					MessageBox.Show(er.ToString() + "\r\n" + line);
+					MessageBox.Show(er.ToString() + "\r\n" + _line);
 				}
 			}
 			sb.Append("end").AppendLine();
@@ -253,6 +266,61 @@ skip:
 
 		private void textBox1_Click(object sender, EventArgs e) {
 			textBox1.Text = "";
+		}
+
+		private void button4_Click(object sender, EventArgs e) {
+			button2.PerformClick();
+			if (File.Exists("f.s")) File.Delete("f.s");
+			if (File.Exists("f.o")) File.Delete("f.o");
+			StreamWriter file = new StreamWriter("f.s");
+			file.WriteLine(".intel_syntax noprefix\n_main:\n" + textBox1.Text);
+			file.Close();
+			StringBuilder o = new StringBuilder();
+			bool res = false;
+			if (exec(o, txtgcc.Text, "-m32 -c f.s -o f.o")) {
+				o.Clear();
+				res = exec(o, txtobjdump.Text, "-M intel -d f.o");
+			}
+			textBox1.Text = o.ToString();
+			//if (File.Exists("f.s")) File.Delete("f.s");
+			//if (File.Exists("f.o")) File.Delete("f.o");
+			if (!res) {
+				return;
+			}
+			button1.PerformClick();
+		}
+
+		public static string mydir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+		private bool exec(StringBuilder o, string exe, string args)
+		{
+			ProcessStartInfo processStartInfo = new ProcessStartInfo(exe, args);
+			processStartInfo.UseShellExecute = false;
+			//processStartInfo.ErrorDialog = false;
+			processStartInfo.RedirectStandardError = true;
+			//processStartInfo.RedirectStandardInput = true;
+			processStartInfo.RedirectStandardOutput = true;
+			//processStartInfo.CreateNoWindow = true;
+			processStartInfo.WorkingDirectory = mydir;
+			Process process = new Process();
+			process.StartInfo = processStartInfo;
+			try
+			{
+				process.Start();
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(exe + " could not commence.");
+				o.Append(ex.Message);
+				return false;
+			}
+
+			// meh, works
+			o.AppendLine(process.StandardOutput.ReadToEnd());
+			o.AppendLine(process.StandardError.ReadToEnd());
+
+			process.WaitForExit();
+
+			return process.ExitCode == 0;
 		}
 	}
 }

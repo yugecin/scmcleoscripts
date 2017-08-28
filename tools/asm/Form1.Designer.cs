@@ -32,6 +32,11 @@ namespace asm {
 			this.button3 = new System.Windows.Forms.Button();
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.checkBox2 = new System.Windows.Forms.CheckBox();
+			this.label1 = new System.Windows.Forms.Label();
+			this.label2 = new System.Windows.Forms.Label();
+			this.txtgcc = new System.Windows.Forms.TextBox();
+			this.txtobjdump = new System.Windows.Forms.TextBox();
+			this.button4 = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// textBox1
@@ -86,7 +91,7 @@ namespace asm {
 			// checkBox1
 			// 
 			this.checkBox1.AutoSize = true;
-			this.checkBox1.Location = new System.Drawing.Point(382, 443);
+			this.checkBox1.Location = new System.Drawing.Point(447, 443);
 			this.checkBox1.Name = "checkBox1";
 			this.checkBox1.Size = new System.Drawing.Size(74, 17);
 			this.checkBox1.TabIndex = 5;
@@ -105,11 +110,62 @@ namespace asm {
 			this.checkBox2.Text = "jump";
 			this.checkBox2.UseVisualStyleBackColor = true;
 			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(113, 470);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(25, 13);
+			this.label1.TabIndex = 7;
+			this.label1.Text = "gcc";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(91, 496);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(47, 13);
+			this.label2.TabIndex = 8;
+			this.label2.Text = "objdump";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// txtgcc
+			// 
+			this.txtgcc.Location = new System.Drawing.Point(144, 467);
+			this.txtgcc.Name = "txtgcc";
+			this.txtgcc.Size = new System.Drawing.Size(618, 20);
+			this.txtgcc.TabIndex = 9;
+			this.txtgcc.Text = "S:\\broftware\\perl\\c\\bin\\gcc.exe";
+			// 
+			// txtobjdump
+			// 
+			this.txtobjdump.Location = new System.Drawing.Point(144, 493);
+			this.txtobjdump.Name = "txtobjdump";
+			this.txtobjdump.Size = new System.Drawing.Size(618, 20);
+			this.txtobjdump.TabIndex = 10;
+			this.txtobjdump.Text = "S:\\broftware\\perl\\c\\bin\\objdump.exe";
+			// 
+			// button4
+			// 
+			this.button4.Location = new System.Drawing.Point(352, 439);
+			this.button4.Name = "button4";
+			this.button4.Size = new System.Drawing.Size(75, 23);
+			this.button4.TabIndex = 11;
+			this.button4.Text = "Do it all";
+			this.button4.UseVisualStyleBackColor = true;
+			this.button4.Click += new System.EventHandler(this.button4_Click);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(774, 474);
+			this.ClientSize = new System.Drawing.Size(774, 525);
+			this.Controls.Add(this.button4);
+			this.Controls.Add(this.txtobjdump);
+			this.Controls.Add(this.txtgcc);
+			this.Controls.Add(this.label2);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.checkBox2);
 			this.Controls.Add(this.checkBox1);
 			this.Controls.Add(this.button3);
@@ -133,6 +189,11 @@ namespace asm {
 		private System.Windows.Forms.Button button3;
 		private System.Windows.Forms.CheckBox checkBox1;
 		private System.Windows.Forms.CheckBox checkBox2;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.TextBox txtgcc;
+		private System.Windows.Forms.TextBox txtobjdump;
+		private System.Windows.Forms.Button button4;
 	}
 }
 
