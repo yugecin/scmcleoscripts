@@ -73,7 +73,11 @@ namespace asm {
 						stuff.Add(instrs, new JMPCALL());
 						int idx = comment.IndexOf(' ') + 1;
 						comment = comment.Substring(0, idx) + "0x" + realaddr(instr);
-						patchinstr(instr, instrs);
+						if (checkBox3.Checked) {
+							patchinstr(instr, 2 * instrs + 4);
+						} else {
+							patchinstr(instr, instrs);
+						}
 					}
 					for (int i = 1; i <= instrc - 4; i++) {
 						if (instr[i + 3] != "ee") {
@@ -104,6 +108,7 @@ namespace asm {
 					}
 				} catch (Exception er) {
 					MessageBox.Show(er.ToString() + "\r\n" + _line);
+					return;
 				}
 			}
 			sb.Append("end").AppendLine();
@@ -210,10 +215,6 @@ namespace asm {
 			Clipboard.SetText(textBox1.Text);
 		}
 
-		private void button3_Click(object sender, EventArgs e) {
-			textBox1.Text = "";
-		}
-
 		public interface A {
 			void dostuff(StringBuilder sb);
 		}
@@ -263,7 +264,6 @@ skip:
 				sb.Append("0A8C: write_memory 1@ size 4 value ").Append(var).Append("@ vp 0").AppendLine();
 			}
 		}
-
 		private void textBox1_Click(object sender, EventArgs e) {
 			textBox1.Text = "";
 		}

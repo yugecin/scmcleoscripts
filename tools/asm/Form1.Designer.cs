@@ -29,7 +29,6 @@ namespace asm {
 			this.button1 = new System.Windows.Forms.Button();
 			this.button2 = new System.Windows.Forms.Button();
 			this.textBox2 = new System.Windows.Forms.TextBox();
-			this.button3 = new System.Windows.Forms.Button();
 			this.checkBox1 = new System.Windows.Forms.CheckBox();
 			this.checkBox2 = new System.Windows.Forms.CheckBox();
 			this.label1 = new System.Windows.Forms.Label();
@@ -37,6 +36,7 @@ namespace asm {
 			this.txtgcc = new System.Windows.Forms.TextBox();
 			this.txtobjdump = new System.Windows.Forms.TextBox();
 			this.button4 = new System.Windows.Forms.Button();
+			this.checkBox3 = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// textBox1
@@ -54,7 +54,7 @@ namespace asm {
 			// 
 			this.button1.Location = new System.Drawing.Point(12, 439);
 			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(126, 23);
+			this.button1.Size = new System.Drawing.Size(84, 23);
 			this.button1.TabIndex = 1;
 			this.button1.Text = "clean disasm";
 			this.button1.UseVisualStyleBackColor = true;
@@ -62,9 +62,9 @@ namespace asm {
 			// 
 			// button2
 			// 
-			this.button2.Location = new System.Drawing.Point(144, 439);
+			this.button2.Location = new System.Drawing.Point(102, 439);
 			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(121, 23);
+			this.button2.Size = new System.Drawing.Size(88, 23);
 			this.button2.TabIndex = 2;
 			this.button2.Text = "strip comments";
 			this.button2.UseVisualStyleBackColor = true;
@@ -77,16 +77,6 @@ namespace asm {
 			this.textBox2.Size = new System.Drawing.Size(181, 20);
 			this.textBox2.TabIndex = 3;
 			this.textBox2.Text = "005869C0";
-			// 
-			// button3
-			// 
-			this.button3.Location = new System.Drawing.Point(271, 439);
-			this.button3.Name = "button3";
-			this.button3.Size = new System.Drawing.Size(75, 23);
-			this.button3.TabIndex = 4;
-			this.button3.Text = "Empty";
-			this.button3.UseVisualStyleBackColor = true;
-			this.button3.Click += new System.EventHandler(this.button3_Click);
 			// 
 			// checkBox1
 			// 
@@ -148,7 +138,7 @@ namespace asm {
 			// 
 			// button4
 			// 
-			this.button4.Location = new System.Drawing.Point(352, 439);
+			this.button4.Location = new System.Drawing.Point(196, 439);
 			this.button4.Name = "button4";
 			this.button4.Size = new System.Drawing.Size(75, 23);
 			this.button4.TabIndex = 11;
@@ -156,11 +146,24 @@ namespace asm {
 			this.button4.UseVisualStyleBackColor = true;
 			this.button4.Click += new System.EventHandler(this.button4_Click);
 			// 
+			// checkBox3
+			// 
+			this.checkBox3.AutoSize = true;
+			this.checkBox3.Checked = true;
+			this.checkBox3.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkBox3.Location = new System.Drawing.Point(348, 443);
+			this.checkBox3.Name = "checkBox3";
+			this.checkBox3.Size = new System.Drawing.Size(93, 17);
+			this.checkBox3.TabIndex = 12;
+			this.checkBox3.Text = "correct offsets";
+			this.checkBox3.UseVisualStyleBackColor = true;
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(774, 525);
+			this.Controls.Add(this.checkBox3);
 			this.Controls.Add(this.button4);
 			this.Controls.Add(this.txtobjdump);
 			this.Controls.Add(this.txtgcc);
@@ -168,7 +171,6 @@ namespace asm {
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.checkBox2);
 			this.Controls.Add(this.checkBox1);
-			this.Controls.Add(this.button3);
 			this.Controls.Add(this.textBox2);
 			this.Controls.Add(this.button2);
 			this.Controls.Add(this.button1);
@@ -186,7 +188,6 @@ namespace asm {
 		private System.Windows.Forms.Button button1;
 		private System.Windows.Forms.Button button2;
 		private System.Windows.Forms.TextBox textBox2;
-		private System.Windows.Forms.Button button3;
 		private System.Windows.Forms.CheckBox checkBox1;
 		private System.Windows.Forms.CheckBox checkBox2;
 		private System.Windows.Forms.Label label1;
@@ -194,6 +195,7 @@ namespace asm {
 		private System.Windows.Forms.TextBox txtgcc;
 		private System.Windows.Forms.TextBox txtobjdump;
 		private System.Windows.Forms.Button button4;
+		private System.Windows.Forms.CheckBox checkBox3;
 	}
 }
 
