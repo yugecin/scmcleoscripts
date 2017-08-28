@@ -145,20 +145,20 @@ fadd dword ptr [esp] ; angle + 1.5707963f
 fstp dword ptr [esp+0xC] ; angle + 1.5707963f
 fsub dword ptr [esp] ; angle - 1.5707963f
 fld ST(0)
-fcos
-fmul dword ptr [esp+0x10]
-fstp dword ptr [esp] ; cos(angle - 1.5707963f) * 4.0f
 fsin
 fmul dword ptr [esp+0x10]
-fstp dword ptr [esp+0x4]  ; sin(angle - 1.5707963f) * 4.0f
+fstp dword ptr [esp] ; sin(angle - 1.5707963f) * 4.0f
+fcos
+fmul dword ptr [esp+0x10]
+fstp dword ptr [esp+0x4]  ; cos(angle - 1.5707963f) * 4.0f
 fld dword ptr [esp+0xC] ; angle + 1.5707963f
 fld ST(0)
-fcos
-fmul dword ptr [esp+0x10]
-fstp dword ptr[esp+0x8] ; cos(angle + 1.5707963f) * 4.0f
 fsin
 fmul dword ptr [esp+0x10]
-fstp dword ptr[esp+0xC]  ; sin(angle + 1.5707963f) * 4.0f
+fstp dword ptr[esp+0x8] ; sin(angle + 1.5707963f) * 4.0f
+fcos
+fmul dword ptr [esp+0x10]
+fstp dword ptr[esp+0xC]  ; cos(angle + 1.5707963f) * 4.0f
 mov eax, dword ptr [esp+0x14]
 
 push [edx]
