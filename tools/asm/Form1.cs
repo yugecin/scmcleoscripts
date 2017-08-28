@@ -322,5 +322,10 @@ skip:
 
 			return process.ExitCode == 0;
 		}
+
+		private void button3_Click(object sender, EventArgs e) {
+			textBox1.Text = Clipboard.GetText();
+			button4.PerformClick();
+		}
 	}
 }
