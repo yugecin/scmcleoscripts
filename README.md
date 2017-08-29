@@ -15,6 +15,7 @@
 [autopilot](/cleo/autopilot)  
 [objsniffer](/cleo/objsniffer)  
 [objsniffer - fast version](/cleo/objsniffer-plugin)  
+[gps](/cleo/gps)  
 
 ### SCM scripts
 [train editing](/scm/trains)  
@@ -31,6 +32,9 @@
 [creating coronas in a loop](/snippets/coronas.txt)  
 [hook](/snippets/hook.txt)  
 [hook drawhud and draw a polygon](/snippets/hookdrawpoly.txt)  
+
+### Tools
+[asm](/tools/asm)  
 
 ### License
 [GPLv3](/LICENSE)  

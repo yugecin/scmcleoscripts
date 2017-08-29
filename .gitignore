@@ -2,9 +2,16 @@ cleo/\!notmine
 cleo/esp/mod_hud.txd
 cleo/snapshots/old
 
+tools/**/*.resx
+tools/**/bin
+tools/**/obj
+tools/asm/Properties
+tools/asm/*.csproj
+
 # vs shenanigans
 *.ilk
 *.suo
+*.sln
 *.opensdf
 *.sdf
 *.user
