@@ -48,7 +48,7 @@ jnz initnextvert
 
 vertsinitialized:
 
-sub esp, 0xC
+sub esp, 0x18
 
 push 0
 lea eax, [esp+0x4]
@@ -73,9 +73,9 @@ jne noblip2
 cmp byte ptr [edi+0x25], 0x0 ; m_nBlipDisplayFlag
 je noblip2
 mov eax, [edi+0x8]
-mov [_var05], eax
+mov [esp+0x18], eax
 mov eax, [edi+0xC]
-mov [_var05+0x4], eax
+mov [esp+0x1C], eax
 pop edx
 jmp yesblip
 noblip2:
@@ -83,11 +83,11 @@ pop edx
 noblip:
 
 yesblip:
-push [_var05]
-push [_var05+0x4]
+push [esp+0x18]
+push [esp+0x18]
 call 0x569660 ; float __cdecl CWorld::findGroundZForCoord(float X, float Y)
-fstp dword ptr [_var05+0x8]
 add esp, 0x10
+fstp dword ptr [esp+0x14]
 
 push 0 ; waterPath
 push 0 ; includeNodesWithoutLinks
@@ -100,9 +100,9 @@ push _var04 ; pDistance
 push 0x7D0 ; (2000) maxNodesToFind
 push _var03 ; pNodesCount
 push _var06 ; pResultNodes
-push [_var05+0x8] ; target.z
-push [_var05+0x4] ; target.y
-push [_var05] ; target.x
+push [esp+0x40] ; target.z
+push [esp+0x40] ; target.y
+push [esp+0x40] ; target.x
 push 0xFFFFFFFF ; originAddr
 push [esp+0x44] ; origin.z
 push [esp+0x44] ; origin.y
@@ -111,7 +111,7 @@ push 0x0 ; pathType
 mov ecx, [0x40CA27] ; this
 call 0x4515D0 ; __thiscall CPathFind::DoPathSearch
 
-add esp, 0xC
+add esp, 0x18
 
 mov ax, [_var03] ; pNodesCount
 test ax, ax
