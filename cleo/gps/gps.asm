@@ -56,6 +56,33 @@ push eax
 call 0x56E010 ; RwV3D *__cdecl getPlayerCoords(RwV3D *outPoint, int playerIndex)
 ;add esp, 0x8
 
+; find target position
+
+; look at target blip first
+mov eax, [0xBA6774] ; FrontEndMenuManager.m_nTargetBlipIndex
+test eax, eax
+jz noblip
+push edx
+mov edx, eax
+and edx, 0x0000ffff
+imul edx, 0x28
+lea edi, [0xBA86F0+edx]
+shr eax, 0x10
+cmp word ptr [edi+0x14], ax ;  CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)].m_nCounter == HIWORD(FrontEndMenuManager.m_nTargetBlipIndex)
+jne noblip2
+cmp byte ptr [edi+0x25], 0x0 ; m_nBlipDisplayFlag
+je noblip2
+mov eax, [edi+0x8]
+mov [_var05], eax
+mov eax, [edi+0xC]
+mov [_var05+0x4], eax
+pop edx
+jmp yesblip
+noblip2:
+pop edx
+noblip:
+
+yesblip:
 push [_var05]
 push [_var05+0x4]
 call 0x569660 ; float __cdecl CWorld::findGroundZForCoord(float X, float Y)
