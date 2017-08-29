@@ -13,6 +13,15 @@
                    
 // ========================================== 
 
+0002: jump @HOOKER
+:NOMOREHOOKER
+
+:MAIN_LOOP
+0001: wait 250
+// inf loop so the allocated mem doesn't get free'd
+0002: jump @MAIN_LOOP
+
+:HOOKER
 0AC6: 0@ = label @ENTRY offset
 
 0085: 1@ = 0@ // (int)
@@ -30,91 +39,57 @@
 0A8D: 2@ = read_memory 1@ size 4 vp 0
 0062: 2@ -= 0@  // (int)
 0A8C: write_memory 1@ size 4 value 2@ vp 0
-000A: 1@ += 76
+000A: 1@ += 70
 0AC6: 3@ = label @DATA0b offset
 0A8C: write_memory 1@ size 4 value 3@ vp 0
-000A: 1@ += 73
-0AC6: 4@ = label @DATA01 offset
+000A: 1@ += 81
+0A8D: 2@ = read_memory 1@ size 4 vp 0
+0062: 2@ -= 0@  // (int)
+0A8C: write_memory 1@ size 4 value 2@ vp 0
+000A: 1@ += 116
+0A8D: 2@ = read_memory 1@ size 4 vp 0
+0062: 2@ -= 0@  // (int)
+0A8C: write_memory 1@ size 4 value 2@ vp 0
+000A: 1@ += 32
+0AC6: 4@ = label @DATA04 offset
 0A8C: write_memory 1@ size 4 value 4@ vp 0
-000A: 1@ += 5
-0A8D: 2@ = read_memory 1@ size 4 vp 0
-0062: 2@ -= 0@  // (int)
-0A8C: write_memory 1@ size 4 value 2@ vp 0
-000A: 1@ += 6
-0AC6: 5@ = label @DATA05 offset
-0A8C: write_memory 1@ size 4 value 5@ vp 0
-000A: 1@ += 6
-0085: 2@ = 5@ // (int)
-000A: 2@ += 0x4
-0A8C: write_memory 1@ size 4 value 2@ vp 0
-000A: 1@ += 5
-0A8D: 2@ = read_memory 1@ size 4 vp 0
-0062: 2@ -= 0@  // (int)
-0A8C: write_memory 1@ size 4 value 2@ vp 0
-000A: 1@ += 6
-0085: 2@ = 5@ // (int)
-000A: 2@ += 0x8
-0A8C: write_memory 1@ size 4 value 2@ vp 0
-000A: 1@ += 28
-0AC6: 6@ = label @DATA04 offset
-0A8C: write_memory 1@ size 4 value 6@ vp 0
 000A: 1@ += 10
-0AC6: 7@ = label @DATA03 offset
-0A8C: write_memory 1@ size 4 value 7@ vp 0
-000A: 1@ += 5
-0AC6: 8@ = label @DATA06 offset
-0A8C: write_memory 1@ size 4 value 8@ vp 0
-000A: 1@ += 6
-0085: 2@ = 5@ // (int)
-000A: 2@ += 0x8
-0A8C: write_memory 1@ size 4 value 2@ vp 0
-000A: 1@ += 6
-0085: 2@ = 5@ // (int)
-000A: 2@ += 0x4
-0A8C: write_memory 1@ size 4 value 2@ vp 0
-000A: 1@ += 6
+0AC6: 5@ = label @DATA03 offset
 0A8C: write_memory 1@ size 4 value 5@ vp 0
-000A: 1@ += 8
-0085: 2@ = 4@ // (int)
-000A: 2@ += 0x8
-0A8C: write_memory 1@ size 4 value 2@ vp 0
-000A: 1@ += 6
-0085: 2@ = 4@ // (int)
-000A: 2@ += 0x4
-0A8C: write_memory 1@ size 4 value 2@ vp 0
-000A: 1@ += 6
-0A8C: write_memory 1@ size 4 value 4@ vp 0
-000A: 1@ += 13
+000A: 1@ += 5
+0AC6: 6@ = label @DATA06 offset
+0A8C: write_memory 1@ size 4 value 6@ vp 0
+000A: 1@ += 39
 0A8D: 2@ = read_memory 1@ size 4 vp 0
 0062: 2@ -= 0@  // (int)
 0A8C: write_memory 1@ size 4 value 2@ vp 0
-000A: 1@ += 6
-0A8C: write_memory 1@ size 4 value 7@ vp 0
+000A: 1@ += 9
+0A8C: write_memory 1@ size 4 value 5@ vp 0
 000A: 1@ += 26
-0A8C: write_memory 1@ size 4 value 8@ vp 0
+0A8C: write_memory 1@ size 4 value 6@ vp 0
 000A: 1@ += 11
 0A8D: 2@ = read_memory 1@ size 4 vp 0
 0062: 2@ -= 0@  // (int)
 0A8C: write_memory 1@ size 4 value 2@ vp 0
 000A: 1@ += 5
-0AC6: 9@ = label @DATA07 offset
-0A8C: write_memory 1@ size 4 value 9@ vp 0
+0AC6: 7@ = label @DATA07 offset
+0A8C: write_memory 1@ size 4 value 7@ vp 0
 000A: 1@ += 7
 0A8D: 2@ = read_memory 1@ size 4 vp 0
 0062: 2@ -= 0@  // (int)
 0A8C: write_memory 1@ size 4 value 2@ vp 0
 000A: 1@ += 5
-0A8C: write_memory 1@ size 4 value 9@ vp 0
+0A8C: write_memory 1@ size 4 value 7@ vp 0
 000A: 1@ += 5
-0AC6: 10@ = label @DATA08 offset
-0A8C: write_memory 1@ size 4 value 10@ vp 0
+0AC6: 8@ = label @DATA08 offset
+0A8C: write_memory 1@ size 4 value 8@ vp 0
 000A: 1@ += 5
 0A8D: 2@ = read_memory 1@ size 4 vp 0
 0062: 2@ -= 0@  // (int)
 0A8C: write_memory 1@ size 4 value 2@ vp 0
 000A: 1@ += 7
-0AC6: 11@ = label @DATA09 offset
-0A8C: write_memory 1@ size 4 value 11@ vp 0
+0AC6: 9@ = label @DATA09 offset
+0A8C: write_memory 1@ size 4 value 9@ vp 0
 000A: 1@ += 6
 0A8D: 2@ = read_memory 1@ size 4 vp 0
 0062: 2@ -= 0@  // (int)
@@ -122,15 +97,15 @@
 000A: 1@ += 37
 0A8C: write_memory 1@ size 4 value 3@ vp 0
 000A: 1@ += 5
-0A8C: write_memory 1@ size 4 value 11@ vp 0
+0A8C: write_memory 1@ size 4 value 9@ vp 0
 000A: 1@ += 40
 0A8D: 2@ = read_memory 1@ size 4 vp 0
 0062: 2@ -= 0@  // (int)
 0A8C: write_memory 1@ size 4 value 2@ vp 0
 000A: 1@ += 228
-0A8C: write_memory 1@ size 4 value 7@ vp 0
+0A8C: write_memory 1@ size 4 value 5@ vp 0
 000A: 1@ += 14
-0A8C: write_memory 1@ size 4 value 7@ vp 0
+0A8C: write_memory 1@ size 4 value 5@ vp 0
 000A: 1@ += 11
 0A8C: write_memory 1@ size 4 value 3@ vp 0
 000A: 1@ += 21
@@ -138,10 +113,7 @@
 0062: 2@ -= 0@  // (int)
 0A8C: write_memory 1@ size 4 value 2@ vp 0
 
-:MAIN_LOOP
-0001: wait 250
-// inf loop so the allocated mem doesn't get free'd
-0002: jump @MAIN_LOOP
+0002: jump @NOMOREHOOKER
 
 :ENTRY
 hex
@@ -150,22 +122,21 @@ e8
 e8
 06 e2 56 00 
 85 c0 
-0f 84 b9 02 00 00 
+0f 84 0e 03 00 00 
 57 
-8d b8 8c 05 00 00 
-85 ff 
-0f 84 a9 02 00 00 
 8b b8 8c 05 00 00 
+85 ff 
+0f 84 fe 02 00 00 
 8b 80 6c 04 00 00 
 a9 00 01 00 00 
-0f 84 92 02 00 00 
-8b bf 90 05 00 00 
+0f 84 ed 02 00 00 
+8b bf 94 05 00 00 
 83 ff 03 
 7c 0e 
 83 ff 09 
 74 09 
 83 ff 0a 
-0f 85 79 02 00 00 
+0f 85 d4 02 00 00 
 a1 
 00 00 00 00 // DATA0b
 83 c0 08 
@@ -185,20 +156,50 @@ c7 00 00 00 00 00
 4f 
 85 ff 
 75 ce 
+83 ec 18 
 6a 00 
-68 
-00 00 00 00 // DATA01
+8d 44 24 04 
+50 
 e8
-6c df 56 00 
-ff 35 
-00 00 00 00 // DATA05
-ff 35 
-00 00 00 00 // DATA05
+6f df 56 00 
+a1 74 67 ba 00 
+85 c0 
+74 33 
+52 
+89 c2 
+81 e2 ff ff 00 00 
+6b d2 28 
+8d ba f0 86 ba 00 
+c1 e8 10 
+66 39 47 14 
+75 17 
+80 7f 25 00 
+74 11 
+8b 47 08 
+89 44 24 18 
+8b 47 0c 
+89 44 24 1c 
+5a 
+eb 2c 
+5a 
+b8 58 f1 c7 00 
+80 78 02 00 
+75 12 
+83 c0 38 
+3d 58 f8 c7 00 
+7c f0 
+83 c4 20 
+e9 25 02 00 00 
+8b 78 10 
+89 7c 24 14 
+8b 78 14 
+89 7c 24 18 
+ff 74 24 18 
+ff 74 24 18 
 e8
-ab 95 56 00 
-d9 1d 
-00 00 00 00 // DATA05
+4b 95 56 00 
 83 c4 10 
+d9 5c 24 14 
 6a 00 
 6a 00 
 6a ff 
@@ -213,23 +214,18 @@ d9 1d
 00 00 00 00 // DATA03
 68 
 00 00 00 00 // DATA06
-ff 35 
-00 00 00 00 // DATA05
-ff 35 
-00 00 00 00 // DATA05
-ff 35 
-00 00 00 00 // DATA05
+ff 74 24 40 
+ff 74 24 40 
+ff 74 24 40 
 6a ff 
-ff 35 
-00 00 00 00 // DATA01
-ff 35 
-00 00 00 00 // DATA01
-ff 35 
-00 00 00 00 // DATA01
+ff 74 24 44 
+ff 74 24 44 
+ff 74 24 44 
 6a 00 
 8b 0d 27 ca 40 00 
 e8
-b7 14 45 00 
+65 14 45 00 
+83 c4 18 
 66 a1 
 00 00 00 00 // DATA03
 66 85 c0 
@@ -242,23 +238,23 @@ ff 34 bd
 00 00 00 00 // DATA06
 8b 0d 27 ca 40 00 
 e8
-7c 09 42 00 
+27 09 42 00 
 68 
 00 00 00 00 // DATA07
 89 c1 
 e8
-c0 08 42 00 
+6b 08 42 00 
 68 
 00 00 00 00 // DATA07
 68 
 00 00 00 00 // DATA08
 e8
-d1 33 58 00 
+7c 33 58 00 
 8d 04 fd 
 00 00 00 00 // DATA09
 50 
 e8
-14 33 58 00 
+bf 32 58 00 
 58 
 6a 00 
 6a 01 
@@ -287,25 +283,25 @@ d9 42 04
 de e9 
 d9 1c 24 
 e8
-b2 ca 53 00 
+5d ca 53 00 
 d9 c0 
 c7 04 24 da 0f c9 3f 
 d8 04 24 
 d9 5c 24 0c 
 d8 24 24 
 d9 c0 
-d9 ff 
+d9 fe 
 d8 4c 24 10 
 d9 1c 24 
-d9 fe 
+d9 ff 
 d8 4c 24 10 
 d9 5c 24 04 
 d9 44 24 0c 
 d9 c0 
-d9 ff 
+d9 fe 
 d8 4c 24 10 
 d9 5c 24 08 
-d9 fe 
+d9 ff 
 d8 4c 24 10 
 d9 5c 24 0c 
 8b 44 24 14 
@@ -384,17 +380,13 @@ ff 50 30
 5b 
 5f 
 e9
-f4 66 58 00 
+9f 66 58 00 
+90 
+90 
+90 
 end
 
 // ==========================================
-
-:DATA01 // RwV3D
-hex
-00 00 00 00 // x
-00 00 00 00 // y
-00 00 00 00 // z
-end
 
 :DATA03 // pNodesCount
 hex
@@ -404,13 +396,6 @@ end
 :DATA04 // pDistance
 hex
 00 00 00 00
-end
-
-:DATA05 // target
-hex
-00 00 00 00 // x
-00 00 00 00 // y
-00 00 00 00 // z
 end
 
 :DATA06 // pResultNodes
