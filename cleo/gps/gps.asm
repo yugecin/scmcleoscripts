@@ -82,6 +82,25 @@ noblip2:
 pop edx
 noblip:
 
+; if no blip, look at race checkpoint
+mov eax, 0xC7F158
+nextcp:
+cmp byte ptr [eax+0x2], 0x0
+jne gotcp
+add eax, 0x38
+cmp eax, 0xC7F858
+jl nextcp
+
+; no cp found
+add esp, 0x20
+jmp nogps2
+
+gotcp:
+mov edi, [eax+0x10]
+mov [esp+0x14], edi
+mov edi, [eax+0x14]
+mov [esp+0x18], edi
+
 yesblip:
 push [esp+0x18]
 push [esp+0x18]
