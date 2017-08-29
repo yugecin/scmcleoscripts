@@ -15,6 +15,7 @@
 [autopilot](/cleo/autopilot)  
 [objsniffer](/cleo/objsniffer)  
 [objsniffer - fast version](/cleo/objsniffer-plugin)  
+[gps](/cleo/gps)  
 
 ### SCM scripts
 [train editing](/scm/trains)  
