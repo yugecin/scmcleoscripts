@@ -9,14 +9,13 @@ call 0x56E210 ; CPed *__cdecl getPlayerPed(int number)
 test eax, eax
 jz nogps
 push edi
-lea edi, [eax+0x58C] ; pVehicle
+mov edi, [eax+0x58C] ; pVehicle
 test edi, edi
 jz nogps2
-mov edi, [eax+0x58C]
 mov eax, [eax+0x46C] ; pedFlags
 test eax, 0x100 ; bInVehicle
 jz nogps2
-mov edi, [edi+0x590] ; carType
+mov edi, [edi+0x594] ; carType
 cmp edi, 0x3 ; heli
 jl correctcartype
 cmp edi, 0x9 ; bike
