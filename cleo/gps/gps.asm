@@ -48,8 +48,12 @@ test edi, edi
 jnz initnextvert
 
 vertsinitialized:
+
+sub esp, 0xC
+
 push 0
-push _var01
+lea eax, [esp+0x4]
+push eax
 call 0x56E010 ; RwV3D *__cdecl getPlayerCoords(RwV3D *outPoint, int playerIndex)
 ;add esp, 0x8
 
@@ -74,12 +78,14 @@ push [_var05+0x8] ; target.z
 push [_var05+0x4] ; target.y
 push [_var05] ; target.x
 push 0xFFFFFFFF ; originAddr
-push [_var01+0x8] ; origin.z
-push [_var01+0x4] ; origin.y
-push [_var01] ; origin.x
+push [esp+0x44] ; origin.z
+push [esp+0x44] ; origin.y
+push [esp+0x44] ; origin.x
 push 0x0 ; pathType
 mov ecx, [0x40CA27] ; this
 call 0x4515D0 ; __thiscall CPathFind::DoPathSearch
+
+add esp, 0xC
 
 mov ax, [_var03] ; pNodesCount
 test ax, ax
