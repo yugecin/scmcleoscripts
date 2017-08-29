@@ -66,7 +66,8 @@ namespace asm {
 					
 					int si = 0;
 					if (instrc == 5 &&
-							(comment.StartsWith("call") || comment.StartsWith("jmp") || comment.StartsWith("je ") || comment.StartsWith("jne "))) {
+							(comment.StartsWith("call") || comment.StartsWith("jmp") || comment.StartsWith("je ") || comment.StartsWith("jne ")) &&
+							instraddr(instr) > 0x40000) {
 						si = 1;
 						sb.Append(instr[0]).AppendLine();
 						instrs++;
@@ -145,13 +146,17 @@ namespace asm {
 			Clipboard.SetText(textBox1.Text);
 		}
 
-		private string realaddr(string[] instr) {
-			int addr =
+		private int instraddr(string[] instr) {
+			return
 				(int.Parse(instr[4], NumberStyles.HexNumber) << 24) |
 				(int.Parse(instr[3], NumberStyles.HexNumber) << 16) |
 				(int.Parse(instr[2], NumberStyles.HexNumber) <<  8) |
 				(int.Parse(instr[1], NumberStyles.HexNumber)      ) |
 				0;
+		}
+
+		private string realaddr(string[] instr) {
+			int addr = instraddr(instr);
 			addr += 4;
 			string s = "";
 			s += ((addr >> 24) & 0xff).ToString("x2");
@@ -171,12 +176,7 @@ namespace asm {
 		}
 
 		private void patchinstr(string[] instr, int instrs) {
-			int addr =
-				(int.Parse(instr[4], NumberStyles.HexNumber) << 24) |
-				(int.Parse(instr[3], NumberStyles.HexNumber) << 16) |
-				(int.Parse(instr[2], NumberStyles.HexNumber) <<  8) |
-				(int.Parse(instr[1], NumberStyles.HexNumber)      ) |
-				0;
+			int addr = instraddr(instr);
 			addr -= instrs;
 			instr[1] = ((addr      ) & 0xff).ToString("x2");
 			instr[2] = ((addr >>  8) & 0xff).ToString("x2");
