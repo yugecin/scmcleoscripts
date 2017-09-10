@@ -15,27 +15,11 @@ char destnearstr[120];
 
 // ==== dmgboxstuff v
 
-void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("fuelpcthandler\n");
-	REPOSITION_ON_ATTACH();
-	fuelval = simplestrval(samptd->szText, 0);
-	if (INCAR) {
-		samptd->fLetterWidth = 0.0f;
-		return;
-	}
-	samptd->fLetterWidth = 0.27f;
-}
-
 void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("damagepcthandler\n");
 	REPOSITION_ON_ATTACH();
-	if (INCAR) {
-		samptd->fLetterWidth = 0.0f;
-		return;
-	}
-	samptd->fLetterWidth = 0.27f;
+	samptd->fLetterWidth = 0.0f;
 }
 
 void damagepatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -50,10 +34,15 @@ void damagepatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd,
 	damagepatchhandler(hxtd, samptd, reason);
 }
 
-void fuelhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
-	TRACE("fuelhandler\n");
-	REPOSITION_ON_ATTACH();
+	TRACE("fuelpcthandler\n");
+	if(reason == TDHANDLER_ATTACH) {
+		samptd->fX = hxtd->fTargetX;
+		samptd->fY = hxtd->fTargetY;
+		fuelval = simplestrval(samptd->szText, 0);
+		return;
+	}
 	if (INCAR) {
 		samptd->fLetterWidth = 0.3f;
 		samptd->fLetterHeight = 1.0f;
@@ -70,6 +59,7 @@ void fuelhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reas
 		memcpy(samptd->szText, destnearstr, 120);
 		return;
 	}
+	samptd->fLetterWidth = 0.0f;
 }
 
 // ==== dmgboxstuff ^
