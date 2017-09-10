@@ -20,7 +20,7 @@ void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 	TRACE("fuelpcthandler\n");
 	REPOSITION_ON_ATTACH();
 	fuelval = simplestrval(samptd->szText, 0);
-	if (ISPLANE) {
+	if (INCAR) {
 		samptd->fLetterWidth = 0.0f;
 		return;
 	}
@@ -31,13 +31,11 @@ void damagepcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 {
 	TRACE("damagepcthandler\n");
 	REPOSITION_ON_ATTACH();
-	if (ISPLANE) {
+	if (INCAR) {
 		samptd->fLetterWidth = 0.0f;
 		return;
 	}
 	samptd->fLetterWidth = 0.27f;
-	sprintf(samptd->szText, "%.0f%%", (float)gamedata.carhp / 10.0f);
-	memcpy(samptd->szString, samptd->szText, 7);
 }
 
 void damagepatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -72,17 +70,6 @@ void fuelhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reas
 		memcpy(samptd->szText, destnearstr, 120);
 		return;
 	}
-}
-
-void removehandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("removehandlerex\n");
-	REPOSITION_ON_ATTACH();
-	samptd->szText[0] = '_';
-	samptd->szString[0] = '_';
-	samptd->byteBox = 0;
-	samptd->fLetterWidth = 0.0f;
-	samptd->fLetterHeight = 0.0f;
 }
 
 // ==== dmgboxstuff ^
@@ -270,18 +257,18 @@ BOOL setupTextdraws()
 {
 	satisfval = -1;
 	destnearstr[0] = 0;
-	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0x44078000, 0x43C48148, &fuelhandler);
-	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0x44044000, 0x43CB0148, &damagepatchhandlerex);
+	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0, 0, &removehandler);
+	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0, 0, &removehandler);
 	setupTD(PLTD_STATUSBARBOX, 0x43A00000, 0x43D60000, 0x43A00000, 0x43D70000, &statusbarhandler);
-	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0x4403C000, 0x43C48148, &removehandlerex);
+	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0, 0, &removehandler);
 	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0x44000148, 0x42C80148, &fuelpricehandler);
 	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, &satisfhandler);
-	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &hijackhandler1);
+	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x44070000, 0x43B18000, &hijackhandler1);
 	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0x43A00000, 0x43D70000, &statusbarhandler);
-	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &hijackhandler2);
+	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x44160000, 0x43B18000, &hijackhandler2);
 	setupTD(PLTD_ODO, 0x43FA8000, 0x43C80000, 0, 0, &odohandler);
-	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x44070000, 0x43B18000, &removehandler);
-	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x44160000, 0x43B18000, &removehandler);
+	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0, 0, &removehandler);
+	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0, 0, &removehandler);
 	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0x42AA0000, 0x43A00000, &gpshandler);
 	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0, 0, &destnearesthandlerex);
 	//setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, NULL);
@@ -289,7 +276,7 @@ BOOL setupTextdraws()
 	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x44128000, 0x43CD0148, &damagepcthandler);
 	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
 	setupTD(PLTD_CARSPEED, 0x44108000, 0x43B58000, 0, 0, &removehandler);
-	setupTD(PLTD_CARODO, 0x4410c000, 0x43BB000, 0, 0, &carodohandler);
+	setupTD(PLTD_CARODO, 0x4410c000, 0x43BB0000, 0, 0, &carodohandler);
 	return TRUE;
 }
 
