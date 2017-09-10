@@ -272,7 +272,7 @@ BOOL setupTextdraws()
 
 void __cdecl drawbars()
 {
-	if (!ISPLANE) {
+	if (!INCAR) {
 		return;
 	}
 	float WIDTHMP = (float)(*(DWORD*)(0xC17044)) / 640.0f;
