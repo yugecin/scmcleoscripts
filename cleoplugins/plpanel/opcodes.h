@@ -4,7 +4,6 @@
 #include "samp.h"
 
 BOOL setupTextdraws();
-BOOL setupPlayerTextdraws();
 BOOL InitOpcodes();
 #if SNOOP
 OpcodeResult WINAPI op6C36(CScriptThread *thread);
@@ -22,7 +21,7 @@ OpcodeResult WINAPI op6C37(CScriptThread *thread);
 // ----------------------
 
 #if !defined THEME
-#define THEME			THEME_STANDARD
+#define THEME			THEME_ROBIN
 #endif
 //#define SNOOP 1
 //#define DOTRACE 1
@@ -75,8 +74,12 @@ enum PLTEXTDRAWS
 	PLTD_FUELPCT,
 	PLTD_DAMAGEPCT,
 	PLTD_HEADING,
+	PLTD_CARSPEED,
+	PLTD_CARODO,
 	PLTDCOUNT,
 };
+
+inline int isplayertd(int td) { return td == PLTD_CARSPEED || td == PLTD_CARODO; }
 
 struct SGAMEDATA
 {

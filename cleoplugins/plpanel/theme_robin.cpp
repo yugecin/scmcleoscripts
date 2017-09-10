@@ -56,7 +56,7 @@ void fuelhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reas
 {
 	TRACE("fuelhandler\n");
 	REPOSITION_ON_ATTACH();
-	if (ISPLANE) {
+	if (INCAR) {
 		samptd->fLetterWidth = 0.3f;
 		samptd->fLetterHeight = 1.0f;
 		samptd->dwLetterColor = -1;
@@ -72,62 +72,17 @@ void fuelhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reas
 		memcpy(samptd->szText, destnearstr, 120);
 		return;
 	}
-	samptd->fLetterWidth = 0.289999f;
-	samptd->fLetterHeight = 1.5f;
-	samptd->dwLetterColor = -1;
-	samptd->byteCenter = 0;
-	samptd->byteLeft = 0;
-	samptd->byteRight = 0;
-	samptd->byteOutline = 0;
-	samptd->fX = 542.0f;
-	samptd->fY = 393.1f;
-	hxtd->fTargetX = samptd->fX;
-	hxtd->fTargetY = samptd->fY;
-	sprintf(samptd->szText, "Fuel");
-	memcpy(samptd->szString, samptd->szText, 5);
 }
 
-void fueldmgboxhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+void removehandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
-	TRACE("fueldmgboxhandler\n");
-	REPOSITION_ON_ATTACH();
-	if (ISPLANE) {
-		samptd->byteBox = 0;
-		return;
-	}
-	samptd->byteBox = 1;
-}
-
-void damagebarhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("damagebarhandlerex\n");
-	REPOSITION_ON_ATTACH();
-	samptd->szText[0] = '_';
-	samptd->szString[0] = '_';
-	if (ISPLANE) {
-		samptd->byteBox = 0;
-		return;
-	}
-	samptd->byteBox = 1;
-	if (gamedata.carhp <= 350 && !gamedata.blinkstatus) {
-		samptd->byteBox = 0;
-	}
-	damagebarhandler(hxtd, samptd, reason);
-}
-
-void progressbarpatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
-{
-	TRACE("progressbarpatchhandler\n");
+	TRACE("removehandlerex\n");
 	REPOSITION_ON_ATTACH();
 	samptd->szText[0] = '_';
 	samptd->szString[0] = '_';
 	samptd->byteBox = 0;
-	if (ISPLANE) {
-		return;
-	}
-	if (INCAR && !(fuelval <= 20 && !gamedata.blinkstatus)) {
-		samptd->byteBox = 1;
-	}
+	samptd->fLetterWidth = 0.0f;
+	samptd->fLetterHeight = 0.0f;
 }
 
 // ==== dmgboxstuff ^
@@ -175,6 +130,26 @@ void odohandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reaso
 	} while (c != 0);
 }
 
+void carodohandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
+{
+	TRACE("carodohandler\n");
+	REPOSITION_ON_ATTACH();
+	odoval = simplestrval(&(samptd->szText[16]), 0);
+	int idx = 10;
+	char c;
+	do {
+		c = samptd->szText[idx];
+		if (c == 'K') {
+			return;
+		}
+		if (c == 'M') {
+			odoval = 0;
+			return;
+		}
+		idx++;
+	} while (c != 0);
+}
+
 void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("fuelpricehandler\n");
@@ -182,6 +157,13 @@ void fuelpricehandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int
 	if (samptd->szText[11] == '$') {
 		fuelprice = simplestrval(samptd->szText, 12);
 	}
+	if (INCAR) {
+		samptd->fLetterWidth = 0.0f;
+		samptd->fLetterHeight = 0.0f;
+		return;
+	}
+	samptd->fLetterWidth = 0.25f;
+	samptd->fLetterHeight = 1.75f;
 }
 
 void satisfhandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
@@ -216,8 +198,9 @@ void hijackhandler1(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 	REPOSITION_ON_ATTACH();
 	if (!INCAR) {
 		samptd->byteBox = 0;
-		samptd->dwLetterColor = 0;
 		samptd->dwShadowColor = 0;
+		samptd->fLetterWidth = 0.0f;
+		samptd->fLetterHeight = 0.0f;
 		return;
 	}
 	samptd->fLetterWidth = 0.26f;
@@ -250,8 +233,9 @@ void hijackhandler2(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int r
 	REPOSITION_ON_ATTACH();
 	if (!INCAR) {
 		samptd->byteBox = 0;
-		samptd->dwLetterColor = 0;
 		samptd->dwShadowColor = 0;
+		samptd->fLetterWidth = 0.0f;
+		samptd->fLetterHeight = 0.0f;
 		return;
 	}
 	samptd->fLetterWidth = 0.26f;
@@ -289,21 +273,23 @@ BOOL setupTextdraws()
 	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0x44078000, 0x43C48148, &fuelhandler);
 	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0x44044000, 0x43CB0148, &damagepatchhandlerex);
 	setupTD(PLTD_STATUSBARBOX, 0x43A00000, 0x43D60000, 0x43A00000, 0x43D70000, &statusbarhandler);
-	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0x4403C000, 0x43C48148, &fueldmgboxhandler);
-	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0, 0, &fuelpricehandler);
+	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0x4403C000, 0x43C48148, &removehandlerex);
+	setupTD(PLTD_FUELPRICE, 0x44000000, 0x42C80000, 0x44000148, 0x42C80148, &fuelpricehandler);
 	setupTD(PLTD_SATISF, 0x44108000, 0x43B58000, 0, 0, &satisfhandler);
-	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &progressbarpatchhandlerex);
+	setupTD(PLTD_FUELBAR, 0x440E4000, 0x43C78000, 0x440E4000, 0x43C78148, &hijackhandler1);
 	setupTD(PLTD_STATUSBAR, 0x43A00000, 0x43D60000, 0x43A00000, 0x43D70000, &statusbarhandler);
-	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &damagebarhandlerex);
+	setupTD(PLTD_DMGBAR, 0x440E4000, 0x43CE8000, 0x440E4000, 0x43CE8148, &hijackhandler2);
 	setupTD(PLTD_ODO, 0x43FA8000, 0x43C80000, 0, 0, &odohandler);
-	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x44070000, 0x43B18000, &hijackhandler1);
-	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x44160000, 0x43B18000, &hijackhandler2);
+	setupTD(PLTD_AIRSPEED, 0x43E38000, 0x43C80000, 0x44070000, 0x43B18000, &removehandler);
+	setupTD(PLTD_ALTITUDE, 0x43CC0000, 0x43C80000, 0x44160000, 0x43B18000, &removehandler);
 	setupTD(PLTD_GPS, 0x43430000, 0x43C80000, 0x42AA0000, 0x43A00000, &gpshandler);
 	setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0, 0, &destnearesthandlerex);
 	//setupTD(PLTD_DESTNEAREST, 0x439D0000, 0x43C80000, 0x439D0000, 0x43C80148, NULL);
 	setupTD(PLTD_FUELPCT, 0x44124000, 0x43C60000, 0x44124000, 0x43C60148, &fuelpcthandler);
 	setupTD(PLTD_DAMAGEPCT, 0x44128000, 0x43CD0000, 0x44128000, 0x43CD0148, &damagepcthandler);
 	setupTD(PLTD_HEADING, 0x439e0000, 0x40000000, 0x439e0000, 0x40200000, &headinghandler);
+	setupTD(PLTD_CARSPEED, 0x44108000, 0x43B58000, 0, 0, &removehandler);
+	setupTD(PLTD_CARODO, 0x4410c000, 0x43BB000, 0, 0, &carodohandler);
 	return TRUE;
 }
 

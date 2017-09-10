@@ -11,7 +11,6 @@ BOOL InitOpcodes()
 			CLEO_RegisterOpcode(0x6C36, &op6C36) &&
 #endif
 			CLEO_RegisterOpcode(0x6C37, &op6C37) &&
-			setupPlayerTextdraws() &&
 			setupTextdraws();
 }
 
@@ -29,7 +28,6 @@ void trace(const char *f)
 #endif
 
 struct SPLHXTEXTDRAW pltextdraws[PLTDCOUNT];
-struct SPLHXTEXTDRAW carspeedtd;
 struct SGAMEDATA gamedata;
 struct stTextdrawPool *tdpool;
 
@@ -67,22 +65,6 @@ int isPTextdrawValid(SPLHXTEXTDRAW *hxtd)
 	return 0;
 }
 
-BOOL setupPlayerTextdraws()
-{
-	carspeedtd.iHandle = INVALID_TEXTDRAW;
-	carspeedtd.handler = &carspeedtdhandler;
-	unsigned int f;
-	f = 0x44108000;
-	memcpy(&(carspeedtd.fX), &f, 4);
-	f = 0x43B58000;
-	memcpy(&(carspeedtd.fY), &f, 4);
-	f = 0x44108000;
-	memcpy(&(carspeedtd.fTargetX), &f, 4);
-	f = 0x43B58148;
-	memcpy(&(carspeedtd.fTargetY), &f, 4);
-	return TRUE;
-}
-
 void setupTD(int tdidx, unsigned int x, unsigned int y, unsigned int targetX, unsigned int targetY, TDHANDLER handler)
 {
 	pltextdraws[tdidx].iHandle = INVALID_TEXTDRAW;
@@ -111,7 +93,16 @@ void __cdecl update_textdraws()
 	int tdstoupdate[PLTDCOUNT];
 	int tdstoupdatecount = 0;
 	for (int i = 0; i < PLTDCOUNT; i++) {
-		if (pltextdraws[i].handler != NULL && !isTextdrawValid(&pltextdraws[i])) {
+		if (pltextdraws[i].handler == NULL) {
+			continue;
+		}
+		int valid;
+		if (isplayertd(i)) {
+			valid = isPTextdrawValid(&pltextdraws[i]);
+		} else {
+			valid = isTextdrawValid(&pltextdraws[i]);
+		}
+		if (!valid) {
 			tdstoupdate[tdstoupdatecount++] = i;
 			pltextdraws[i].iHandle = INVALID_TEXTDRAW;
 		}
@@ -120,33 +111,26 @@ void __cdecl update_textdraws()
 	TRACE("updating handles\n");
 	for (int i = 0; i < tdstoupdatecount; i++) {
 		SPLHXTEXTDRAW *hxtd = &pltextdraws[tdstoupdate[i]];
-		for (int j = 0; j < SAMP_MAX_TEXTDRAWS; j++) {
-			if (!tdpool->iIsListed[j]) {
-				continue;
+		if (isplayertd(tdstoupdate[i])) {
+			for (int j = 0; j < SAMP_MAX_PLAYERTEXTDRAWS; j++) {
+				if (tdpool->iPlayerTextDraw[j] &&
+						tdpool->playerTextdraw[j]->fX == hxtd->fX &&
+						tdpool->playerTextdraw[j]->fY == hxtd->fY) {
+					TRACE1("assigned a handle to a textdraw %d\n", tdstoupdate[i]);
+					hxtd->iHandle = j;
+					hxtd->handler(hxtd, tdpool->playerTextdraw[hxtd->iHandle], TDHANDLER_ATTACH);
+					break;
+				}
 			}
-			if (tdpool->textdraw[j]->fX == hxtd->fX &&
+			continue;
+		}
+		for (int j = 0; j < SAMP_MAX_TEXTDRAWS; j++) {
+			if (tdpool->iIsListed[j] &&
+					tdpool->textdraw[j]->fX == hxtd->fX &&
 					tdpool->textdraw[j]->fY == hxtd->fY) {
 				TRACE1("assigned a handle to a textdraw %d\n", tdstoupdate[i]);
 				hxtd->iHandle = j;
 				hxtd->handler(hxtd, tdpool->textdraw[hxtd->iHandle], TDHANDLER_ATTACH);
-				break;
-			}
-		}
-	}
-
-	TRACE("updating carspeedhandle\n");
-	if (carspeedtd.handler != NULL && !isPTextdrawValid(&carspeedtd)) {
-		carspeedtd.iHandle = INVALID_TEXTDRAW;
-		SPLHXTEXTDRAW *hxtd = &carspeedtd;
-		for (int j = 0; j < SAMP_MAX_PLAYERTEXTDRAWS; j++) {
-			if (!tdpool->iPlayerTextDraw[j]) {
-				continue;
-			}
-			if (tdpool->playerTextdraw[j]->fX == hxtd->fX &&
-					tdpool->playerTextdraw[j]->fY == hxtd->fY) {
-				TRACE("assigned a handle to a player textdraw\n");
-				hxtd->iHandle = j;
-				hxtd->handler(hxtd, tdpool->playerTextdraw[hxtd->iHandle], TDHANDLER_ATTACH);
 				break;
 			}
 		}
@@ -174,14 +158,12 @@ void __cdecl update_textdraws()
 		SPLHXTEXTDRAW *hxtd = &pltextdraws[i];
 		if (hxtd->iHandle != INVALID_TEXTDRAW && hxtd->handler != NULL) {
 			TRACE1("textdraw with a handle %d\n", i);
-			hxtd->handler(hxtd, tdpool->textdraw[hxtd->iHandle], TDHANDLER_UPDATE);
+			struct stTextdraw *samptd = tdpool->textdraw[hxtd->iHandle];
+			if (isplayertd(i)) {
+				samptd = tdpool->playerTextdraw[hxtd->iHandle];
+			}
+			hxtd->handler(hxtd, samptd, TDHANDLER_UPDATE);
 		}
-	}
-
-	SPLHXTEXTDRAW *hxtd = &carspeedtd;
-	if (hxtd->iHandle != INVALID_TEXTDRAW && hxtd->handler != NULL) {
-		TRACE("invoking carspeed handler\n");
-		hxtd->handler(hxtd, tdpool->playerTextdraw[hxtd->iHandle], TDHANDLER_UPDATE);
 	}
 }
 
