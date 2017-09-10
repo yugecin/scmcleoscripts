@@ -1,5 +1,6 @@
 
 #include "opcodes.h"
+#include "util.h"
 
 void headinghandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
@@ -91,6 +92,12 @@ void destnearesthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, i
 	}
 	if (gamedata.missiondistance != -1) {
 		sprintf(destnearstr, "~b~Distance~b~ ~w~%d M", gamedata.missiondistance);
+		return;
+	}
+	// rescue!!
+	if (strncmp(samptd->szText, "Destination (", 13) == 0) {
+		int distance = simplestrval(samptd->szText, 13);
+		sprintf(destnearstr, "~b~Distance~b~ ~w~%d M", distance);
 		return;
 	}
 	if (strncmp(samptd->szText, "Nearest Airport (", 17) != 0) {
