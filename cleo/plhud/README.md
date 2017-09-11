@@ -14,6 +14,7 @@ HUD kind of thing that shows runways, specifically for [the pilot's life SA:MP s
 * <kbd>Y+F10</kbd> increase viewdistance
 * <kbd>H+F10</kbd> decrease viewdistance
 * <kbd>G+F10</kbd> enable/disable smart mode
+* <kbd>U+F10</kbd> switch between render modes (textures/immediate mode) (default is textures)
 
 Smart mode = only show runways in range of the (un)loading point.
 

@@ -7,6 +7,11 @@
 {$O 0C31=12,draw_text %1d% at_hud_xy %2d% %3d% font %4d% proportional %5d% align %6d% RGBA %7d% %8d% %9d% %10d% letter_size %11d% %12d%}
 
 03A4: name_thread 'PLHUD00'
+  
+0A8C: write_memory 0x859F3F size 4 value 0x5C2E5C2E virtual_protect 0
+0390: load_txd_dictionary 'PARTICLE'
+038F: load_texture "WHITE" as 5 // Load dictionary with 0390 first
+0A8C: write_memory 0x859F3F size 4 value 0x5C647874 virtual_protect 0 
 
 const
     CURRENT_VERTEX_COUNT = 0@
@@ -34,6 +39,8 @@ const
     SMARTMODE = 22@
     CLOSESTAS = 23@
     ASPTR = 24@
+    RENDERER = 25@
+    HOOKPLANTED = 26@
     TEMP3 = 29@
     TEMP2 = 30@
     TEMP = 31@
@@ -42,28 +49,33 @@ const
 end
 
 //==============================================================
-0AC6: 1@ = label @HUDHOOK offset
-000E: 1@ -= 0x58EAF1
-000E: 1@ -= 0x4
+jump @SKIPPLANTHOOK
+
+:PLANTHOOK
+0AC6: TEMP = label @HUDHOOK offset
+000E: TEMP -= 0x58EAF1
+000E: TEMP -= 0x4
 0A8C: write_memory 0x58EAF0 size 1 value 0xE9 vp 0 // jmp near
-0A8C: write_memory 0x58EAF1 size 4 value 1@ vp 0
+0A8C: write_memory 0x58EAF1 size 4 value TEMP vp 0
 0A8C: write_memory 0x58EAF5 size 1 value 0x90 vp 0 // NOP
 
-0AC6: 0@ = label @HUHOOKRETURNJUMP offset
-0006: 1@ = 0x58EAF1
-0062: 1@ -= 0@  // (int)
-0A8C: write_memory 0@ size 4 value 1@ vp 0
+0AC6: TEMP2 = label @HUHOOKRETURNJUMP offset
+0006: TEMP = 0x58EAF1
+0062: TEMP -= TEMP2  // (int)
+0A8C: write_memory TEMP2 size 4 value TEMP vp 0
 
-0AC6: 0@ = label @HUCALL offset
-0006: 1@ = 0x734E90
-0062: 1@ -= 0@  // (int)
-000E: 1@ -= 0x4
-0A8C: write_memory 0@ size 4 value 1@ vp 0
+0AC6: TEMP2 = label @HUCALL offset
+0006: TEMP = 0x734E90
+0062: TEMP -= TEMP2  // (int)
+000E: TEMP -= 0x4
+0A8C: write_memory TEMP2 size 4 value TEMP vp 0
 
-0AC6: 0@ = label @LINES offset
-0AC6: 1@ = label @LINEHERE offset
-0A8C: write_memory 1@ size 4 value 0@ vp 0
+0AC6: TEMP2 = label @LINES offset
+0AC6: TEMP = label @LINEHERE offset
+0A8C: write_memory TEMP size 4 value TEMP2 vp 0
+return
 
+:SKIPPLANTHOOK
 0AC6: NUMVERTICESMEM = label @NUMVERTICES offset
 
 //==============================================================
@@ -111,6 +123,8 @@ end
 
 0006: INFOTMR = 3000
 0006: SMARTMODE = 1
+0006: RENDERER = -1
+0006: HOOKPLANTED = 0
 0007: MAXVIEWDIST = 1500.0
 
 :MAIN_LOOP
@@ -130,6 +144,11 @@ end
 000F: MAXVIEWDIST -= 200.0 // LOCALVAR MINUS FLOAT
 0002: jump @SKIPKEY
 :SKIPDOWN
+0AB0:   key_pressed 0x55 // U
+004D: jump_if_false @SKIPRENDERER
+0012: RENDERER *= -1 // LOCALVAR MULTIPLY INT
+0002: jump @SKIPKEY
+:SKIPRENDERER
 0AB0:   key_pressed 0x47 // G
 004D: jump_if_false @SKIPMODE
 0019:   SMARTMODE > 0 // LOCALVAR CMP INT
@@ -372,24 +391,51 @@ return
 050A: DISTANCE = distance_between_XYZ MX MY Z1 and_XYZ PX PY PZ
 0092: DISTANCE = float DISTANCE to_integer
 
-0C27: transform world_xyz MX MY Z1 to hud_xy TEMP TEMP2
-0C28: transform world_xyz X1 Y1 Z1 to screen_xy X1 Y1
-0C28: transform world_xyz X2 Y2 Z2 to screen_xy X2 Y2
+0C27: transform world_xyz MX MY Z1 to hud_xy MX MY
+0013: MY *= 0.93333333333 // 448.0/480.0
 
 0340: set_text_draw_RGBA 255 255 255 255
 033F: set_text_draw_letter_size 0.15 0.95
 0342: set_text_draw_centered 1
 081C: draw_text_outline 0 RGBA 72 72 255 255
 060D: draw_text_shadow 0 rgba 72 72 255 255
-0348: enable_text_draw_proportional 0
-0013: TEMP2 *= 0.93333333333 // 448.0/480.0
-000F: TEMP2 -= 8.0 // LOCALVAR MINUS FLOAT
-045A: draw_text_1number TEMP TEMP2 GXT 'NUMBER' number DISTANCE // ~1~
+0348: enable_text_draw_proportional 0     
+0087: TEMP = MY // (float) GLOCALVAR ASSIGNMENT FLOAT
+000F: TEMP -= 8.0 // LOCALVAR MINUS FLOAT
+045A: draw_text_1number MX TEMP GXT 'NUMBER' number DISTANCE // ~1~
+
+0087: TEMP = X1 // (float) GLOCALVAR ASSIGNMENT FLOAT
+0087: TEMP2 = Y1 // (float) GLOCALVAR ASSIGNMENT FLOAT
+
 001B:   6 > HCKTXTS // LOCALVAR CMP INT
-004D: jump_if_false @2MUCHTEXTS 
+004D: jump_if_false @2MUCHTEXTS
+0C28: transform world_xyz X1 Y1 Z1 to screen_xy X1 Y1 
 0C30: draw_text TXT at_screen_xy X1 Y1 font 1 proportional 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
 000A: HCKTXTS += 1 // LOCALVAR PLUS INT
 :2MUCHTEXTS
+
+001B:   0 > RENDERER // LOCALVAR CMP FLOAT
+004D: jump_if_false @IMRENDERER
+0087: X1 = TEMP // (float) GLOCALVAR ASSIGNMENT FLOAT
+0087: Y1 = TEMP2 // (float) GLOCALVAR ASSIGNMENT FLOAT
+0C27: transform world_xyz X1 Y1 Z1 to hud_xy X1 Y1
+0C27: transform world_xyz X2 Y2 Z2 to hud_xy X2 Y2
+0509: TEMP = distance_between_XY X1 Y1 and_XY X2 Y2
+0013: TEMP *= -1.25 // LOCALVAR MULTIPLY FLOAT
+0063: X1 -= X2  // (float) LOCALVAR MIN FLOAT
+0063: Y1 -= Y2  // (float) LOCALVAR MIN FLOAT
+0604: get_Z_angle_for_point X1 Y1 store_to TEMP2
+074B: draw_texture 5 position MX MY scale 1.0 TEMP angle TEMP2 color_RGBA 72 72 255 255
+return
+
+:IMRENDERER
+0039:   HOOKPLANTED == 0 // LOCALVAR EQ INT
+004D: jump_if_false @HOOKPLANTED
+0006: HOOKPLANTED = 1
+0050: gosub @PLANTHOOK
+:HOOKPLANTED
+
+0C28: transform world_xyz X2 Y2 Z2 to screen_xy X2 Y2
 
 const
     LINES = TEMP
