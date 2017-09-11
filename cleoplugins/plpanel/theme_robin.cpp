@@ -37,13 +37,12 @@ void damagepatchhandlerex(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd,
 void fuelpcthandler(struct SPLHXTEXTDRAW *hxtd, struct stTextdraw *samptd, int reason)
 {
 	TRACE("fuelpcthandler\n");
-	if(reason == TDHANDLER_ATTACH) {
-		samptd->fX = hxtd->fTargetX;
-		samptd->fY = hxtd->fTargetY;
-		fuelval = simplestrval(samptd->szText, 0);
-		return;
-	}
+	REPOSITION_ON_ATTACH();
 	if (INCAR) {
+		char c = samptd->szText[0];
+		if ('0' <= c && c <= '9') {
+			fuelval = simplestrval(samptd->szText, 0);
+		}
 		samptd->fLetterWidth = 0.3f;
 		samptd->fLetterHeight = 1.0f;
 		samptd->dwLetterColor = -1;
