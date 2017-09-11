@@ -40,7 +40,6 @@ const
     CLOSESTAS = 23@
     ASPTR = 24@
     RENDERER = 25@
-    HOOKPLANTED = 26@
     TEMP3 = 29@
     TEMP2 = 30@
     TEMP = 31@
@@ -49,9 +48,7 @@ const
 end
 
 //==============================================================
-jump @SKIPPLANTHOOK
 
-:PLANTHOOK
 0AC6: TEMP = label @HUDHOOK offset
 000E: TEMP -= 0x58EAF1
 000E: TEMP -= 0x4
@@ -73,9 +70,7 @@ jump @SKIPPLANTHOOK
 0AC6: TEMP2 = label @LINES offset
 0AC6: TEMP = label @LINEHERE offset
 0A8C: write_memory TEMP size 4 value TEMP2 vp 0
-return
 
-:SKIPPLANTHOOK
 0AC6: NUMVERTICESMEM = label @NUMVERTICES offset
 
 //==============================================================
@@ -123,8 +118,7 @@ end
 
 0006: INFOTMR = 3000
 0006: SMARTMODE = 1
-0006: RENDERER = -1
-0006: HOOKPLANTED = 0
+0006: RENDERER = 1
 0007: MAXVIEWDIST = 1500.0
 
 :MAIN_LOOP
@@ -420,6 +414,8 @@ return
 0087: Y1 = TEMP2 // (float) GLOCALVAR ASSIGNMENT FLOAT
 0C27: transform world_xyz X1 Y1 Z1 to hud_xy X1 Y1
 0C27: transform world_xyz X2 Y2 Z2 to hud_xy X2 Y2
+0013: Y1 *= 0.93333333333 // 448.0/480.0
+0013: Y2 *= 0.93333333333 // 448.0/480.0
 0509: TEMP = distance_between_XY X1 Y1 and_XY X2 Y2
 0013: TEMP *= -1.25 // LOCALVAR MULTIPLY FLOAT
 0063: X1 -= X2  // (float) LOCALVAR MIN FLOAT
@@ -429,11 +425,6 @@ return
 return
 
 :IMRENDERER
-0039:   HOOKPLANTED == 0 // LOCALVAR EQ INT
-004D: jump_if_false @HOOKPLANTED
-0006: HOOKPLANTED = 1
-0050: gosub @PLANTHOOK
-:HOOKPLANTED
 
 0C28: transform world_xyz X2 Y2 Z2 to screen_xy X2 Y2
 
