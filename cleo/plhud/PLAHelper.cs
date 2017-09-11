@@ -54,6 +54,7 @@ namespace PLAHConsole
 					}
 					else
 					{
+						comment = comment + " (" + (int) z + " FT)";
 						res += " " + b2h( new byte[] { BitConverter.GetBytes( comment.Length + 1 )[0] } );
 						res += " \"" + comment.Replace(' ', '_') + "\"";
 						res += " 00";
