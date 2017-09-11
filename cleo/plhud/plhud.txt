@@ -380,8 +380,10 @@ return
 033F: set_text_draw_letter_size 0.15 0.95
 0342: set_text_draw_centered 1
 081C: draw_text_outline 0 RGBA 72 72 255 255
+060D: draw_text_shadow 0 rgba 72 72 255 255
 0348: enable_text_draw_proportional 0
 0013: TEMP2 *= 0.93333333333 // 448.0/480.0
+000F: TEMP2 -= 8.0 // LOCALVAR MINUS FLOAT
 045A: draw_text_1number TEMP TEMP2 GXT 'NUMBER' number DISTANCE // ~1~
 001B:   6 > HCKTXTS // LOCALVAR CMP INT
 004D: jump_if_false @2MUCHTEXTS 
