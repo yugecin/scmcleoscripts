@@ -12,8 +12,10 @@ namespace PLAHConsole
 		static void Main( string[] args )
 		{
 			StreamReader i = new StreamReader("savedpositions.txt");
-			StreamWriter o = new StreamWriter( "result.txt", false );
+			StreamWriter o = new StreamWriter( "plhudairports.txt", false );
+			o.Write(":AIRPORTS\r\nhex\r\n");
 			o.Write( convert( i.ReadToEnd() ) );
+			o.Write("\r\nend");
 			i.Close();
 			o.Close();
 		}
@@ -23,9 +25,20 @@ namespace PLAHConsole
 			string[] lines = savedpositions.Split('\n', '\r');
 			string __l = "";
 			try {
+				bool skip = false;
 				foreach(string line in lines) {
+					if( skip )
+					{
+						skip = false;
+						continue;
+					}
 					if( line.Length < 10 )
 					{
+						continue;
+					}
+					if( line.StartsWith(";") )
+					{
+						skip = true;
 						continue;
 					}
 					__l = line;
