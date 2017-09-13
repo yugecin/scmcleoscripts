@@ -400,10 +400,10 @@ return
 
 0087: TEMP = X1 // (float) GLOCALVAR ASSIGNMENT FLOAT
 0087: TEMP2 = Y1 // (float) GLOCALVAR ASSIGNMENT FLOAT
-
+            
+0C28: transform world_xyz X1 Y1 Z1 to screen_xy X1 Y1 
 001B:   6 > HCKTXTS // LOCALVAR CMP INT
 004D: jump_if_false @2MUCHTEXTS
-0C28: transform world_xyz X1 Y1 Z1 to screen_xy X1 Y1 
 0C30: draw_text TXT at_screen_xy X1 Y1 font 1 proportional 1 align 1 RGBA 255 255 255 255 letter_size 0.15 0.65
 000A: HCKTXTS += 1 // LOCALVAR PLUS INT
 :2MUCHTEXTS
@@ -577,7 +577,7 @@ end
 
 :INFOSTRING
 hex
-    "runways_loaded pl_runway_helper_v12" 00
+    "runways_loaded pl_runway_helper_v13" 00
 end
 :INFOSTRING2
 hex
