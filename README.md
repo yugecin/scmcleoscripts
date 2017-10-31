@@ -28,6 +28,7 @@
 [plpanel](/cleoplugins/plpanel)  
 
 ### Snippets
+[world2screen projection](/snippets/world2screen.txt)  
 [altering memory without CLEO](/snippets/memorywithoutcleo.txt)  
 [creating coronas in a loop](/snippets/coronas.txt)  
 [hook](/snippets/hook.txt)  
