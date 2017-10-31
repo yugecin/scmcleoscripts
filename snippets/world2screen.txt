@@ -18,7 +18,7 @@
 0AC6: 5@ = label @PSCREEN offset
 0AC6: 6@ = label @PCOORDS offset
 
-// farclip seems to mess up things when you get far away from it
+// keep farclip & nearclip at 0, or it will mess up when looking the other direction
 0AA5: call 0x70CE30 num_params 6 pop 6 bFarClip 0 bNearClip 0 pMultY 3@ pMultX 4@ pScreen=x,y 5@ pCoords=x,y,z 6@ 
 
 0A8D: 0@ = read_memory 5@ size 4 vp 0 // result x (float)
@@ -70,8 +70,7 @@
 0013: 1@ *= 448.0 // l*=i (float)
 
 /********************************/
-// 3: call (same as 1 but without near/far 'clip' options)
-
+// 3: call (same as 1 but without near/far 'clip' options on 1 (= you don't want this))
 0AC6: 6@ = label @PCOORDS offset
 0A8C: write_memory 6@ size 4 value 0@ vp 0
 000A: 6@ += 4 // l+=i (int)
