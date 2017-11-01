@@ -1,4 +1,4 @@
-// 3 methods below
+// 7 methods below
 // input: 0@ 1@ 2@ xyz world coordinates
 // output: 0@ 1@ xy screen coordinates (640x448)
 
@@ -240,6 +240,43 @@ for 20@ = 0 to 2
     0A8D: 4@ = read_memory 21@ size 4 vp 0 // _41/_42/_43
     000E: 21@ -= 0x2C // l-=i (int)
     005B: 10@(20@,1i) += 4@  // l+=l (float)
+
+end
+
+// x *= 640.0 / z
+// y *= 448.0 / z
+0007: 0@ = 640.0 // l=i (float)
+0007: 1@ = 448.0 // l=i (float) 
+
+006B: 0@ *= 10@ // l*=l (float)
+006B: 1@ *= 11@ // l*=l (float)
+
+0073: 0@ /= 12@ // l/=l (float)
+0073: 1@ /= 12@ // l/=l (float)
+
+/********************************/
+// 7: manually w adma (no CLEO needed) (CAMERAVIEWMATRIX 0xB6FA2C)
+
+0006: 21@ = 0xB6FA2C // l=i (int)
+for 20@ = 0 to 2
+
+    0007: 10@(20@,1i) = 0.0 // l=i (float)
+
+    for 22@ = 0 to 2
+        0087: 3@ = 0@(22@,1i) // l=l (float)
+        0085: 4@ = 21@ // l=l (int)
+        000E: 4@ -= 0xA49960  // l-=i (int)
+        0016: 4@ /= 4 // l/=i (int)
+        006B: 3@ *= &0(4@,1i) // l*=g (float)
+        000A: 21@ += 0x10 // l+=i (int)
+        005B: 10@(20@,1i) += 3@  // l+=l (float)
+    end
+    
+    0085: 4@ = 21@ // l=l (int)
+    000E: 4@ -= 0xA49960  // l-=i (int)
+    0016: 4@ /= 4 // l/=i (int)
+    000E: 21@ -= 0x2C // l-=i (int)
+    005B: 10@(20@,1i) += &0(4@,1i)  // l+=l (float)
 
 end
 
