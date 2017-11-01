@@ -1,0 +1,12 @@
+// loading a sprite from /models/ instead of /models/txd/
+// e.g. normally fronten2.txd can't be used as it's not in the txd dir
+
+// change lookup path from "txd/" to "././"
+0A8C: write_memory 0x859F3F size 4 value 0x5C2E5C2E virtual_protect 0
+0390: load_txd_dictionary 'FRONTEN2'
+038F: load_texture "MAP" as 1 // Load dictionary with 0390 first
+0390: load_txd_dictionary 'HUD'
+038F: load_texture "RADAR_WAYPOINT" as 2 // Load dictionary with 0390 first
+038F: load_texture "RADAR_GANGB" as 3 // Load dictionary with 0390 first
+// revert loading path back to "txd/"
+0A8C: write_memory 0x859F3F size 4 value 0x5C647874 virtual_protect 0

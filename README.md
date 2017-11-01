@@ -29,6 +29,7 @@
 
 ### Snippets
 [world2screen projection](/snippets/world2screen.txt)  
+[use textures from the models directory](/snippets/textureloading.txt)  
 [altering memory without CLEO](/snippets/memorywithoutcleo.txt)  
 [creating coronas in a loop](/snippets/coronas.txt)  
 [hook](/snippets/hook.txt)  
