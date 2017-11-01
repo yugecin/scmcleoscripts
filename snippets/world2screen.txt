@@ -71,6 +71,7 @@
 
 /********************************/
 // 3: call (same as 1 but without near/far 'clip' options on 1 (= you don't want this))
+
 0AC6: 6@ = label @PCOORDS offset
 0A8C: write_memory 6@ size 4 value 0@ vp 0
 000A: 6@ += 4 // l+=i (int)
@@ -100,5 +101,157 @@
 
 0073: 0@ /= 2@ // l/=l (float)
 0073: 1@ /= 3@ // l/=l (float)
+
+/********************************/
+// 4: manually (CAMERAVIEWMATRIX 0xB6FA2C)
+/*
+// x = _x * _11 + _y * _21 + _z * _31 + 1 * _41
+0007: 10@ = 0.0 // l=i (float)
+
+0087: 3@ = 0@ // l=l (float)
+0A8D: 4@ = read_memory 0xB6FA2C size 4 vp 0 // _11
+006B: 3@ *= 4@ // l*=l (float)
+005B: 10@ += 3@  // l+=l (float)
+
+0087: 3@ = 1@ // l=l (float)
+0A8D: 4@ = read_memory 0xB6FA3C size 4 vp 0 // _21
+006B: 3@ *= 4@ // l*=l (float)
+005B: 10@ += 3@  // l+=l (float)
+
+0087: 3@ = 2@ // l=l (float)
+0A8D: 4@ = read_memory 0xB6FA4C size 4 vp 0 // _31
+006B: 3@ *= 4@ // l*=l (float)
+005B: 10@ += 3@  // l+=l (float)
+
+0A8D: 4@ = read_memory 0xB6FA5C size 4 vp 0 // _41
+005B: 10@ += 4@  // l+=l (float)
+
+// y = _x * _12 + _y * _22 + _z * _32 + 1 * _42
+0007: 11@ = 0.0 // l=i (float)
+
+0087: 3@ = 0@ // l=l (float)
+0A8D: 4@ = read_memory 0xB6FA30 size 4 vp 0 // _12
+006B: 3@ *= 4@ // l*=l (float)
+005B: 11@ += 3@  // l+=l (float)
+
+0087: 3@ = 1@ // l=l (float)
+0A8D: 4@ = read_memory 0xB6FA40 size 4 vp 0 // _22
+006B: 3@ *= 4@ // l*=l (float)
+005B: 11@ += 3@  // l+=l (float)  
+
+0087: 3@ = 2@ // l=l (float)
+0A8D: 4@ = read_memory 0xB6FA50 size 4 vp 0 // _32
+006B: 3@ *= 4@ // l*=l (float)
+005B: 11@ += 3@  // l+=l (float)
+                                  
+0A8D: 4@ = read_memory 0xB6FA60 size 4 vp 0 // _42
+005B: 11@ += 4@  // l+=l (float)
+
+// z = _x * _13 + _y * _23 + _z * _33 + 1 * _43
+0007: 12@ = 0.0 // l=i (float)
+
+0087: 3@ = 0@ // l=l (float)
+0A8D: 4@ = read_memory 0xB6FA34 size 4 vp 0 // _13
+006B: 3@ *= 4@ // l*=l (float)
+005B: 12@ += 3@  // l+=l (float)
+
+0087: 3@ = 1@ // l=l (float)
+0A8D: 4@ = read_memory 0xB6FA44 size 4 vp 0 // _23
+006B: 3@ *= 4@ // l*=l (float)
+005B: 12@ += 3@  // l+=l (float)
+
+0087: 3@ = 2@ // l=l (float)
+0A8D: 4@ = read_memory 0xB6FA54 size 4 vp 0 // _33
+006B: 3@ *= 4@ // l*=l (float)
+005B: 12@ += 3@  // l+=l (float)
+
+0A8D: 4@ = read_memory 0xB6FA64 size 4 vp 0 // _43
+005B: 12@ += 4@  // l+=l (float)
+
+// x *= 640.0 / z
+// y *= 448.0 / z
+0007: 0@ = 640.0 // l=i (float)
+0007: 1@ = 448.0 // l=i (float) 
+
+006B: 0@ *= 10@ // l*=l (float)
+006B: 1@ *= 11@ // l*=l (float)
+
+0073: 0@ /= 12@ // l/=l (float)
+0073: 1@ /= 12@ // l/=l (float)
+*/
+/********************************/     
+// 5: manually w arrays (CAMERAVIEWMATRIX 0xB6FA2C)
+/*
+0006: 21@ = 0xB6FA2C // l=i (int)
+for 20@ = 0 to 2
+
+    0007: 10@(20@,1i) = 0.0 // l=i (float)
+
+    0087: 3@ = 0@ // l=l (float)
+    0A8D: 4@ = read_memory 21@ size 4 vp 0 // _11/_12/_13
+    006B: 3@ *= 4@ // l*=l (float)
+    000A: 21@ += 0x10 // l+=i (int)
+    005B: 10@(20@,1i) += 3@  // l+=l (float)
+    
+    0087: 3@ = 1@ // l=l (float)
+    0A8D: 4@ = read_memory 21@ size 4 vp 0 // _21/_22/_23
+    006B: 3@ *= 4@ // l*=l (float)
+    000A: 21@ += 0x10 // l+=i (int)
+    005B: 10@(20@,1i) += 3@  // l+=l (float)
+    
+    0087: 3@ = 2@ // l=l (float)
+    0A8D: 4@ = read_memory 21@ size 4 vp 0 // _31/_32/_33
+    006B: 3@ *= 4@ // l*=l (float)
+    000A: 21@ += 0x10 // l+=i (int)
+    005B: 10@(20@,1i) += 3@  // l+=l (float)
+    
+    0A8D: 4@ = read_memory 21@ size 4 vp 0 // _41/_42/_43
+    000E: 21@ -= 0x2C // l-=i (int)
+    005B: 10@(20@,1i) += 4@  // l+=l (float)
+end
+
+// x *= 640.0 / z
+// y *= 448.0 / z
+0007: 0@ = 640.0 // l=i (float)
+0007: 1@ = 448.0 // l=i (float) 
+
+006B: 0@ *= 10@ // l*=l (float)
+006B: 1@ *= 11@ // l*=l (float)
+
+0073: 0@ /= 12@ // l/=l (float)
+0073: 1@ /= 12@ // l/=l (float)
+*/
+/********************************/     
+// 6: manually w more arrays (CAMERAVIEWMATRIX 0xB6FA2C)
+
+0006: 21@ = 0xB6FA2C // l=i (int)
+for 20@ = 0 to 2
+
+    0007: 10@(20@,1i) = 0.0 // l=i (float)
+
+    for 22@ = 0 to 2
+        0087: 3@ = 0@(22@,1i) // l=l (float)
+        0A8D: 4@ = read_memory 21@ size 4 vp 0 // _11/_12/_13 _21/_22/_23 _31/_32/_33
+        006B: 3@ *= 4@ // l*=l (float)
+        000A: 21@ += 0x10 // l+=i (int)
+        005B: 10@(20@,1i) += 3@  // l+=l (float)
+    end
+    
+    0A8D: 4@ = read_memory 21@ size 4 vp 0 // _41/_42/_43
+    000E: 21@ -= 0x2C // l-=i (int)
+    005B: 10@(20@,1i) += 4@  // l+=l (float)
+
+end
+
+// x *= 640.0 / z
+// y *= 448.0 / z
+0007: 0@ = 640.0 // l=i (float)
+0007: 1@ = 448.0 // l=i (float) 
+
+006B: 0@ *= 10@ // l*=l (float)
+006B: 1@ *= 11@ // l*=l (float)
+
+0073: 0@ /= 12@ // l/=l (float)
+0073: 1@ /= 12@ // l/=l (float)
 
 /********************************/
