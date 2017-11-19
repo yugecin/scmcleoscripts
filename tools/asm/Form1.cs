@@ -14,17 +14,103 @@ namespace asm {
 	public partial class Form1 : Form {
 
 		[STAThread]
-		static void Main() {
+		static void Main(string[] args) {
+			string result = "";
+			if (args.Length > 0) {
+				result = doheadless(args[0]);
+				if (result == null) {
+					return;
+				}
+			}
+
 			Application.SetCompatibleTextRenderingDefault(true);
-			Application.Run(new Form1());
+			Application.Run(new Form1(result));
 		}
 
-		public Form1() {
+		private static string headlessTargetFile = null;
+		private static string gcc;
+		private static string objdump;
+		private static bool comments;
+		private static bool correctoffsets = true;
+		private static bool jump = true;
+		private static string hookaddr;
+
+		public Form1(string initialText) {
 			InitializeComponent();
+			textBox1.Text = initialText;
 		}
 
-		private void button1_Click(object sender, EventArgs e) {
-			var lines = textBox1.Text.Split('\n');
+		private static string doheadless(string file) {
+			if (!File.Exists(file)) {
+				return "input file doesn't exist";
+			}
+
+			List<string> lines = new List<string>();
+			using (var reader = new StreamReader(file)) {
+				string line;
+				while ((line = reader.ReadLine()) != null) {
+					if (line.StartsWith(";_ASM_") || line.StartsWith("; _ASM_")) {
+						string directive = line.Substring(";_ASM_".Length);
+						if (directive[0] == '_') {
+							directive = directive.Substring(1);
+						}
+						parseDirective(directive);
+						continue;
+					}
+					lines.Add(line);
+				}
+			}
+
+			if (headlessTargetFile == null) {
+				return "no headless target file specified";
+			}
+
+			string result;
+			if (!asmstuff(stripcomments(lines.ToArray()), out result)) {
+				return result;
+			}
+
+			result = cleandisasm(result.Split('\n'));
+
+			using (var writer = new StreamWriter(headlessTargetFile)) {
+				foreach (string line in result.Split('\n')) {
+					writer.Write(line);
+					writer.Write("\n");
+				}
+			}
+
+			return null;
+		}
+
+		private static void parseDirective(string dir) {
+			string[] p = dir.Split(new char[] {':'}, 2);
+			p[1] = p[1].Trim();
+			switch (p[0].Trim().ToUpper()) {
+			case "HOOKADDR":
+				hookaddr = p[1];
+				break;
+			case "JUMP":
+				jump = p[1].ToLower() == "true";
+				break;
+			case "CORRECT_OFFSETS":
+				correctoffsets = p[1].ToLower() == "true";
+				break;
+			case "COMMENTS":
+				comments = p[1].ToLower() == "true";
+				break;
+			case "GCC":
+				gcc = p[1];
+				break;
+			case "OBJDUMP":
+				objdump = p[1];
+				break;
+			case "TARGETFILE":
+				headlessTargetFile = p[1];
+				break;
+			}
+		}
+
+		private static string cleandisasm(string[] lines) {
 			var sb = new StringBuilder();
 			string[] instr = new string[8];
 			int instrc;
@@ -48,7 +134,7 @@ namespace asm {
 						continue;
 					}
 					if (line.EndsWith(":")) {
-						if (checkBox1.Checked) {
+						if (comments) {
 							sb.Append("// ").Append(line.Trim()).AppendLine();
 						}
 						continue;
@@ -74,7 +160,7 @@ namespace asm {
 						stuff.Add(instrs, new JMPCALL());
 						int idx = comment.IndexOf(' ') + 1;
 						comment = comment.Substring(0, idx) + "0x" + realaddr(instr);
-						if (checkBox3.Checked) {
+						if (correctoffsets) {
 							patchinstr(instr, 2 * instrs + 4);
 						} else {
 							patchinstr(instr, instrs);
@@ -104,12 +190,13 @@ namespace asm {
 					}
 					sb.AppendLine();
 	skiptocomment:
-					if (checkBox1.Checked) {
+					if (comments) {
 						sb.Append("// ").Append(comment.Trim()).AppendLine();
 					}
 				} catch (Exception er) {
-					MessageBox.Show(er.ToString() + "\r\n" + _line);
-					return;
+					string result = er.ToString() + "\r\n" + _line;
+					MessageBox.Show(result);
+					return result;
 				}
 			}
 			sb.Append("end").AppendLine();
@@ -120,14 +207,14 @@ namespace asm {
 			sb2.Append("0085: 1@ = 0@ // (int)").AppendLine();
 			string[] hookadrs = new string[] {
 				"",
-				textBox2.Text.Substring(6, 2),
-				textBox2.Text.Substring(4, 2),
-				textBox2.Text.Substring(2, 2),
-				textBox2.Text.Substring(0, 2),
+				hookaddr.Substring(6, 2),
+				hookaddr.Substring(4, 2),
+				hookaddr.Substring(2, 2),
+				hookaddr.Substring(0, 2),
 			};
 			sb2.Append("000E: 1@ -= 0x").Append(realaddr(hookadrs)).AppendLine();
-			sb2.Append("0A8C: write_memory 0x").Append(i2hs(int.Parse(textBox2.Text, NumberStyles.HexNumber) - 1)).Append(" size 1 value 0xE9 vp 0").AppendLine();
-			sb2.Append("0A8C: write_memory 0x").Append(textBox2.Text).Append(" size 4 value 1@ vp 0").AppendLine();
+			sb2.Append("0A8C: write_memory 0x").Append(i2hs(int.Parse(hookaddr, NumberStyles.HexNumber) - 1)).Append(" size 1 value 0xE9 vp 0").AppendLine();
+			sb2.Append("0A8C: write_memory 0x").Append(hookaddr).Append(" size 4 value 1@ vp 0").AppendLine();
 			sb2.AppendLine();
 			sb2.Append("0AC6: 1@ = label @ENTRY offset").AppendLine();
 			sb2.AppendLine();
@@ -142,11 +229,20 @@ namespace asm {
 			sb2.Append("0002: jump @NOMOREHOOKER").AppendLine().AppendLine();
 			sb2.AppendLine();
 			sb.Insert(0, sb2.ToString());
-			textBox1.Text = sb.ToString();
+			return sb.ToString();
+		}
+
+		private void button1_Click(object sender, EventArgs e) {
+			var lines = textBox1.Text.Split('\n');
+			comments = checkBox1.Checked;
+			correctoffsets = checkBox3.Checked;
+			jump = checkBox2.Checked;
+			hookaddr = textBox2.Text;
+			textBox1.Text = cleandisasm(lines);
 			Clipboard.SetText(textBox1.Text);
 		}
 
-		private int instraddr(string[] instr) {
+		private static int instraddr(string[] instr) {
 			return
 				(int.Parse(instr[4], NumberStyles.HexNumber) << 24) |
 				(int.Parse(instr[3], NumberStyles.HexNumber) << 16) |
@@ -155,7 +251,7 @@ namespace asm {
 				0;
 		}
 
-		private string realaddr(string[] instr) {
+		private static string realaddr(string[] instr) {
 			int addr = instraddr(instr);
 			addr += 4;
 			string s = "";
@@ -166,7 +262,7 @@ namespace asm {
 			return s;
 		}
 
-		private string i2hs(int i) {
+		private static string i2hs(int i) {
 			string s = "";
 			s += ((i >> 24) & 0xff).ToString("x2");
 			s += ((i >> 16) & 0xff).ToString("x2");
@@ -175,7 +271,7 @@ namespace asm {
 			return s;
 		}
 
-		private void patchinstr(string[] instr, int instrs) {
+		private static void patchinstr(string[] instr, int instrs) {
 			int addr = instraddr(instr);
 			addr -= instrs;
 			instr[1] = ((addr      ) & 0xff).ToString("x2");
@@ -194,7 +290,11 @@ namespace asm {
 		}
 
 		private void button2_Click(object sender, EventArgs e) {
-			var lines = textBox1.Text.Split('\n');
+			textBox1.Text = stripcomments(textBox1.Text.Split('\n'));
+			Clipboard.SetText(textBox1.Text);
+		}
+
+		private static string stripcomments(string[] lines) {
 			var sb = new StringBuilder();
 			foreach (var line in lines) {
 				if (line.Trim().Length == 0) {
@@ -211,8 +311,7 @@ namespace asm {
 					sb.Append(txt).AppendLine();
 				}
 			}
-			textBox1.Text = sb.ToString();
-			Clipboard.SetText(textBox1.Text);
+			return sb.ToString();
 		}
 
 		public interface A {
@@ -264,34 +363,44 @@ skip:
 				sb.Append("0A8C: write_memory 1@ size 4 value ").Append(var).Append("@ vp 0").AppendLine();
 			}
 		}
+
 		private void textBox1_Click(object sender, EventArgs e) {
 			textBox1.Text = "";
 		}
 
 		private void button4_Click(object sender, EventArgs e) {
 			button2.PerformClick();
-			if (File.Exists("f.s")) File.Delete("f.s");
-			if (File.Exists("f.o")) File.Delete("f.o");
-			StreamWriter file = new StreamWriter("f.s");
-			file.WriteLine(".intel_syntax noprefix\n_main:\n" + textBox1.Text);
-			file.Close();
-			StringBuilder o = new StringBuilder();
-			bool res = false;
-			if (exec(o, txtgcc.Text, "-m32 -c f.s -o f.o")) {
-				o.Clear();
-				res = exec(o, txtobjdump.Text, "-M intel -d f.o");
-			}
-			textBox1.Text = o.ToString();
-			//if (File.Exists("f.s")) File.Delete("f.s");
-			//if (File.Exists("f.o")) File.Delete("f.o");
-			if (!res) {
+			gcc = txtgcc.Text;
+			objdump = txtobjdump.Text;
+			string res;
+			if (!asmstuff(textBox1.Text, out res)) {
+				textBox1.Text = res;
 				return;
 			}
+			textBox1.Text = res;
 			button1.PerformClick();
 		}
 
+		private static bool asmstuff(string code, out string result) {
+			if (File.Exists(mydir + "/f.s")) File.Delete(mydir + "/f.s");
+			if (File.Exists(mydir + "/f.o")) File.Delete(mydir + "/f.o");
+			StreamWriter file = new StreamWriter(mydir + "/f.s");
+			file.WriteLine(".intel_syntax noprefix\n_main:\n" + code);
+			file.Close();
+			StringBuilder o = new StringBuilder();
+			bool res = false;
+			if (exec(o, gcc, "-m32 -c f.s -o f.o")) {
+				o.Clear();
+				res = exec(o, objdump, "-M intel -d f.o");
+			}
+			result = o.ToString();
+			if (File.Exists(mydir + "/f.s")) File.Delete(mydir + "/f.s");
+			if (File.Exists(mydir + "/f.o")) File.Delete(mydir + "/f.o");
+			return res;
+		}
+
 		public static string mydir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-		private bool exec(StringBuilder o, string exe, string args)
+		private static bool exec(StringBuilder o, string exe, string args)
 		{
 			ProcessStartInfo processStartInfo = new ProcessStartInfo(exe, args);
 			processStartInfo.UseShellExecute = false;

@@ -86,4 +86,21 @@ hex
 end
 ```
 
+Command line usage
+------------------
+
+It's also possible to call this program with an input file as single argument. Then you must specify options in that input file as comments (can be anywhere in that file):
+
+```
+; _ASM_HOOKADDR: 0058EAF1
+; _ASM_JUMP: true
+; _ASM_CORRECT_OFFSETS: true
+; _ASM_COMMENTS: false
+; _ASM_GCC: S:\broftware\perl\c\bin\gcc.exe
+; _ASM_OBJDUMP: S:\broftware\perl\c\bin\objdump.exe
+; _ASM_TARGETFILE: plnewhud-asm.txt
+```
+
+If some error happend, the gui will pop open with the error message.
+
 this was used for [gps](../../cleo/gps) and stuff
