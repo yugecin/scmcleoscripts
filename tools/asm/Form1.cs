@@ -42,8 +42,6 @@ namespace asm {
 		}
 
 		private static string doheadless(string file) {
-			MyStringBuilder.lf = "\n";
-
 			if (!File.Exists(file)) {
 				return "input file doesn't exist";
 			}
@@ -109,6 +107,11 @@ namespace asm {
 				break;
 			case "COMMENTS":
 				comments = p[1].ToLower() == "true";
+				break;
+			case "LF":
+				if (p[1].ToLower() == "true") {
+					MyStringBuilder.lf = "\n";
+				}
 				break;
 			case "GCC":
 				gcc = p[1];
