@@ -524,13 +524,8 @@ skip:
 				this.realbuilder = new StringBuilder();
 			}
 
-			public MyStringBuilder Append(string line) {
+			public MyStringBuilder Append(Object line) {
 				realbuilder.Append(line);
-				return this;
-			}
-
-			public MyStringBuilder Append(int i) {
-				realbuilder.Append(i);
 				return this;
 			}
 
