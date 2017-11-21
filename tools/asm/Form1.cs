@@ -42,6 +42,8 @@ namespace asm {
 		}
 
 		private static string doheadless(string file) {
+			MyStringBuilder.lf = "\n";
+
 			if (!File.Exists(file)) {
 				return "input file doesn't exist";
 			}
@@ -121,7 +123,7 @@ namespace asm {
 		}
 
 		private static string cleandisasm(string[] lines) {
-			var sb = new StringBuilder();
+			var sb = new MyStringBuilder();
 			string[] instr = new string[8];
 			int instrc;
 			int instrs = 0;
@@ -210,7 +212,7 @@ namespace asm {
 				}
 			}
 			sb.Append("end").AppendLine();
-			var sb2 = new StringBuilder();
+			var sb2 = new MyStringBuilder();
 			sb2.Append(":HOOKER").AppendLine();
 			sb2.Append("0AC6: 0@ = label @ENTRY offset").AppendLine();
 			sb2.AppendLine();
@@ -292,7 +294,7 @@ namespace asm {
 
 		private static string b2h(byte[] b, int offset, int len)
 		{
-			StringBuilder sb = new StringBuilder();
+			var sb = new MyStringBuilder();
 			for(int i = offset, j = offset + len; i < j; i++) {
 				sb.Append(b[i].ToString("X2"));
 			}
@@ -306,7 +308,7 @@ namespace asm {
 		}
 
 		private static string stripcomments(string[] lines) {
-			var sb = new StringBuilder();
+			var sb = new MyStringBuilder();
 			var replacements = new Dictionary<string, string>();
 			foreach (var line in lines) {
 				if (line.Trim().Length == 0) {
@@ -387,11 +389,11 @@ namespace asm {
 		}
 
 		public interface A {
-			void dostuff(StringBuilder sb);
+			void dostuff(MyStringBuilder sb);
 		}
 
 		public class JMPCALL : A {
-			void A.dostuff(StringBuilder sb) {
+			void A.dostuff(MyStringBuilder sb) {
 				sb.Append("0A8D: 2@ = read_memory 1@ size 4 vp 0").AppendLine();
 				sb.Append("0062: 2@ -= 0@  // (int)").AppendLine();
 				sb.Append("0A8C: write_memory 1@ size 4 value 2@ vp 0").AppendLine();
@@ -407,7 +409,7 @@ namespace asm {
 				this.n = n;
 				this.offset = offset;
 			}
-			void A.dostuff(StringBuilder sb) {
+			void A.dostuff(MyStringBuilder sb) {
 				int var = 2;
 				if (cache.TryGetValue(n, out var)) {
 					if (offset != 0) {
@@ -459,7 +461,7 @@ skip:
 			StreamWriter file = new StreamWriter(mydir + "/f.s");
 			file.WriteLine(".intel_syntax noprefix\n_main:\n" + code);
 			file.Close();
-			StringBuilder o = new StringBuilder();
+			var o = new MyStringBuilder();
 			bool res = false;
 			if (exec(o, gcc, "-m32 -c f.s -o f.o")) {
 				o.Clear();
@@ -472,7 +474,7 @@ skip:
 		}
 
 		public static string mydir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-		private static bool exec(StringBuilder o, string exe, string args)
+		private static bool exec(MyStringBuilder o, string exe, string args)
 		{
 			ProcessStartInfo processStartInfo = new ProcessStartInfo(exe, args);
 			processStartInfo.UseShellExecute = false;
@@ -507,6 +509,52 @@ skip:
 		private void button3_Click(object sender, EventArgs e) {
 			textBox1.Text = Clipboard.GetText();
 			button4.PerformClick();
+		}
+
+		public class MyStringBuilder {
+
+			public static string lf = Environment.NewLine;
+
+			private StringBuilder realbuilder;
+			
+			public MyStringBuilder() {
+				this.realbuilder = new StringBuilder();
+			}
+
+			public MyStringBuilder Append(string line) {
+				realbuilder.Append(line);
+				return this;
+			}
+
+			public MyStringBuilder Append(int i) {
+				realbuilder.Append(i);
+				return this;
+			}
+
+			public MyStringBuilder AppendLine(string line) {
+				realbuilder.Append(line + lf);
+				return this;
+			}
+
+			public MyStringBuilder AppendLine() {
+				realbuilder.Append(lf);
+				return this;
+			}
+
+			public MyStringBuilder Clear() {
+				realbuilder.Clear();
+				return this;
+			}
+
+			public MyStringBuilder Insert(int pos, string stuff) {
+				realbuilder.Insert(pos, stuff);
+				return this;
+			}
+
+			public override string ToString() {
+				return realbuilder.ToString();
+			}
+
 		}
 	}
 }
