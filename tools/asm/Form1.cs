@@ -33,6 +33,7 @@ namespace asm {
 		private static bool comments;
 		private static bool correctoffsets = true;
 		private static bool jump = true;
+		private static bool preproconly = false;
 		private static string hookaddr;
 
 		public Form1(string initialText) {
@@ -65,12 +66,15 @@ namespace asm {
 				return "no headless target file specified";
 			}
 
-			string result;
-			if (!asmstuff(stripcomments(lines.ToArray()), out result)) {
-				return result;
-			}
+			string result = stripcomments(lines.ToArray());
 
-			result = cleandisasm(result.Split('\n'));
+			if (!preproconly) {
+				if (!asmstuff(result, out result)) {
+					return result;
+				}
+
+				result = cleandisasm(result.Split('\n'));
+			}
 
 			using (var writer = new StreamWriter(headlessTargetFile)) {
 				foreach (string line in result.Split('\n')) {
@@ -88,6 +92,9 @@ namespace asm {
 			switch (p[0].Trim().ToUpper()) {
 			case "HOOKADDR":
 				hookaddr = p[1];
+				break;
+			case "PREPROCONLY":
+				preproconly = p[1].ToLower() == "true";
 				break;
 			case "JUMP":
 				jump = p[1].ToLower() == "true";
@@ -290,6 +297,7 @@ namespace asm {
 		}
 
 		private void button2_Click(object sender, EventArgs e) {
+			preproconly = false;
 			textBox1.Text = stripcomments(textBox1.Text.Split('\n'));
 			Clipboard.SetText(textBox1.Text);
 		}
