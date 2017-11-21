@@ -302,14 +302,13 @@ namespace asm {
 				}
 				string l = new Regex("_var(..)").Replace(line, "0xEE${1}0000");
 				int i = l.IndexOf(';');
-				if (i == -1) {
-					sb.Append(l).AppendLine();
-					continue;
+				if (i != -1) {
+					l = l.Substring(0, i).Trim();
+					if (l.Length == 0) {
+						continue;
+					}
 				}
-				string txt = l.Substring(0, i).Trim();
-				if (txt.Length > 0) {
-					sb.Append(txt).AppendLine();
-				}
+				sb.Append(l).AppendLine();
 			}
 			return sb.ToString();
 		}
