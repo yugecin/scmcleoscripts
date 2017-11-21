@@ -296,13 +296,36 @@ namespace asm {
 
 		private static string stripcomments(string[] lines) {
 			var sb = new StringBuilder();
+			var replacements = new Dictionary<string, string>();
 			foreach (var line in lines) {
 				if (line.Trim().Length == 0) {
 					continue;
 				}
-				string l = new Regex("_var(..)").Replace(line, "0xEE${1}0000");
+
+				string l = line;
+				bool didreplace = true;
+				while (didreplace) {
+					didreplace = false;
+					foreach (var entry in replacements) {
+						l = doPreprocReplacement(l, entry.Key, entry.Value, out didreplace);
+						if (didreplace) {
+							break;
+						}
+					}
+				}
+
+				l = new Regex("_var(..)").Replace(l, "0xEE${1}0000");
 				int i = l.IndexOf(';');
 				if (i != -1) {
+					if (i < l.Length - 1) {
+						string comment = l.Substring(i + 1).Trim();
+						if (comment.StartsWith("_DEFINE:")) {
+							string[] parts = comment.Substring("_DEFINE:".Length).Split(new char[] {'='}, 2);
+							if (parts[0].Length != 0) {
+								replacements.Add(parts[0], parts[1]);
+							}
+						}
+					}
 					l = l.Substring(0, i).Trim();
 					if (l.Length == 0) {
 						continue;
@@ -311,6 +334,45 @@ namespace asm {
 				sb.Append(l).AppendLine();
 			}
 			return sb.ToString();
+		}
+
+		private static string doPreprocReplacement(string line, string search, string replace, out bool didreplace) {
+			didreplace = false;
+			int commentidx = /*(ushort) */line.IndexOf(';');
+			if (commentidx == -1) commentidx = 3000000;
+			int idx = 0;
+		loop:
+			idx = line.IndexOf(search, idx);
+
+			if (idx == -1) {
+				return line;
+			}
+
+			if (idx >= commentidx) {
+				return line;
+			}
+
+			if (idx == 0 || !isIdentifierChar(line[idx - 1])) {
+				if (idx + search.Length >= line.Length || !isIdentifierChar(line[idx + search.Length])) {
+					line = line.Substring(0, idx) + replace + line.Substring(idx + search.Length);
+				}
+			}
+			
+			idx++;
+
+			if (idx >= line.Length) {
+				return line;
+			}
+
+			goto loop;
+		}
+
+		private static bool isIdentifierChar(char c) {
+			return
+				('_' == c) || 
+				('0' <= c && c <= '9') ||
+				('a' <= c && c <= 'z') ||
+				('A' <= c && c <= 'Z');
 		}
 
 		public interface A {
