@@ -88,6 +88,9 @@ namespace asm {
 
 		private static void parseDirective(string dir) {
 			string[] p = dir.Split(new char[] {':'}, 2);
+			if (p.Length < 2) {
+				return;
+			}
 			p[1] = p[1].Trim();
 			switch (p[0].Trim().ToUpper()) {
 			case "HOOKADDR":
