@@ -11,17 +11,45 @@ NOTES:
 
 }
 
-0AC8: 0@ = allocate_memory_size 18480 // sizeof(RwD3D9Vertex) (=28) * 4 * runwaycount (=165)  
+0AC8: 0@ = allocate_memory_size 18480 // sizeof(RwD3D9Vertex) (=28) * 4 * runwaycount (=165)
 0AC6: 1@ = label @DATA00 offset
 0A8C: write_memory 1@ size 4 value 0@ vp 0
 
 0002: jump @HOOKER
 :NOMOREHOOKER
 
-// -
+const
+    OPTIONS = 0@
+    _OPTIONS = 1@
+end
+
+0006: OPTIONS = 0 // l=i (int)
+0AC6: _OPTIONS = label @_OPTIONS offset
+
+0006: 10@ = 0x79 // l=i (int) // F10
+0006: 11@ = 0x27 // l=i (int) // right
+0006: 12@ = 0x28 // l=i (int) // down
+0006: 13@ = 0x26 // l=i (int) // up
+0006: 14@ = 0x25 // l=i (int) // left
 
 :MAIN_LOOP
 0001: wait 0
+
+// >>>>>>> keys
+0006: 30@ = 0 // l=i (int)
+0002: jump @KEYS_LOOP_START
+:KEYS_LOOP
+000A: 30@ += 1 // l+=i (int)
+001B:   5 > 30@ // i>l (int)
+004D: jump_if_false @KEYS_LOOP_END
+:KEYS_LOOP_START
+0AB0: key_pressed 10@(30@,1i)
+004D: jump_if_false @KEYS_LOOP
+000A: 30@ += 2 // l+=i (int)
+08BD: set OPTIONS bit 30@
+0A8C: write_memory _OPTIONS size 4 value OPTIONS vp 0
+:KEYS_LOOP_END
+// <<<<<<< keys
 
 0002: jump @MAIN_LOOP
 
@@ -54,7 +82,7 @@ end
 
 :DATA02
 {
-    stores options, states 
+    stores options, states
       bit 1: smart mode?
       bit 0: is active?
 }
