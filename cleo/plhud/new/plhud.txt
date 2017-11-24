@@ -1,0 +1,64 @@
+{$CLEO}
+{$NOSOURCE}
+
+03A4: name_thread 'PLHUD01'
+
+{
+NOTES:
+
+  adding runway:
+      make sure enough memory is allocated for the shapes
+
+}
+
+0AC8: 0@ = allocate_memory_size 18480 // sizeof(RwD3D9Vertex) (=28) * 4 * runwaycount (=165)  
+0AC6: 1@ = label @DATA00 offset
+0A8C: write_memory 1@ size 4 value 0@ vp 0
+
+0002: jump @HOOKER
+:NOMOREHOOKER
+
+// -
+
+:MAIN_LOOP
+0001: wait 0
+
+0002: jump @MAIN_LOOP
+
+{$INCLUDE plhud-asm.txt}
+{$INCLUDE plhudairports.txt}
+
+:DATA00
+{
+    stores a pointer to allocated mem for primitives
+}
+hex
+    00 00 00 00
+end
+
+:DATA01
+{
+    stores menu text to show
+}
+hex
+    "USE THE UP AND DOWN ARROW KEYS"     "~n~"
+    "TO BROWSE THIS MENU.  USE THE"      "~n~"
+    "LEFT AND RIGHT ARROW KEYS TO"       "~n~"
+    "CHANGE VALUES OR ACCEPT."           "~n~"
+                                         "~n~"
+    "> CONTINUE"                         "~n~"
+    "  SMART MODE: ON "                  "~n~"
+    "  VIEW DISTANCE: 1500M"             "~n~"
+    00
+end
+
+:DATA02
+{
+    stores options, states 
+      bit 1: smart mode?
+      bit 0: is active?
+}
+hex
+    00 00 00 00
+end
+
