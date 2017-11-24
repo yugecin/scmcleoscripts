@@ -99,8 +99,26 @@ It's also possible to call this program with an input file as single argument. T
 ; _ASM_GCC: S:\broftware\perl\c\bin\gcc.exe
 ; _ASM_OBJDUMP: S:\broftware\perl\c\bin\objdump.exe
 ; _ASM_TARGETFILE: plnewhud-asm.txt
+; _ASM_PREPROCONLY: false
+; _ASM_LF: true
 ```
+
+Not all options are required.
 
 If some error happend, the gui will pop open with the error message.
 
-this was used for [gps](../../cleo/gps) and stuff
+Preprocessor
+------------
+
+It is also possible to do some preprocessor-like replacements:
+```
+; _DEFINE:mem_addr=0x719510
+```
+
+This will literal replace `mem_addr` to `0x71951`. Note that is tries to not replace things that should not be replaced; e.g. `some_mem_addr` will _not_ be replaced to `some_0x71951`.
+
+Use `; _ASM_PREPROCONLY: true` to only let the preprocessor run (also applies when using the gui).
+
+---
+
+this was used for [gps](../../cleo/gps) and [plhud](../../cleo/plhud) and stuff

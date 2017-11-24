@@ -50,15 +50,9 @@ namespace asm {
 			using (var reader = new StreamReader(file)) {
 				string line;
 				while ((line = reader.ReadLine()) != null) {
-					if (line.StartsWith(";_ASM_") || line.StartsWith("; _ASM_")) {
-						string directive = line.Substring(";_ASM_".Length);
-						if (directive[0] == '_') {
-							directive = directive.Substring(1);
-						}
-						parseDirective(directive);
-						continue;
+					if (!checkDirective(line)) {
+						lines.Add(line);
 					}
-					lines.Add(line);
 				}
 			}
 
@@ -84,6 +78,19 @@ namespace asm {
 			}
 
 			return null;
+		}
+
+		private static bool checkDirective(string line) {
+			if (!line.StartsWith(";_ASM_") && !line.StartsWith("; _ASM_")) {
+				return false;
+			}
+
+			string directive = line.Substring(";_ASM_".Length);
+			if (directive[0] == '_') {
+				directive = directive.Substring(1);
+			}
+			parseDirective(directive);
+			return true;
 		}
 
 		private static void parseDirective(string dir) {
@@ -446,11 +453,23 @@ skip:
 		}
 
 		private void button4_Click(object sender, EventArgs e) {
-			button2.PerformClick();
+			preproconly = false;
 			gcc = txtgcc.Text;
 			objdump = txtobjdump.Text;
+
+			string[] lines = textBox1.Text.Split('\n');
+			foreach (string line in lines) {
+				checkDirective(line);
+			}
+			string code = stripcomments(lines);
+
+			if (preproconly) {
+				textBox1.Text = code;
+				return;
+			}
+
 			string res;
-			if (!asmstuff(textBox1.Text, out res)) {
+			if (!asmstuff(code, out res)) {
 				textBox1.Text = res;
 				return;
 			}
