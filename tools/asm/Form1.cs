@@ -226,14 +226,15 @@ namespace asm {
 						}
 					}
 					for (int i = 1; i <= instrc - 4; i++) {
-						if (instr[i + 3] != "ee") {
+						if (instr[i] != "ee" || instr[i + 1] != "ff" || instr[i + 3] != "ee") {
 							continue;
 						}
 						for (; si < i; si++) {
 							sb.Append(instr[si]).Append(' ');
 							instrs++;
 						}
-						stuff.Add(instrs, new DATA(instr[i + 2], (int.Parse(instr[i + 1], NumberStyles.HexNumber) << 8) | int.Parse(instr[i], NumberStyles.HexNumber)));
+						//stuff.Add(instrs, new DATA(instr[i + 2], (int.Parse(instr[i + 1], NumberStyles.HexNumber) << 8) | int.Parse(instr[i], NumberStyles.HexNumber)));
+						stuff.Add(instrs, new DATA(instr[i + 2], 0));
 						sb.AppendLine();
 						sb.Append("00 00 00 00 // DATA").Append(instr[i + 2]).AppendLine();
 						instrs += 4;
@@ -374,7 +375,8 @@ namespace asm {
 					}
 				}
 
-				l = new Regex("_var(..)").Replace(l, "0xEE${1}0000");
+				//l = new Regex("_var(..)").Replace(l, "0xEE${1}0000");
+				l = new Regex("_var(..)").Replace(l, "0xEE${1}FFEE");
 				int i = l.IndexOf(';');
 				if (i != -1) {
 					if (i < l.Length - 1) {
