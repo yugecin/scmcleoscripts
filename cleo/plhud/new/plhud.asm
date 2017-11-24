@@ -21,16 +21,35 @@
 ; _DEFINE:CText__SetTextUseProportionalValues=0x7195B0
 ; _DEFINE:dummy_7194F0=0x7194F0
 
+; _DEFINE:_options=_var02
+
+; _DEFINE:OPTION_BIT_ENABLED=0x00000001
+; _DEFINE:OPTION_BIT_SMART_MODE=0x00000002
+; _DEFINE:OPTION_BIT_KEY_F10=0x00000004
+; _DEFINE:OPTION_BIT_KEY_RARR=0x00000008
+; _DEFINE:OPTION_BIT_KEY_DARR=0x00000010
+; _DEFINE:OPTION_BIT_KEY_UARR=0x00000020
+; _DEFINE:OPTION_BIT_KEY_LARR=0x00000040
+; _DEFINE:OPTION_BIT_ALL_KEYS=0x0000007C
+; _DEFINE:OPTION_BIT_ALL_KEYS_NOT=0xFFFFFF83
+
 entry:
+	test dword ptr [_options], OPTION_BIT_KEY_F10
+	jz no_enable_keypress
+	
+	xor dword ptr [_options], OPTION_BIT_ENABLED
+	and dword ptr [_options], OPTION_BIT_ALL_KEYS_NOT
+
+no_enable_keypress:
+	test dword ptr [_options], OPTION_BIT_ENABLED
+	jz _exit
+	
+main:
 	push edi
 	push ebx
 	push edx
 	push ecx
 	push eax
-	
-	jmp main
-;	
-main:
 	
 	; >>>>>>> menu text
 	push 0 ; a2
@@ -80,6 +99,7 @@ exit:
 	pop ebx
 	pop edi
 	
+_exit:
 	sub esp, 0x1A0
 	jmp 0x58EAF6
 
