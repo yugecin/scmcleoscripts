@@ -238,17 +238,17 @@ namespace asm {
 						sb.Append("00 00 00 00 // DATA").Append(instr[i + 2]).AppendLine();
 						instrs += 4;
 						i += 3;
-						si += 3;
-						if (si == instrc - 1) {
-							goto skiptocomment;
-						}
+						si += 4;
+						//if (si == instrc - 1) {
+						//	goto skiptocomment;
+						//}
 					}
 					for (; si < instrc; si++) {
 						sb.Append(instr[si]).Append(' ');
 						instrs++;
 					}
 					sb.AppendLine();
-	skiptocomment:
+	//skiptocomment:
 					if (comments) {
 						sb.Append("// ").Append(comment.Trim()).AppendLine();
 					}
