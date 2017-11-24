@@ -134,7 +134,7 @@ namespace asm {
 
 		private static string cleandisasm(string[] lines) {
 			var sb = new MyStringBuilder();
-			string[] instr = new string[8];
+			string[] instr = new string[14];
 			int instrc;
 			int instrs = 0;
 			DATA.lvars.Clear();
@@ -171,6 +171,43 @@ namespace asm {
 					} while (line[c] != ' ' && line [c] != '\t');
 					while (line[c] == ' ' || line[c] == '\t') c++;
 					string comment = line.Substring(c);
+
+					// >>>>>>> nextline
+					// try to include next line if necessary
+					// for example:
+					//   test   DWORD PTR [esp+0x11223344],0x44332211
+					// results in:
+					// 0:  f7 84 24 44 33 22 11    test   DWORD PTR [esp+0x11223344],0x44332211
+                                        // 7:  11 22 33 44 
+
+				tryparsenextline:
+					if (_ + 1 >= lines.Length) {
+						goto skipnextline;
+					}
+
+					string nextline = lines[_+1].Replace("\r", "").Trim();
+					nextline = new Regex("^[0-9a-fA-F]+:\\s+").Replace(nextline, "");
+					string[] opcodes = nextline.Split(' ');
+					foreach (string oc in opcodes) {
+						if (oc.Length != 2) {
+							goto skipnextline;
+						}
+						try {
+							int.Parse(oc, NumberStyles.HexNumber);
+						} catch (Exception) {
+							goto skipnextline;
+						}
+					}
+
+					foreach (string oc in opcodes) {
+						instr[instrc++] = new string(new char[] { oc[0], oc[1] } );
+					}
+
+					_++;
+					goto tryparsenextline;
+
+				skipnextline:
+					// <<<<<<< nextline
 					
 					int si = 0;
 					if (instrc == 5 &&
