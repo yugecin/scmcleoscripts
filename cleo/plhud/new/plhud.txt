@@ -82,9 +82,15 @@ end
 
 :DATA02
 {
-    stores options, states
+    stores options, states, stuffs
+      bit 6: left arrow pressed?
+      bit 5: up arrow pressed?
+      bit 4: down arrow pressed?
+      bit 3: right arrow pressed?
+      bit 2: F10 pressed?
       bit 1: smart mode?
       bit 0: is active?
+    key states reset by asm
 }
 hex
     00 00 00 00
