@@ -128,7 +128,7 @@ end
     key states reset by asm
 }
 hex
-    00 00 00 00
+    02 00 00 00
 end
 
 :_MENUIDX
