@@ -132,6 +132,12 @@ Multiple files
 
 Can be relative, can be absolute, can have any extension.
 
+Caveats
+-------
+
+* things like `mov edx, [eax+_var03]` won't work
+* same with `mov edx, [edi*4+__BASEOFFSET+somelabel]`
+
 ---
 
 this was used for [gps](../../cleo/gps) and [plhud](../../cleo/plhud) and stuff
