@@ -161,11 +161,11 @@ menu_rl_smartmode:
 	add eax, 0xAA ; !!MENUOFFSET
 	lea edx, [eax-0x3] ; !!MENUOFFSET
 	test dword ptr [_options], OPTION_BIT_SMART_MODE
-	jz menu_rl_smartmode@1
+	jz menu_rl_smartmode@off
 	mov word ptr [eax], 0x5F4E ; "_N"
 	mov byte ptr [edx], 0x67 ; "g"
 	jmp menu_show_clearkeys
-menu_rl_smartmode@1:
+menu_rl_smartmode@off:
 	mov word ptr [eax], 0x4646 ; "FF"
 	mov byte ptr [edx], 0x72 ; "r"
 	jmp menu_show_clearkeys
