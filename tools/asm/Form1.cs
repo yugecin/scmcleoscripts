@@ -435,6 +435,7 @@ namespace asm {
 			if (idx == 0 || !isIdentifierChar(line[idx - 1])) {
 				if (idx + search.Length >= line.Length || !isIdentifierChar(line[idx + search.Length])) {
 					line = line.Substring(0, idx) + replace + line.Substring(idx + search.Length);
+					didreplace = true;
 				}
 			}
 			
