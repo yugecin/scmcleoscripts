@@ -269,29 +269,28 @@ namespace asm {
 							//stuff.Add(instrs, new DATA(instr[i + 2], (int.Parse(instr[i + 1], NumberStyles.HexNumber) << 8) | int.Parse(instr[i], NumberStyles.HexNumber)));
 							stuff.Add(instrs, new DATA(instr[i + 2], 0));
 							sb.AppendLine();
-							sb.Append("00 00 00 00 // DATA").Append(instr[i + 2]).AppendLine();
+							sb.Append("00 00 00 00 // DATA").Append(instr[i + 2]);
 							real_data_accesses++;
 							break;
 						case TYPE_BASE:
 							baseaddrpatches.Add(new BASEADDRPATCH(instrs));
 							sb.AppendLine();
-							sb.Append("00 00 00 00 // __BASEADDR").AppendLine();
+							sb.Append("00 00 00 00 // __BASEADDR");
 							real_base_accesses++;
 							break;
 						}
 						instrs += 4;
 						i += 3;
 						si += 4;
-						//if (si == instrc - 1) {
-						//	goto skiptocomment;
-						//}
+						if (si < instrc) {
+							sb.AppendLine();
+						}
 					}
 					for (; si < instrc; si++) {
 						sb.Append(instr[si]).Append(' ');
 						instrs++;
 					}
 					sb.AppendLine();
-	//skiptocomment:
 					if (comments) {
 						sb.Append("// ").Append(comment.Trim()).AppendLine();
 					}
