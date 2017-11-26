@@ -27,8 +27,11 @@
 {
 NOTES:
 
+  sannybuilder: put case converting on 'As is' when compiling
+    options (F10) > formats > case converting
+
   adding runway:
-      make sure enough memory is allocated for the shapes
+    make sure enough memory is allocated for the shapes
 
 }
 
