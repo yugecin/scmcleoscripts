@@ -512,12 +512,12 @@ namespace asm {
 			public int offset;
 			private static int lastoffset;
 			public BASEADDRPATCH(int offset) {
-				this.offset = offset - lastoffset;
-				lastoffset = this.offset;
+				this.offset = offset;
 			}
 			public void dostuff(MyStringBuilder sb) {
-				sb.Append("000A: 2@ += ").Append(offset).AppendLine();
+				sb.Append("000A: 2@ += ").Append(offset - lastoffset).AppendLine();
 				sb.Append("0A8C: write_memory 2@ size 4 value 1@ vp 0").AppendLine();
+				lastoffset = offset;
 			}
 		}
 
