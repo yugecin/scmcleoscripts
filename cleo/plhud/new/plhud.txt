@@ -116,6 +116,7 @@ end
 :DATA02
 {
     stores options, states, stuffs
+      bit 7: show menu?
       bit 6: left arrow pressed?
       bit 5: up arrow pressed?
       bit 4: down arrow pressed?
@@ -124,6 +125,15 @@ end
       bit 1: smart mode?
       bit 0: is active?
     key states reset by asm
+}
+hex
+    00 00 00 00
+end
+
+:_MENUIDX
+:DATA03
+{
+    currently selected menu idx
 }
 hex
     00 00 00 00

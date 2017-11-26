@@ -21,7 +21,12 @@
 ; _DEFINE:CText__SetTextUseProportionalValues=0x7195B0
 ; _DEFINE:dummy_7194F0=0x7194F0
 
+; _DEFINE:_menutxt=_var01
 ; _DEFINE:_options=_var02
+; _DEFINE:_menuidx=_var03
+
+; _DEFINE:MAXMENUIDX=2
+; _DEFINE:MENUITEMS=MAXMENUIDX+1
 
 ; _DEFINE:OPTION_BIT_ENABLED=0x00000001
 ; _DEFINE:OPTION_BIT_SMART_MODE=0x00000002
@@ -32,14 +37,18 @@
 ; _DEFINE:OPTION_BIT_KEY_LARR=0x00000040
 ; _DEFINE:OPTION_BIT_ALL_KEYS=0x0000007C
 ; _DEFINE:OPTION_BIT_ALL_KEYS_NOT=0xFFFFFF83
+; _DEFINE:OPTION_BIT_ARR_KEYS=0x0000003C
+; _DEFINE:OPTION_BIT_ARR_KEYS_NOT=0xFFFFFFC3
+; _DEFINE:OPTION_BIT_ARR_KEYS_UPDOWN=0x00000030
+; _DEFINE:OPTION_BIT_SHOW_MENU=0x00000080
+; _DEFINE:OPTION_BIT_SHOW_MENU_NOT=0xFFFFFF7F
 
 entry:
 	test dword ptr [_options], OPTION_BIT_KEY_F10
 	jz no_enable_keypress
-	
 	xor dword ptr [_options], OPTION_BIT_ENABLED
 	and dword ptr [_options], OPTION_BIT_ALL_KEYS_NOT
-
+	or dword ptr [_options], OPTION_BIT_SHOW_MENU
 no_enable_keypress:
 	test dword ptr [_options], OPTION_BIT_ENABLED
 	jz _exit
@@ -50,7 +59,51 @@ main:
 	push edx
 	push ecx
 	push eax
+	test dword ptr [_options], OPTION_BIT_SHOW_MENU
+	jnz menu
+menu_ret:
 	
+exit:
+	pop eax
+	pop ecx
+	pop edx
+	pop ebx
+	pop edi
+
+_exit:
+	sub esp, 0x1A0
+	jmp 0x58EAF6
+
+menu:
+	; >>>>>>> menu nav
+	test dword ptr [_options], OPTION_BIT_ARR_KEYS
+	jz menu_show
+	test dword ptr [_options], OPTION_BIT_ARR_KEYS_UPDOWN
+	jz menu_keys_rightleft
+	; >>> updown nav
+	mov dl, 0x5F ; "_"
+	call menu_write_mark
+	test dword ptr [_options], OPTION_BIT_KEY_UARR
+	jz menu_keys_down
+	sub byte ptr [_menuidx], 1
+	mov al, MAXMENUIDX
+	jmp menu_idx_boundscheck
+menu_keys_down:
+	add byte ptr [_menuidx], 1
+	mov al, 0
+menu_idx_boundscheck:
+	cmp byte ptr [_menuidx], MENUITEMS
+	jb menu_update_idx
+	mov byte ptr [_menuidx], al
+menu_update_idx:
+	mov dl, 0x3E ; ">"
+	call menu_write_mark
+	; <<< updown nav
+menu_keys_rightleft:
+menu_show_clearkeys:
+	and dword ptr [_options], OPTION_BIT_ARR_KEYS_NOT
+	; <<<<<<< menu nav
+menu_show:
 	; >>>>>>> menu text
 	push 0 ; a2
 	push 0 ; a1
@@ -82,26 +135,21 @@ main:
 	push 0xFFFFFFFF; ABGR
 	call CText__SetTextColour
 	;add esp, 0x4
-	push _var01 ; str
+	push _menutxt ; str
 	push 0x43600000 ; y (224.0)
 	push 0x43a00000 ; x (320.0)
 	call __drawText
 	;add esp, 0xC
 	add esp, 0x28
 	; <<<<<<< menu text
-	
-	jmp exit
-	
-exit:
-	pop eax
-	pop ecx
-	pop edx
-	pop ebx
-	pop edi
-	
-_exit:
-	sub esp, 0x1A0
-	jmp 0x58EAF6
+	jmp menu_ret
+
+menu_write_mark:
+	mov eax, [_menuidx]
+	imul eax, 0x1A ; !!MENUOFFSET
+	add eax, _menutxt
+	mov byte ptr [eax+0x7E], dl ; !!MENUOFFSET
+	ret
 
 ;hud2screen(float x, float y) ; in place
 hud2screen:
