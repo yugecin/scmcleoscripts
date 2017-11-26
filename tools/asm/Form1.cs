@@ -50,7 +50,7 @@ namespace asm {
 			using (var reader = new StreamReader(file)) {
 				string line;
 				while ((line = reader.ReadLine()) != null) {
-					if (!checkDirective(line)) {
+					if (!checkDirective(line, lines)) {
 						lines.Add(line);
 					}
 				}
@@ -80,7 +80,7 @@ namespace asm {
 			return null;
 		}
 
-		private static bool checkDirective(string line) {
+		private static bool checkDirective(string line, List<string> lines) {
 			if (!line.StartsWith(";_ASM_") && !line.StartsWith("; _ASM_")) {
 				return false;
 			}
@@ -89,11 +89,11 @@ namespace asm {
 			if (directive[0] == '_') {
 				directive = directive.Substring(1);
 			}
-			parseDirective(directive);
+			parseDirective(directive, lines);
 			return true;
 		}
 
-		private static void parseDirective(string dir) {
+		private static void parseDirective(string dir, List<string> lines) {
 			string[] p = dir.Split(new char[] {':'}, 2);
 			if (p.Length < 2) {
 				return;
@@ -129,6 +129,24 @@ namespace asm {
 			case "TARGETFILE":
 				headlessTargetFile = p[1];
 				break;
+			case "INCLUDE":
+				doInclude(p[1], lines);
+				break;
+			}
+		}
+
+		private static void doInclude(string file, List<string> lines) {
+			if (!File.Exists(file)) {
+				MessageBox.Show("Could not include file '" + file + "': not found");
+				return;
+			}
+			using (var reader = new StreamReader(file)) {
+				string line;
+				while ((line = reader.ReadLine()) != null) {
+					if (!checkDirective(line, lines)) {
+						lines.Add(line);
+					}
+				}
 			}
 		}
 
@@ -496,11 +514,17 @@ skip:
 			gcc = txtgcc.Text;
 			objdump = txtobjdump.Text;
 
-			string[] lines = textBox1.Text.Split('\n');
-			foreach (string line in lines) {
-				checkDirective(line);
+			List<string> lineslist = new List<string>();
+			{
+				string[] lines = textBox1.Text.Split('\n');
+				foreach (string line in lines) {
+					if (!checkDirective(line, lineslist)) {
+						lineslist.Add(line);
+					}
+				}
 			}
-			string code = stripcomments(lines);
+
+			string code = stripcomments(lineslist.ToArray());
 
 			if (preproconly) {
 				textBox1.Text = code;

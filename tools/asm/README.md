@@ -119,6 +119,15 @@ This will literal replace `mem_addr` to `0x71951`. Note that is tries to not rep
 
 Use `; _ASM_PREPROCONLY: true` to only let the preprocessor run (also applies when using the gui).
 
+Multiple files
+--------------
+
+```
+; _ASM_INCLUDE: otherfile.asm
+```
+
+Can be relative, can be absolute, can have any extension.
+
 ---
 
 this was used for [gps](../../cleo/gps) and [plhud](../../cleo/plhud) and stuff
