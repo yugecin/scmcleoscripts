@@ -172,18 +172,18 @@ menu_rl_smartmode@off:
 	mov byte ptr [edx], 0x72 ; "r"
 	jmp menu_show_clearkeys
 menu_rl_viewdistance:
+	; _DEFINE:VIEWDISTANCEDELTA=0x01F4FE0C ; 500/-500
+	; _DEFINE:VIEWDISTANCEMAX=0x7530 ; 30000
+	; _DEFINE:VIEWDISTANCEDEFAULT=0x5DC ; 1500
+	mov eax, VIEWDISTANCEDELTA
 	test dword ptr [_options], OPTION_BIT_KEY_RARR
 	jz menu_rl_viewdistance@decrease
-	add dword ptr [_viewdis], 0x1F4 ; 500
-	cmp dword ptr [_viewdis], 0x184AC ; 99500
-	jb menu_rl_viewdistance@updatetxt
-	mov dword ptr [_viewdis], 0x5DC ; 1500
-	jmp menu_rl_viewdistance@updatetxt
+	shr eax, 16
 menu_rl_viewdistance@decrease:
-	sub dword ptr [_viewdis], 0x1F4 ; 500
-	cmp dword ptr [_viewdis], 0x184AC ; 99500
+	add word ptr [_viewdis], ax
+	cmp word ptr [_viewdis], VIEWDISTANCEMAX
 	jb menu_rl_viewdistance@updatetxt
-	mov dword ptr [_viewdis], 0x5DC ; 1500
+	mov word ptr [_viewdis], VIEWDISTANCEDEFAULT
 menu_rl_viewdistance@updatetxt:
 	push 0
 	push 0
