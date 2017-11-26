@@ -36,6 +36,9 @@ namespace asm {
 		private static bool preproconly = false;
 		private static string hookaddr;
 
+		private static int check_data_accesses = 0;
+		private static int check_base_accesses = 0;
+
 		public Form1(string initialText) {
 			InitializeComponent();
 			textBox1.Text = initialText;
@@ -155,6 +158,8 @@ namespace asm {
 			string[] instr = new string[14];
 			int instrc;
 			int instrs = 0;
+			int real_data_accesses = 0;
+			int real_base_accesses = 0;
 			DATA.lvars.Clear();
 			DATA.cache.Clear();
 			SortedDictionary<int, A> stuff = new SortedDictionary<int, A>();
@@ -265,11 +270,13 @@ namespace asm {
 							stuff.Add(instrs, new DATA(instr[i + 2], 0));
 							sb.AppendLine();
 							sb.Append("00 00 00 00 // DATA").Append(instr[i + 2]).AppendLine();
+							real_data_accesses++;
 							break;
 						case TYPE_BASE:
 							baseaddrpatches.Add(new BASEADDRPATCH(instrs));
 							sb.AppendLine();
 							sb.Append("00 00 00 00 // __BASEADDR").AppendLine();
+							real_base_accesses++;
 							break;
 						}
 						instrs += 4;
@@ -331,7 +338,23 @@ namespace asm {
 			sb2.Append("0002: jump @NOMOREHOOKER").AppendLine().AppendLine();
 			sb2.AppendLine();
 			sb.Insert(0, sb2.ToString());
+
+			check(check_data_accesses, real_data_accesses, "data accesses");
+			check(check_base_accesses, real_base_accesses, "base addr accesses");
+
 			return sb.ToString();
+		}
+
+		private static void check(int expected, int actual, string type) {
+			if (expected == actual) {
+				return;
+			}
+			MessageBox.Show(string.Format(
+				"unstability: expected {0} {2}, found only {1}",
+				expected,
+				actual,
+				type
+			), "asm", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
 
 		private void button1_Click(object sender, EventArgs e) {
@@ -398,9 +421,12 @@ namespace asm {
 		}
 
 		private static string stripcomments(string[] lines) {
+			check_base_accesses = 0;
+			check_data_accesses = 0;
 			var sb = new MyStringBuilder();
 			var replacements = new Dictionary<string, string>();
 			replacements.Add("__BASEADDR", "0xEEEFEEFF");
+			var varRegex = new Regex("_var(..)");
 			foreach (var line in lines) {
 				if (line.Trim().Length == 0) {
 					continue;
@@ -413,13 +439,14 @@ namespace asm {
 					foreach (var entry in replacements) {
 						l = doPreprocReplacement(l, entry.Key, entry.Value, out didreplace);
 						if (didreplace) {
+							if (entry.Key == "__BASEADDR") {
+								check_base_accesses++;
+							}
 							break;
 						}
 					}
 				}
 
-				//l = new Regex("_var(..)").Replace(l, "0xEE${1}0000");
-				l = new Regex("_var(..)").Replace(l, "0xEE${1}FFEE");
 				int i = l.IndexOf(';');
 				if (i != -1) {
 					if (i < l.Length - 1) {
@@ -436,6 +463,8 @@ namespace asm {
 						continue;
 					}
 				}
+				check_data_accesses += varRegex.Matches(l).Count;
+				l = varRegex.Replace(l, "0xEE${1}FFEE");
 				sb.Append(l).AppendLine();
 			}
 			return sb.ToString();
