@@ -158,6 +158,7 @@ namespace asm {
 			DATA.lvars.Clear();
 			DATA.cache.Clear();
 			SortedDictionary<int, A> stuff = new SortedDictionary<int, A>();
+			List<BASEADDRPATCH> baseaddrpatches = new List<BASEADDRPATCH>();
 			sb.Append(":ENTRY").AppendLine();
 			sb.Append("hex").AppendLine();
 			int _ = 0;
@@ -244,17 +245,33 @@ namespace asm {
 						}
 					}
 					for (int i = 1; i <= instrc - 4; i++) {
-						if (instr[i] != "ee" || instr[i + 1] != "ff" || instr[i + 3] != "ee") {
+						int type = 0;
+						const int TYPE_DATA = 1;
+						const int TYPE_BASE = 2;
+						if (instr[i] == "ee" && instr[i + 1] == "ff" && instr[i + 3] == "ee") {
+							type = TYPE_DATA;
+						} else if (instr[i] == "ff" && instr[i + 1] == "ee" && instr[i + 2] == "ef" && instr[i + 3] == "ee") {
+							type = TYPE_BASE;
+						} else {
 							continue;
 						}
 						for (; si < i; si++) {
 							sb.Append(instr[si]).Append(' ');
 							instrs++;
 						}
-						//stuff.Add(instrs, new DATA(instr[i + 2], (int.Parse(instr[i + 1], NumberStyles.HexNumber) << 8) | int.Parse(instr[i], NumberStyles.HexNumber)));
-						stuff.Add(instrs, new DATA(instr[i + 2], 0));
-						sb.AppendLine();
-						sb.Append("00 00 00 00 // DATA").Append(instr[i + 2]).AppendLine();
+						switch (type) {
+						case TYPE_DATA:
+							//stuff.Add(instrs, new DATA(instr[i + 2], (int.Parse(instr[i + 1], NumberStyles.HexNumber) << 8) | int.Parse(instr[i], NumberStyles.HexNumber)));
+							stuff.Add(instrs, new DATA(instr[i + 2], 0));
+							sb.AppendLine();
+							sb.Append("00 00 00 00 // DATA").Append(instr[i + 2]).AppendLine();
+							break;
+						case TYPE_BASE:
+							baseaddrpatches.Add(new BASEADDRPATCH(instrs));
+							sb.AppendLine();
+							sb.Append("00 00 00 00 // __BASEADDR").AppendLine();
+							break;
+						}
 						instrs += 4;
 						i += 3;
 						si += 4;
@@ -296,6 +313,13 @@ namespace asm {
 			sb2.AppendLine();
 			sb2.Append("0AC6: 1@ = label @ENTRY offset").AppendLine();
 			sb2.AppendLine();
+			if (baseaddrpatches.Count > 0) {
+				sb2.Append("0085: 2@ = 1@").AppendLine();
+				foreach (BASEADDRPATCH p in baseaddrpatches) {
+					p.dostuff(sb2);
+				}
+				sb2.AppendLine();
+			}
 			int offset = 0;
 			foreach (KeyValuePair<int, A> s in stuff) {
 				int diff = s.Key - offset;
@@ -376,6 +400,7 @@ namespace asm {
 		private static string stripcomments(string[] lines) {
 			var sb = new MyStringBuilder();
 			var replacements = new Dictionary<string, string>();
+			replacements.Add("__BASEADDR", "0xEEEFEEFF");
 			foreach (var line in lines) {
 				if (line.Trim().Length == 0) {
 					continue;
@@ -454,6 +479,19 @@ namespace asm {
 				('0' <= c && c <= '9') ||
 				('a' <= c && c <= 'z') ||
 				('A' <= c && c <= 'Z');
+		}
+
+		public class BASEADDRPATCH {
+			public int offset;
+			private static int lastoffset;
+			public BASEADDRPATCH(int offset) {
+				this.offset = offset - lastoffset;
+				lastoffset = this.offset;
+			}
+			public void dostuff(MyStringBuilder sb) {
+				sb.Append("000A: 2@ += ").Append(offset).AppendLine();
+				sb.Append("0A8C: write_memory 2@ size 4 value 1@ vp 0").AppendLine();
+			}
 		}
 
 		public interface A {
