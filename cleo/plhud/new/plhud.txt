@@ -3,6 +3,27 @@
 
 03A4: name_thread 'PLHUD01'
 
+// >>>>>>> number of airports
+0006: 9@ = 0 // l=i (int)
+0AC6: 0@ = label @AIRPORTS offset
+:NUMBER_AIRPORTS_LOOP
+0A8D: 1@ = read_memory 0@ size 4 vp 0
+8039:   not 1@ == 0 // l==i (int)
+004D: jump_if_false @NUMBER_AIRPORTS_LOOP_END
+000A: 9@ += 1 // l+=i (int)
+000A: 0@ += 24 // l+=i (int)
+0A8D: 1@ = read_memory 0@ size 1 vp 0
+000A: 0@ += 1 // l+=i (int)
+005A: 0@ += 1@  // l+=l (int)
+0002: jump @NUMBER_AIRPORTS_LOOP
+:NUMBER_AIRPORTS_LOOP_END
+0AC6: 0@ = label @_MENUTEXT offset
+000A: 0@ += 192 // l+=i (int)
+0AD3: 0@ = format "%d" 9@
+000A: 0@ += 3 // l+=i (int)
+0A8C: write_memory 0@ size 1 value 0x20 vp 0
+// <<<<<<< number of airports
+
 {
 NOTES:
 
@@ -70,19 +91,24 @@ hex
     00 00 00 00
 end
 
+:_MENUTEXT
 :DATA01
 {
     stores menu text to show
+    when changing, update offsets in
+      'number of airports' cleo
 }
 hex
     "USE THE UP AND DOWN ARROW KEYS"     "~n~"
-    "TO BROWSE THIS MENU.  USE THE"      "~n~"
+    "TO BROWSE THIS MENU. _USE THE"      "~n~"
     "LEFT AND RIGHT ARROW KEYS TO"       "~n~"
     "CHANGE VALUES OR ACCEPT."           "~n~"
                                          "~n~"
     "> CONTINUE"                         "~n~"
-    "  SMART MODE: ON "                  "~n~"
-    "  VIEW DISTANCE: 1500M"             "~n~"
+    " _SMART MODE: ON "                  "~n~"
+    " _VIEW DISTANCE: _1500M"            "~n~"
+                                         "~n~"
+    "v14 ___ runways"                    "~n~"
     00
 end
 
