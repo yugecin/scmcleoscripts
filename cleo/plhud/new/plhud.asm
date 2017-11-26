@@ -37,8 +37,8 @@
 ; _DEFINE:OPTION_BIT_KEY_LARR=0x00000040
 ; _DEFINE:OPTION_BIT_ALL_KEYS=0x0000007C
 ; _DEFINE:OPTION_BIT_ALL_KEYS_NOT=0xFFFFFF83
-; _DEFINE:OPTION_BIT_ARR_KEYS=0x0000003C
-; _DEFINE:OPTION_BIT_ARR_KEYS_NOT=0xFFFFFFC3
+; _DEFINE:OPTION_BIT_ARR_KEYS=0x00000078
+; _DEFINE:OPTION_BIT_ARR_KEYS_NOT=0xFFFFFF87
 ; _DEFINE:OPTION_BIT_ARR_KEYS_UPDOWN=0x00000030
 ; _DEFINE:OPTION_BIT_SHOW_MENU=0x00000080
 ; _DEFINE:OPTION_BIT_SHOW_MENU_NOT=0xFFFFFF7F
@@ -52,7 +52,7 @@ entry:
 no_enable_keypress:
 	test dword ptr [_options], OPTION_BIT_ENABLED
 	jz _exit
-	
+
 main:
 	push edi
 	push ebx
@@ -74,12 +74,13 @@ _exit:
 	sub esp, 0x1A0
 	jmp 0x58EAF6
 
+; modifies eax, edx
 menu:
 	; >>>>>>> menu nav
 	test dword ptr [_options], OPTION_BIT_ARR_KEYS
 	jz menu_show
 	test dword ptr [_options], OPTION_BIT_ARR_KEYS_UPDOWN
-	jz menu_keys_rightleft
+	jz menu_rl_nav
 	; >>> updown nav
 	mov dl, 0x5F ; "_"
 	call menu_write_mark
@@ -99,7 +100,6 @@ menu_update_idx:
 	mov dl, 0x3E ; ">"
 	call menu_write_mark
 	; <<< updown nav
-menu_keys_rightleft:
 menu_show_clearkeys:
 	and dword ptr [_options], OPTION_BIT_ARR_KEYS_NOT
 	; <<<<<<< menu nav
@@ -144,6 +144,34 @@ menu_show:
 	; <<<<<<< menu text
 	jmp menu_ret
 
+menu_rl_nav:
+	mov eax, [_menuidx]
+	imul eax, 4
+	add eax, __BASEADDR
+	mov eax, [eax+menujmptable]
+	add eax, __BASEADDR
+	jmp eax
+menu_rl_continue:
+	xor dword ptr [_options], OPTION_BIT_SHOW_MENU
+	and dword ptr [_options], OPTION_BIT_ARR_KEYS_NOT
+	jmp menu_ret
+menu_rl_smartmode:
+	xor dword ptr [_options], OPTION_BIT_SMART_MODE
+	mov eax, _menutxt
+	add eax, 0xAA ; !!MENUOFFSET
+	lea edx, [eax-0x3] ; !!MENUOFFSET
+	test dword ptr [_options], OPTION_BIT_SMART_MODE
+	jz menu_rl_smartmode@1
+	mov word ptr [eax], 0x5F4E ; "_N"
+	mov byte ptr [edx], 0x67 ; "g"
+	jmp menu_show_clearkeys
+menu_rl_smartmode@1:
+	mov word ptr [eax], 0x4646 ; "FF"
+	mov byte ptr [edx], 0x72 ; "r"
+	jmp menu_show_clearkeys
+menu_rl_viewdistance:
+	jmp menu_show_clearkeys
+
 menu_write_mark:
 	mov eax, [_menuidx]
 	imul eax, 0x1A ; !!MENUOFFSET
@@ -162,3 +190,9 @@ hud2screen:
 	fmul dword ptr [esp +0x4] ; x
 	fstp dword ptr [esp +0x4] ; x
 	ret
+
+menujmptable:
+	.long menu_rl_continue
+	.long menu_rl_smartmode
+	.long menu_rl_viewdistance
+

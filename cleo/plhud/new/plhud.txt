@@ -106,7 +106,7 @@ hex
     "CHANGE VALUES OR ACCEPT."           "~n~"
                                          "~n~"
     "> CONTINUE_____________"            "~n~"
-    " _SMART MODE: ON ______"            "~n~"
+    " _SMART MODE: ~g~ON_~w~"            "~n~"
     " _VIEW DISTANCE: _1500M"            "~n~"
                                          "~n~"
     "v14 ___ runways"                    "~n~"
