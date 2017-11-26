@@ -526,7 +526,7 @@ skip:
 			bool res = false;
 			if (exec(o, gcc, "-m32 -c f.s -o f.o")) {
 				o.Clear();
-				res = exec(o, objdump, "-M intel -d f.o");
+				res = exec(o, objdump, "-z -M intel -d f.o");
 			}
 			result = o.ToString();
 			if (File.Exists(mydir + "/f.s")) File.Delete(mydir + "/f.s");
