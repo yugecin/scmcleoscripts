@@ -18,7 +18,7 @@
 0002: jump @NUMBER_AIRPORTS_LOOP
 :NUMBER_AIRPORTS_LOOP_END
 0AC6: 0@ = label @_MENUTEXT offset
-000A: 0@ += 192 // l+=i (int)
+000A: 0@ += 211 // l+=i (int) !!MENUOFFSET
 0AD3: 0@ = format "%d" 9@
 000A: 0@ += 3 // l+=i (int)
 0A8C: write_memory 0@ size 1 value 0x20 vp 0
@@ -104,8 +104,8 @@ hex
     "LEFT AND RIGHT ARROW KEYS TO"       "~n~"
     "CHANGE VALUES OR ACCEPT."           "~n~"
                                          "~n~"
-    "> CONTINUE"                         "~n~"
-    " _SMART MODE: ON "                  "~n~"
+    "> CONTINUE_____________"            "~n~"
+    " _SMART MODE: ON ______"            "~n~"
     " _VIEW DISTANCE: _1500M"            "~n~"
                                          "~n~"
     "v14 ___ runways"                    "~n~"
