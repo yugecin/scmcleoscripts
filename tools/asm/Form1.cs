@@ -336,7 +336,6 @@ namespace asm {
 			}
 			sb2.AppendLine();
 			sb2.Append("0002: jump @NOMOREHOOKER").AppendLine().AppendLine();
-			sb2.AppendLine();
 			sb.Insert(0, sb2.ToString());
 
 			check(check_data_accesses, real_data_accesses, "data accesses");
