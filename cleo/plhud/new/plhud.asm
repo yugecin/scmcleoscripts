@@ -24,6 +24,8 @@
 ; _DEFINE:_menutxt=_var01
 ; _DEFINE:_options=_var02
 ; _DEFINE:_menuidx=_var03
+; _DEFINE:_viewdis=_var04
+; _DEFINE:_sprintf=_var05
 
 ; _DEFINE:MAXMENUIDX=2
 ; _DEFINE:MENUITEMS=MAXMENUIDX+1
@@ -170,6 +172,33 @@ menu_rl_smartmode@off:
 	mov byte ptr [edx], 0x72 ; "r"
 	jmp menu_show_clearkeys
 menu_rl_viewdistance:
+	test dword ptr [_options], OPTION_BIT_KEY_RARR
+	jz menu_rl_viewdistance@decrease
+	add dword ptr [_viewdis], 0x1F4 ; 500
+	cmp dword ptr [_viewdis], 0x184AC ; 99500
+	jb menu_rl_viewdistance@updatetxt
+	mov dword ptr [_viewdis], 0x5DC ; 1500
+	jmp menu_rl_viewdistance@updatetxt
+menu_rl_viewdistance@decrease:
+	sub dword ptr [_viewdis], 0x1F4 ; 500
+	cmp dword ptr [_viewdis], 0x184AC ; 99500
+	jb menu_rl_viewdistance@updatetxt
+	mov dword ptr [_viewdis], 0x5DC ; 1500
+menu_rl_viewdistance@updatetxt:
+	push 0
+	push 0
+	mov eax, esp
+	push 0x643525 ; %5d\0
+	mov edx, esp
+	push [_viewdis] ; ...
+	push edx ; pFormat
+	push eax ; pResult
+	call [_sprintf] ; _sprintf
+	add esp, 0x10
+	mov edx, _menutxt
+	pop dword ptr [edx+0xC3] ; !!MENUOFFSET
+	pop eax
+	mov byte ptr [edx+0xC7], al ; !!MENUOFFSET
 	jmp menu_show_clearkeys
 
 menu_write_mark:
