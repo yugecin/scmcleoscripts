@@ -95,8 +95,9 @@ end
 :DATA01
 {
     stores menu text to show
-    when changing, update offsets in
-      'number of airports' cleo
+    when changing, search for
+      '!!MENUOFFSET' in cleo and asm
+      and change offsets as needed
 }
 hex
     "USE THE UP AND DOWN ARROW KEYS"     "~n~"
