@@ -26,6 +26,7 @@ end
 0006: OPTIONS = 0 // l=i (int)
 0AC6: _OPTIONS = label @_OPTIONS offset
 
+0006: 9@ = 0x0 // l=i (int) // hold keypress state
 0006: 10@ = 0x79 // l=i (int) // F10
 0006: 11@ = 0x27 // l=i (int) // right
 0006: 12@ = 0x28 // l=i (int) // down
@@ -39,13 +40,18 @@ end
 0006: 30@ = 0 // l=i (int)
 0002: jump @KEYS_LOOP_START
 :KEYS_LOOP
+08C3: clear 9@ bit 30@
 000A: 30@ += 1 // l+=i (int)
 001B:   5 > 30@ // i>l (int)
 004D: jump_if_false @KEYS_LOOP_END
 :KEYS_LOOP_START
 0AB0: key_pressed 10@(30@,1i)
 004D: jump_if_false @KEYS_LOOP
+88B7:   not test 9@ bit 30@
+004D: jump_if_false @KEYS_LOOP_END
+08BD: set 9@ bit 30@
 000A: 30@ += 2 // l+=i (int)
+0A8D: OPTIONS = read_memory _OPTIONS size 4 vp 0
 08BD: set OPTIONS bit 30@
 0A8C: write_memory _OPTIONS size 4 value OPTIONS vp 0
 :KEYS_LOOP_END
@@ -80,6 +86,7 @@ hex
     00
 end
 
+:_OPTIONS
 :DATA02
 {
     stores options, states, stuffs
