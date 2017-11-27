@@ -18,8 +18,8 @@ NOTES:
 0A8D: 0@ = read_memory 0x58EBAF size 1 vp 0
 0039:   0@ == 0xE8 // l==i (int) // sprintf call
 004D: jump_if_false @INCOMPATIBLE
-0A8D: 0@ = read_memory 0x58EAF0 size 4 vp 0
-0039:   0@ == 0x1A0EC81 // l==i (int) // drawhud rewritten part
+0A8D: 0@ = read_memory 0x58EAF6 size 4 vp 0
+0039:   0@ == 0x7405B60F // l==i (int) // drawhud rewritten part
 004D: jump_if_false @INCOMPATIBLE
 // <<<<<<< compability checks
 
