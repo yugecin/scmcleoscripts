@@ -3,6 +3,17 @@
 
 03A4: name_thread 'PLHUD01'
 
+{
+NOTES:
+
+  sannybuilder: put case converting on 'As is' when compiling
+    options (F10) > formats > case converting
+
+  adding runway:
+    make sure enough memory is allocated for the shapes
+
+}
+
 // >>>>>>> compability checks
 0A8D: 0@ = read_memory 0x58EBAF size 1 vp 0
 0039:   0@ == 0xE8 // l==i (int) // sprintf call
@@ -39,17 +50,6 @@
 000A: 1@ += 0x58EBB4 // l+=i (int)
 0A8C: write_memory 0@ size 4 value 1@ vp 0
 // <<<<<<< sprintf
-
-{
-NOTES:
-
-  sannybuilder: put case converting on 'As is' when compiling
-    options (F10) > formats > case converting
-
-  adding runway:
-    make sure enough memory is allocated for the shapes
-
-}
 
 0AC8: 0@ = allocate_memory_size 18480 // sizeof(RwD3D9Vertex) (=28) * 4 * runwaycount (=165)
 0AC6: 1@ = label @DATA00 offset
