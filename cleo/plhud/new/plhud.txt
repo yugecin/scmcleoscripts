@@ -3,6 +3,15 @@
 
 03A4: name_thread 'PLHUD01'
 
+// >>>>>>> compability checks
+0A8D: 0@ = read_memory 0x58EBAF size 1 vp 0
+0039:   0@ == 0xE8 // l==i (int) // sprintf call
+004D: jump_if_false @INCOMPATIBLE
+0A8D: 0@ = read_memory 0x58EAF0 size 4 vp 0
+0039:   0@ == 0x1A0EC81 // l==i (int) // drawhud rewritten part
+004D: jump_if_false @INCOMPATIBLE
+// <<<<<<< compability checks
+
 // >>>>>>> number of airports
 0006: 9@ = 0 // l=i (int)
 0AC6: 0@ = label @AIRPORTS offset
@@ -89,6 +98,11 @@ end
 // <<<<<<< keys
 
 0002: jump @MAIN_LOOP
+
+:INCOMPATIBLE
+0001: wait 5000
+00BA: show_text_styled GXT 'RATNG23' time 2000 style 6 // Playa
+0002: jump @INCOMPATIBLE
 
 {$INCLUDE plhud-asm.txt}
 {$INCLUDE plhudairports.txt}
