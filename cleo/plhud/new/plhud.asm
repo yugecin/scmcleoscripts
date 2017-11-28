@@ -20,12 +20,14 @@
 ; _DEFINE:CText__SetTextOutline=0x719590
 ; _DEFINE:CText__SetTextUseProportionalValues=0x7195B0
 ; _DEFINE:dummy_7194F0=0x7194F0
+; _DEFINE:getPlayerCoords=0x56E010
 
 ; _DEFINE:_menutxt=_var01
 ; _DEFINE:_options=_var02
 ; _DEFINE:_menuidx=_var03
 ; _DEFINE:_viewdis=_var04
 ; _DEFINE:_sprintf=_var05
+; _DEFINE:_runways=_var06
 
 ; _DEFINE:MAXMENUIDX=2
 ; _DEFINE:MENUITEMS=MAXMENUIDX+1
@@ -60,13 +62,73 @@ main:
 	push ebx
 	push edx
 	push ecx
-	push eax
+	; don't push eax, is overwritten anyways
 	test dword ptr [_options], OPTION_BIT_SHOW_MENU
 	jnz menu
 menu_ret:
-	
-exit:
+	test dword ptr [_options], OPTION_BIT_SMART_MODE
+	jz dont_get_checkpoint
+	; >>>>>>> get checkpoint
+	mov ebx, 0xC7F158
+smart_next_checkpoint:
+	cmp byte ptr [ebx+0x2], 1
+	je smart_got_checkpoint
+	add ebx, 0x38
+	cmp ebx, 0xC7F858
+	jae exit ; fix radar first?
+	jmp smart_next_checkpoint
+smart_got_checkpoint:
+	push [ebx+0x10] ; checkpoint x
+	push [ebx+0x14] ; checkpoint y
+	; <<<<<<< get checkpoint
+dont_get_checkpoint:
+	push 0 ; viewdistance^2 (int)
+	fild dword ptr [_viewdis]
+	fmul ST(0), ST(0)
+	fistp dword ptr [esp]
+	push 0x4EBEBC20 ; closest distance (for radar) 1.6B
+	push 0xFFFFFFFF ; closest idx (for radar)
+	sub esp, 0xC ; player coords
+	mov eax, esp
+	push 0
+	push eax
+	call getPlayerCoords
+	add esp, 0x8
+	;
+	mov ebx, _runways
+runwayloop:
+	; end check
+	mov eax, dword ptr [ebx]
+	test eax, eax
+	jz runwayloop@end
+	; distance check
+	push 0x40000000 ; 2.0
+	fld dword ptr [ebx]
+	fadd dword ptr [ebx+0xC]
+	fld dword ptr [esp]
+	fdivp
+	fmul ST(0), ST(0)
+	fld dword ptr [ebx+0x4]
+	fadd dword ptr [ebx+0x10]
+	fld dword ptr [esp]
+	fdivp
+	fmul ST(0), ST(0)
+	faddp
+	fistp dword ptr [esp]
 	pop eax
+	cmp dword ptr [esp+0x14], eax
+	jg runwayloop@next
+runwayloop@next:
+	movzx eax, byte ptr [ebx+0x18]
+	add ebx, eax
+	add ebx, 0x19
+	jmp runwayloop
+runwayloop@end:
+	add esp, 0x18 ; 0xC player coords + 0xC viewdist + radar stuff
+	test dword ptr [_options], OPTION_BIT_SMART_MODE
+	jz exit
+	add esp, 0x8
+exit:
 	pop ecx
 	pop edx
 	pop ebx
@@ -185,8 +247,7 @@ menu_rl_viewdistance@decrease:
 	jb menu_rl_viewdistance@updatetxt
 	mov word ptr [_viewdis], VIEWDISTANCEDEFAULT
 menu_rl_viewdistance@updatetxt:
-	push 0
-	push 0
+	sub esp, 0x8
 	mov eax, esp
 	push 0x643525 ; %5d\0
 	mov edx, esp
