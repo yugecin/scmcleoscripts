@@ -142,25 +142,57 @@ runwayloop:
 	fadd dword ptr [ebx+0xC] ; rnwy x 2
 	fld dword ptr [esp]
 	fdivp
+	fld ST(0) ; save for later
 	fsub dword ptr [esp+0x4] ; player x
 	fmul ST(0), ST(0)
 	fld dword ptr [ebx+0x4] ; rnwy y 2
 	fadd dword ptr [ebx+0x10] ; rnwy y 2
 	fld dword ptr [esp]
-	fdivp
+	fdiv
+	fld ST(0) ; save for later
 	fsub dword ptr [esp+0x8] ; player y
 	fmul ST(0), ST(0)
+	fxch ST(1)
+	fxch ST(2)
 	faddp
 	fistp dword ptr [esp]
 	pop eax
 	cmp eax, dword ptr [esp+0x14]
-	jg runwayloop@next
+	jg runwayloop@clean@next
+	; smart mode check
+	test dword ptr [_options], OPTION_BIT_SMART_MODE
+	jz runwayloop@nosmart
+	; checkpoint to middle < radius * 1.2
+	fld ST(1) ; mx
+	fsub dword ptr [ebx] ; rnwy x 1
+	fmul ST(0)
+	fld ST(1) ; my
+	fsub dword ptr [ebx+0x4] ; rnwy y 1
+	fmul ST(0)
+	faddp
+	push 0x3f99999a ; 1.2
+	fmul dword ptr [esp]
+	add esp, 0x4
+	fld ST(2) ; mx
+	fsub dword ptr [esp+0x1C] ; chkpnt x
+	fmul ST(0)
+	fld ST(2) ; my
+	fsub dword ptr [esp+0x18] ; chkpnt y
+	fmul ST(0)
+	faddp
+	fcomip ST, ST(1)
+	fstp ST(0) ; dist b
+	ja runwayloop@clean@next
+runwayloop@nosmart:
 	lea eax, [ebx+0x19]
 	push eax; str
 	push 0x43600000 ; y (224.0)
 	push 0x43a00000 ; x (320.0)
 	call __drawText
 	add esp, 0xC
+runwayloop@clean@next:
+	fstp ST(0) ; my
+	fstp ST(0) ; mx
 runwayloop@next:
 	movzx eax, byte ptr [ebx+0x18]
 	add ebx, eax
