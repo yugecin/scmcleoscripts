@@ -103,15 +103,17 @@ runwayloop:
 	jz runwayloop@end
 	; distance check
 	push 0x40000000 ; 2.0
-	fld dword ptr [ebx]
-	fadd dword ptr [ebx+0xC]
+	fld dword ptr [ebx] ; rnwy x 1
+	fadd dword ptr [ebx+0xC] ; rnwy x 2
 	fld dword ptr [esp]
 	fdivp
+	fsub dword ptr [esp+0x4] ; player x
 	fmul ST(0), ST(0)
-	fld dword ptr [ebx+0x4]
-	fadd dword ptr [ebx+0x10]
+	fld dword ptr [ebx+0x4] ; rnwy y 2
+	fadd dword ptr [ebx+0x10] ; rnwy y 2
 	fld dword ptr [esp]
 	fdivp
+	fsub dword ptr [esp+0x8] ; player y
 	fmul ST(0), ST(0)
 	faddp
 	fistp dword ptr [esp]
