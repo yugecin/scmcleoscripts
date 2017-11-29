@@ -66,9 +66,42 @@ main:
 	test dword ptr [_options], OPTION_BIT_SHOW_MENU
 	jnz menu
 menu_ret:
+	; set textdraw stuff for runways
+	push 0 ; a2
+	push 0 ; a1
+	call CText__SetTextBackground
+	;add esp, 0x8
+	;;push 0
+	call dummy_7194F0
+	;;add esp, 0x4
+	;;push 0 ; 0 center 1 left 2 right
+	call CText__SetTextAlignment
+	;;add esp, 0x4
+	push 0x3e19999a ; x ; 0.15
+	push 0x3f733333 ; y ; 0.95
+	call hud2screen
+	call CText__SetTextLetterSize ; flip x/y when alignment is center
+	;add esp, 0x8
+	push 1
+	call CText__SetTextUseProportionalValues
+	;add esp, 0x4
+	;;push 1
+	call CText__SetFont
+	;;add esp, 0x4
+	;;push 1
+	call CText__SetTextOutline
+	;;add esp, 0x4
+	push 0xFF000000 ; ABGR
+	call CText__SetBorderEffectRGBA
+	;add esp, 0x4
+	push 0xFFFFFF50 ; ABGR
+	call CText__SetTextColour
+	;add esp, 0x4
+	add esp, 0x1C
+	; smart mode
+	; >>>>>>> get checkpoint
 	test dword ptr [_options], OPTION_BIT_SMART_MODE
 	jz dont_get_checkpoint
-	; >>>>>>> get checkpoint
 	mov ebx, 0xC7F158
 smart_next_checkpoint:
 	cmp byte ptr [ebx+0x2], 1
@@ -118,8 +151,14 @@ runwayloop:
 	faddp
 	fistp dword ptr [esp]
 	pop eax
-	cmp dword ptr [esp+0x14], eax
+	cmp eax, dword ptr [esp+0x14]
 	jg runwayloop@next
+	lea eax, [ebx+0x19]
+	push eax; str
+	push 0x43600000 ; y (224.0)
+	push 0x43a00000 ; x (320.0)
+	call __drawText
+	add esp, 0xC
 runwayloop@next:
 	movzx eax, byte ptr [ebx+0x18]
 	add ebx, eax
