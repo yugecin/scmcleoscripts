@@ -77,8 +77,10 @@ menu_ret:
 	;;push 0 ; 0 center 1 left 2 right
 	call CText__SetTextAlignment
 	;;add esp, 0x4
-	push 0x3e19999a ; x ; 0.15
-	push 0x3f733333 ; y ; 0.95
+	;push 0x3e19999a ; x ; 0.15
+	;push 0x3f733333 ; y ; 0.95
+	push [0x858F14] ; y ; 1.1
+	push [0x866CAC] ; x ; 0.55000001
 	call hud2screen
 	call CText__SetTextLetterSize ; flip x/y when alignment is center
 	;add esp, 0x8
