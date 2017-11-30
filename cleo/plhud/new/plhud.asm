@@ -148,7 +148,7 @@ runwayloop:
 	fld dword ptr [ebx+0x4] ; rnwy y 2
 	fadd dword ptr [ebx+0x10] ; rnwy y 2
 	fld dword ptr [esp]
-	fdiv
+	fdivp
 	fld ST(0) ; save for later
 	fsub dword ptr [esp+0x8] ; player y
 	fmul ST(0), ST(0)
