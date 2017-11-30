@@ -280,8 +280,9 @@ menu_show:
 	call CText__SetWrappingCoordinateForLeftAlignedText
 	;add esp, 0x4
 	push _menutxt ; str
-	push 0x43600000 ; y (224.0)
-	push 0x43a00000 ; x (320.0)
+	push 0x3ee66666 ; 0.45 ; y
+	push 0x3e800000 ; 0.25 ; x
+	call norm2screen
 	call __drawText
 	;add esp, 0xC
 	add esp, 0x2C
@@ -357,6 +358,16 @@ hud2screen:
 	fstp dword ptr [esp +0x8] ; y
 	fild dword ptr [0xC17044] ; _RwCurrentResolution_X
 	fmul dword ptr [0x859520] ; 1.0f/640.0f
+	fmul dword ptr [esp +0x4] ; x
+	fstp dword ptr [esp +0x4] ; x
+	ret
+
+;norm2screen(float x, float y) ; in place
+norm2screen:
+	fild dword ptr [0xC17048] ; _RwCurrentResolution_Y
+	fmul dword ptr [esp +0x8] ; y
+	fstp dword ptr [esp +0x8] ; y
+	fild dword ptr [0xC17044] ; _RwCurrentResolution_X
 	fmul dword ptr [esp +0x4] ; x
 	fstp dword ptr [esp +0x4] ; x
 	ret
