@@ -20,6 +20,7 @@
 ; _DEFINE:CText__SetTextOutline=0x719590
 ; _DEFINE:CText__SetTextUseProportionalValues=0x7195B0
 ; _DEFINE:dummy_7194F0=0x7194F0
+; _DEFINE:CText__SetWrappingCoordinateForLeftAlignedText=0x7194D0
 ; _DEFINE:getPlayerCoords=0x56E010
 
 ; _DEFINE:_menutxt=_var01
@@ -63,6 +64,7 @@ main:
 	push edx
 	push ecx
 	; don't push eax, is overwritten anyways
+	; show menu if needed
 	test dword ptr [_options], OPTION_BIT_SHOW_MENU
 	jnz menu
 menu_ret:
@@ -274,12 +276,15 @@ menu_show:
 	push 0xFFFFFFFF; ABGR
 	call CText__SetTextColour
 	;add esp, 0x4
+	push 0x461c4000 ; 10000.0
+	call CText__SetWrappingCoordinateForLeftAlignedText
+	;add esp, 0x4
 	push _menutxt ; str
 	push 0x43600000 ; y (224.0)
 	push 0x43a00000 ; x (320.0)
 	call __drawText
 	;add esp, 0xC
-	add esp, 0x28
+	add esp, 0x2C
 	; <<<<<<< menu text
 	jmp menu_ret
 
