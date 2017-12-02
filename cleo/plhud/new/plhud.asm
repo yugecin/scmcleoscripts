@@ -186,12 +186,7 @@ runwayloop:
 	fstp ST(0) ; dist b
 	ja runwayloop@clean@next
 runwayloop@nosmart:
-	lea eax, [ebx+0x19]
-	push eax; str
-	push 0x43600000 ; y (224.0)
-	push 0x43a00000 ; x (320.0)
-	call __drawText
-	add esp, 0xC
+	call dorunway
 runwayloop@clean@next:
 	fstp ST(0) ; my
 	fstp ST(0) ; mx
@@ -348,6 +343,73 @@ menu_write_mark:
 	imul eax, 0x1A ; !!MENUOFFSET
 	add eax, _menutxt
 	mov byte ptr [eax+0x7E], dl ; !!MENUOFFSET
+	ret
+
+; ebx: ptr to runway
+; eax: distance^2
+; nothing interesting in stack
+; rnwy middle y, x in fpu stack
+dorunway:
+	; project middle first and see if it's on screen
+	push eax
+	sub esp, 0xC
+	fstp dword ptr [esp+0x4] ; my
+	fstp dword ptr [esp] ; mx
+	fld dword ptr [ebx+0x8] ; rnwy z1
+	fadd dword ptr [ebx+0x14] ; rnwy z2
+	push 0x40000000 ; 2.0
+	fdiv dword ptr [esp]
+	add esp, 0x4
+	fstp dword ptr [esp+0x8] ; mz
+	;project
+	call world2screen
+	cmp dword ptr [esp+0x8], 0 ; mz'
+	jl dorunway@notonscreen
+	; show the name & distance
+	lea eax, [ebx+0x19]
+	push eax; str
+	;push 0x43600000 ; y (224.0)
+	;push 0x43a00000 ; x (320.0)
+	push [esp+0x8] ; y
+	push [esp+0x8] ; x
+	call __drawText
+	add esp, 0x18
+	pop eax
+	ret
+dorunway@notonscreen:
+	add esp, 0xC
+	pop eax
+	ret
+
+; modifies eax, ecx, edx
+;world2screen(float x, float y, float z) ; in place
+world2screen:
+	; _DEFINE:MatrixMulVector=0x59C890
+	; _DEFINE:_cameraViewMatrix=0xB6FA2C
+	; _DEFINE:_RwCurrentResolution_X=0xC17044
+	; _DEFINE:_RwCurrentResolution_Y=0xC17048
+	push dword ptr [esp+0xC] ; z
+	push dword ptr [esp+0xC] ; y
+	push dword ptr [esp+0xC] ; x
+	push esp ; in
+	push _cameraViewMatrix ; matrix
+	lea eax, [esp+0x18]
+	push eax ; out
+	call MatrixMulVector
+	add esp, 0x18
+	; adjust
+	fld dword ptr [esp+0xC] ; z
+	fld dword ptr [esp+0x4] ; x
+	fild dword ptr [_RwCurrentResolution_X]
+	fmulp
+	fdiv ST(0), ST(1)
+	fstp dword ptr [esp+0x4] ; x
+	fld dword ptr [esp+0x8] ; y
+	fild dword ptr [_RwCurrentResolution_Y]
+	fmulp
+	fdiv ST(0), ST(1)
+	fstp dword ptr [esp+0x8] ; y
+	fstp ST(0)
 	ret
 
 ;hud2screen(float x, float y) ; in place
