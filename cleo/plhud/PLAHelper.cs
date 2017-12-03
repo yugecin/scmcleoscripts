@@ -58,13 +58,13 @@ namespace PLAHConsole
 						res += " " + b2h( new byte[] { BitConverter.GetBytes( comment.Length + 1 )[0] } );
 						res += " \"" + comment.Replace(' ', '_') + "\"";
 						res += " 00";
-						res += "\r\n";
+						res += "\n";
 					}
 				}
 			}
 			catch( Exception r )
 			{
-				res = r.Message + "\r\n" + r.StackTrace + "\r\n" + __l;
+				res = r.Message + "\n" + r.StackTrace + "\n" + __l;
 			}
 			res += "00000000";
 			return res;
