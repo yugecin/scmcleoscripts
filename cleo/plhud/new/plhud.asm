@@ -375,6 +375,187 @@ dorunway:
 	call __drawText
 	add esp, 0x18
 	pop eax
+	; draw stuff
+	; get 4 points
+	; _DEFINE:CGeneral__getATanOfXY=0x53CC70
+	;             ^ modifies eax
+	sub esp, 0x8
+	fld dword ptr [ebx+0xC] ; rnwy x2
+	fsub dword ptr [ebx] ; rnwy x1
+	fstp dword ptr [esp+0x4] ; dx
+	fld dword ptr [ebx+0x10] ; rnwy y2
+	fsub dword ptr [ebx+0x4] ; rnwy y1
+	fstp dword ptr [esp] ; dy
+	call CGeneral__getATanOfXY
+	fld ST(0)
+	fldpi
+	fld1
+	fadd ST(0)
+	fdivp
+	fsub ST(2), ST(0)
+	faddp
+	; ST(1) angle-90deg
+	; ST(0) angle+90deg
+	fsincos
+	fxch ST(2)
+	fsincos
+	; ST(3) cos(angle+90deg)
+	; ST(2) sin(angle+90deg)
+	; ST(1) sin(angle-90deg)
+	; ST(0) cos(angle-90deg)
+	mov dword ptr [esp], 0x41980000 ; 19.0
+	fld dword ptr[esp]
+	;fldpi
+	;fld1
+	;fadd ST(0)
+	;fdivp
+	add esp, 0x8
+	fmul ST(4), ST(0)
+	fmul ST(3), ST(0)
+	fmul ST(2), ST(0)
+	fmulp
+	;
+	;     3
+	;      / 4
+	;     /
+	;    /
+	; 1 /
+	;    2
+	;
+	; tri strip
+	;
+	; 3|\\``|4
+	;  | \\ |
+	; 1|..\\|2
+	;
+	;; _DEFINE:fNearScreenZ=0x38D1B717 ; 0.0001f
+	;; _DEFINE:fRecipNearClip=0x40555555 ; 3.333333254f
+	; _DEFINE:fNearScreenZ=0x00000000
+	; _DEFINE:fRecipNearClip=0x00000000
+	push edx
+	xor edx, edx
+	; p1
+	inc edx
+	push 0 ; v
+	push 0 ; u
+	push 0x334848FF ; argb
+	push fRecipNearClip ; rwh
+	push dword ptr [ebx+0x8] ; z1 z1
+	sub esp, 0x8
+	fld dword ptr [ebx+0x4] ; y1
+	fsub ST(0), ST(4) ; y1 - cos(angle+90deg)
+	fstp dword ptr [esp+0x4] ; y1 y1
+	fld dword ptr [ebx] ; x1
+	fsub ST(0), ST(3) ; x1 - sin(angle+90deg)
+	fstp dword ptr [esp] ; x1 x1
+	call world2screen
+	cmp dword ptr [esp+0x8], 0
+	mov dword ptr [esp+0x8], fNearScreenZ
+	jl dorunway@skipesp
+	; p2
+	inc edx
+	push 0 ; v
+	push 0 ; u
+	push 0x334848FF ; argb
+	push fRecipNearClip ; rwh
+	push dword ptr [ebx+0x8] ; z1 z2
+	sub esp, 0x8
+	fld dword ptr [ebx+0x4] ; y1
+	fsub ST(0), ST(1) ; y1 - cos(angle-90deg)
+	fstp dword ptr [esp+0x4] ; y1 y2
+	fld dword ptr [ebx] ; x1
+	fsub ST(0), ST(2) ; x1 - sin(angle-90deg)
+	fstp dword ptr [esp] ; x1 x2
+	call world2screen
+	cmp dword ptr [esp+0x8], 0
+	mov dword ptr [esp+0x8], fNearScreenZ
+	jl dorunway@skipesp
+	; p3
+	inc edx
+	push 0 ; v
+	push 0 ; u
+	push 0x334848FF ; argb
+	push fRecipNearClip ; rwh
+	push dword ptr [ebx+0x14] ; z2 z3
+	sub esp, 0x8
+	fld dword ptr [ebx+0x10] ; y2
+	fsub ST(0), ST(4)
+	fstp dword ptr [esp+0x4] ; y2 y3
+	fld dword ptr [ebx+0xC] ; x2
+	fsub ST(0), ST(3)
+	fstp dword ptr [esp] ; x2 x3
+	call world2screen
+	cmp dword ptr [esp+0x8], 0
+	mov dword ptr [esp+0x8], fNearScreenZ
+	jl dorunway@skipesp
+	; p4
+	inc edx
+	push 0 ; v
+	push 0 ; u
+	push 0x334848FF ; argb
+	push fRecipNearClip ; rwh
+	push dword ptr [ebx+0x14] ; z2 z4
+	sub esp, 0x8
+	fld dword ptr [ebx+0x10] ; y2
+	;fsub ST(0), ST(1)
+	fstp dword ptr [esp+0x4] ; y2 y4
+	fld dword ptr [ebx+0xC] ; x2
+	;fsub ST(0), ST(2)
+	fstp dword ptr [esp] ; x2 x4
+	call world2screen
+	cmp dword ptr [esp+0x8], 0
+	mov dword ptr [esp+0x8], fNearScreenZ
+	jl dorunway@skipesp
+	; draw it!
+	; _DEFINE:rwPRIMTYPETRISTRIP=4
+	; _DEFINE:_RwEngineInstance=0xC97B24
+	; _DEFINE:RwEngineInstance.dOpenDevice.fpRenderStateSet=0x10+0x10
+	; _DEFINE:RwEngineInstance.dOpenDevice.fpIm2DRenderPrimitive=0x10+0x20
+	; _DEFINE:rwRENDERSTATETEXTURERASTER=1
+	push eax
+	push esi
+	push edx
+	push ebx
+	push ecx
+	; TODO: remove this ;)
+	push 0xFF4848FF
+	push esp
+	push 0x42C80000
+	push 0x42C80000
+	push 0x42C80000
+	push 0x43480000
+	push 0x42C80000
+	push 0x42C80000
+	push 0x0
+	push 0x0
+	call 0x7285B0
+	add esp, 0x28
+	; ^ remove
+	mov eax, [_RwEngineInstance]
+	push rwRENDERSTATETEXTURERASTER ; state
+	push 0 ; value
+	call [eax+RwEngineInstance.dOpenDevice.fpRenderStateSet]
+	add esp, 0x8
+	push 4 ; numVertices
+	lea eax, [esp+0x18]
+	push eax ; vertices
+	push rwPRIMTYPETRISTRIP ; primType
+	mov eax, [_RwEngineInstance]
+	call [eax+RwEngineInstance.dOpenDevice.fpIm2DRenderPrimitive]
+	add esp, 0xC
+	pop ecx
+	pop ebx
+	pop edx
+	pop esi
+	pop eax
+dorunway@skipesp:
+	imul edx, 0x1C
+	add esp, edx
+	pop edx
+	fstp ST(0)
+	fstp ST(0)
+	fstp ST(0)
+	fstp ST(0)
 	ret
 dorunway@notonscreen:
 	add esp, 0xC

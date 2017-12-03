@@ -9,9 +9,6 @@ NOTES:
   sannybuilder: put case converting on 'As is' when compiling
     options (F10) > formats > case converting
 
-  adding runway:
-    make sure enough memory is allocated for the shapes
-
 }
 
 // >>>>>>> compability checks
@@ -50,10 +47,6 @@ NOTES:
 000A: 1@ += 0x58EBB4 // l+=i (int)
 0A8C: write_memory 0@ size 4 value 1@ vp 0
 // <<<<<<< sprintf
-
-0AC8: 0@ = allocate_memory_size 18480 // sizeof(RwD3D9Vertex) (=28) * 4 * runwaycount (=165)
-0AC6: 1@ = label @DATA00 offset
-0A8C: write_memory 1@ size 4 value 0@ vp 0
 
 0002: jump @HOOKER
 :NOMOREHOOKER
@@ -106,14 +99,6 @@ end
 
 {$INCLUDE plhud-asm.txt}
 {$INCLUDE plhudairports.txt}
-
-:DATA00
-{
-    stores a pointer to allocated mem for primitives
-}
-hex
-    00 00 00 00
-end
 
 :_MENUTEXT
 :DATA01
