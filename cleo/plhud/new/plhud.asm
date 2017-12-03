@@ -381,35 +381,39 @@ dorunway@notonscreen:
 	pop eax
 	ret
 
-; modifies eax, ecx, edx
+; modifies nothing (except values in stack)
 ;world2screen(float x, float y, float z) ; in place
 world2screen:
 	; _DEFINE:MatrixMulVector=0x59C890
 	; _DEFINE:_cameraViewMatrix=0xB6FA2C
 	; _DEFINE:_RwCurrentResolution_X=0xC17044
 	; _DEFINE:_RwCurrentResolution_Y=0xC17048
-	push dword ptr [esp+0xC] ; z
-	push dword ptr [esp+0xC] ; y
-	push dword ptr [esp+0xC] ; x
+	push ecx ; modified by MatrixMulVector
+	push edx ; modified by MatrixMulVector
+	push dword ptr [esp+0x14] ; z
+	push dword ptr [esp+0x14] ; y
+	push dword ptr [esp+0x14] ; x
 	push esp ; in
 	push _cameraViewMatrix ; matrix
-	lea eax, [esp+0x18]
-	push eax ; out
+	lea ecx, [esp+0x20]
+	push ecx ; out
 	call MatrixMulVector
 	add esp, 0x18
 	; adjust
-	fld dword ptr [esp+0xC] ; z
-	fld dword ptr [esp+0x4] ; x
+	fld dword ptr [esp+0x14] ; z
+	fld dword ptr [esp+0xC] ; x
 	fild dword ptr [_RwCurrentResolution_X]
 	fmulp
 	fdiv ST(0), ST(1)
-	fstp dword ptr [esp+0x4] ; x
-	fld dword ptr [esp+0x8] ; y
+	fstp dword ptr [esp+0xC] ; x
+	fld dword ptr [esp+0x10] ; y
 	fild dword ptr [_RwCurrentResolution_Y]
 	fmulp
 	fdiv ST(0), ST(1)
-	fstp dword ptr [esp+0x8] ; y
+	fstp dword ptr [esp+0x10] ; y
 	fstp ST(0)
+	pop edx
+	pop ecx
 	ret
 
 ;hud2screen(float x, float y) ; in place
