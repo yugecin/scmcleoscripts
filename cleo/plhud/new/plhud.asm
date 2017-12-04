@@ -405,10 +405,6 @@ dorunway:
 	; ST(0) cos(angle-90deg)
 	mov dword ptr [esp], 0x41980000 ; 19.0
 	fld dword ptr[esp]
-	;fldpi
-	;fld1
-	;fadd ST(0)
-	;fdivp
 	add esp, 0x8
 	fmul ST(4), ST(0)
 	fmul ST(3), ST(0)
@@ -497,10 +493,10 @@ dorunway:
 	push dword ptr [ebx+0x14] ; z2 z4
 	sub esp, 0x8
 	fld dword ptr [ebx+0x10] ; y2
-	;fsub ST(0), ST(1)
+	fsub ST(0), ST(1)
 	fstp dword ptr [esp+0x4] ; y2 y4
 	fld dword ptr [ebx+0xC] ; x2
-	;fsub ST(0), ST(2)
+	fsub ST(0), ST(2)
 	fstp dword ptr [esp] ; x2 x4
 	call world2screen
 	cmp dword ptr [esp+0x8], 0
