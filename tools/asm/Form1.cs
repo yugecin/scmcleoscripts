@@ -431,19 +431,6 @@ namespace asm {
 				}
 
 				string l = line;
-				bool didreplace = true;
-				while (didreplace) {
-					didreplace = false;
-					foreach (var entry in replacements) {
-						l = doPreprocReplacement(l, entry.Key, entry.Value, out didreplace);
-						if (didreplace) {
-							if (entry.Key == "__BASEADDR") {
-								check_base_accesses++;
-							}
-							break;
-						}
-					}
-				}
 
 				int i = l.IndexOf(';');
 				if (i != -1) {
@@ -452,7 +439,16 @@ namespace asm {
 						if (comment.StartsWith("_DEFINE:")) {
 							string[] parts = comment.Substring("_DEFINE:".Length).Split(new char[] {'='}, 2);
 							if (parts[0].Length != 0) {
-								replacements.Add(parts[0], parts[1]);
+								string value = parts[1];
+								int idx = value.IndexOf(';');
+								if (idx > -1) {
+									value = value.Substring(0, idx);
+								}
+								value = preproc(value, replacements);
+								if (replacements.ContainsKey(parts[0])) {
+									replacements.Remove(parts[0]);
+								}
+								replacements.Add(parts[0], value);
 							}
 						}
 					}
@@ -461,11 +457,31 @@ namespace asm {
 						continue;
 					}
 				}
+
+				l = preproc(l, replacements);
+
 				check_data_accesses += varRegex.Matches(l).Count;
 				l = varRegex.Replace(l, "0xEE${1}FFEE");
 				sb.Append(l).AppendLine();
 			}
 			return sb.ToString();
+		}
+
+		private static string preproc(string line, Dictionary<string, string> replacements) {
+			bool didreplace = true;
+			while (didreplace) {
+				didreplace = false;
+				foreach (var entry in replacements) {
+					line = doPreprocReplacement(line, entry.Key, entry.Value, out didreplace);
+					if (didreplace) {
+						if (entry.Key == "__BASEADDR") {
+							check_base_accesses++;
+						}
+						break;
+					}
+				}
+			}
+			return line;
 		}
 
 		private static string doPreprocReplacement(string line, string search, string replace, out bool didreplace) {
