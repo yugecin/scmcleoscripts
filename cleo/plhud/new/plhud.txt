@@ -98,7 +98,6 @@ end
 0002: jump @INCOMPATIBLE
 
 {$INCLUDE plhud-asm.txt}
-{$INCLUDE plhudairports.txt}
 
 :_MENUTEXT
 :DATA01
@@ -166,4 +165,11 @@ end
 hex
     00 00 00 00
 end
+
+:_RUNWAYS
+:DATA06
+{
+    runways
+}
+{$INCLUDE ../plhudairports.txt}
 
