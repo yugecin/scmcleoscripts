@@ -513,29 +513,34 @@ dorunway:
 	; _DEFINE:RwEngineInstance.dOpenDevice.fpIm2DRenderPrimitive=0x10+0x20
 	; _DEFINE:rwRENDERSTATENARENDERSTATE=0
 	; _DEFINE:rwRENDERSTATETEXTURERASTER=1
+	; _DEFINE:__lineoffset=0x0
 	push eax
 	push esi
 	push edx
 	push ebx
 	push ecx
+	; _DEFINE:__lineoffset=0x14+__lineoffset
 	; see CHud::Draw2DPolygon @ 0x7285B0
 	push rwRENDERSTATENARENDERSTATE  ; state
 	push 1 ; value
 	mov eax, [_RwEngineInstance]
 	call [eax+RwEngineInstance.dOpenDevice.fpRenderStateSet]
-	add esp, 0x8
+	;add esp, 0x8
+	; _DEFINE:__lineoffset=0x8+__lineoffset
 	push rwRENDERSTATETEXTURERASTER ; state
 	push NULL ; value
 	mov eax, [_RwEngineInstance]
 	call [eax+RwEngineInstance.dOpenDevice.fpRenderStateSet]
-	add esp, 0x8
+	;add esp, 0x8
+	; _DEFINE:__lineoffset=0x8+__lineoffset
+	lea eax, [esp+__lineoffset]
 	push 4 ; numVertices
-	lea eax, [esp+0x18]
 	push eax ; vertices
 	push rwPRIMTYPETRISTRIP ; primType
 	mov eax, [_RwEngineInstance]
 	call [eax+RwEngineInstance.dOpenDevice.fpIm2DRenderPrimitive]
-	add esp, 0xC
+	;add esp, 0xC
+	add esp, 0x1C
 	pop ecx
 	pop ebx
 	pop edx
