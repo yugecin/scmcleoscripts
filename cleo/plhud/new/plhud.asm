@@ -446,7 +446,7 @@ dorunway:
 	fsub ST(0), ST(3) ; x1 - sin(angle+90deg)
 	fstp dword ptr [esp] ; x1 x1
 	call world2screen
-	cmp dword ptr [esp+0x8], 0
+	cmp dword ptr [esp+0x8], 1
 	mov dword ptr [esp+0x8], fNearScreenZ
 	jl dorunway@skipesp
 	; p2
@@ -464,7 +464,7 @@ dorunway:
 	fsub ST(0), ST(2) ; x1 - sin(angle-90deg)
 	fstp dword ptr [esp] ; x1 x2
 	call world2screen
-	cmp dword ptr [esp+0x8], 0
+	cmp dword ptr [esp+0x8], 1
 	mov dword ptr [esp+0x8], fNearScreenZ
 	jl dorunway@skipesp
 	; p3
@@ -482,7 +482,7 @@ dorunway:
 	fsub ST(0), ST(3)
 	fstp dword ptr [esp] ; x2 x3
 	call world2screen
-	cmp dword ptr [esp+0x8], 0
+	cmp dword ptr [esp+0x8], 1
 	mov dword ptr [esp+0x8], fNearScreenZ
 	jl dorunway@skipesp
 	; p4
@@ -500,7 +500,7 @@ dorunway:
 	fsub ST(0), ST(2)
 	fstp dword ptr [esp] ; x2 x4
 	call world2screen
-	cmp dword ptr [esp+0x8], 0
+	cmp dword ptr [esp+0x8], 1
 	mov dword ptr [esp+0x8], fNearScreenZ
 	jl dorunway@skipesp
 	; draw it!
@@ -590,6 +590,35 @@ world2screen:
 	fmulp
 	fdiv ST(0), ST(1)
 	fstp dword ptr [esp+0x10] ; y
+	fistp dword ptr [esp+0x14] ; z
+	; try to minimize artifacts
+	;push 0x447a0000 ; 0x461c4000 ; 10000.0
+	push 0x461c4000 ; 10000.0
+	fld dword ptr [esp]
+	add esp, 0x4
+	fld dword ptr [esp+0x10] ; y
+	fcomip ST, ST(1)
+	ja world2screen@oob
+	fld dword ptr [esp+0xC] ; x
+	fcomip ST, ST(1)
+	ja world2screen@oob
+	fstp ST(0)
+	;push 0xc47a0000 ; 0xc61c4000 ; -10000.0
+	push 0xc61c4000 ; -10000.0
+	fld dword ptr [esp]
+	add esp, 0x4
+	fld dword ptr [esp+0x10] ; y
+	fcomip ST, ST(1)
+	jb world2screen@oob
+	fld dword ptr [esp+0xC] ; x
+	fcomip ST, ST(1)
+	jb world2screen@oob
+	fstp ST(0)
+	pop edx
+	pop ecx
+	ret
+world2screen@oob:
+	mov dword ptr [esp+0x14], -1 ; z
 	fstp ST(0)
 	pop edx
 	pop ecx
