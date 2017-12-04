@@ -10,6 +10,7 @@
 
 ; hook on 0058EAF0 _DrawHud (0058EAF1 in asmtool)
 
+; _DEFINE:NULL=0
 ; _DEFINE:__drawText=0x71A700
 ; _DEFINE:CText__SetBorderEffectRGBA=0x719510
 ; _DEFINE:CText__SetFont=0x719490
@@ -503,33 +504,29 @@ dorunway:
 	mov dword ptr [esp+0x8], fNearScreenZ
 	jl dorunway@skipesp
 	; draw it!
+	; see https://github.com/DK22Pac/plugin-sdk/blob/plugin_sa/game_sa/rw/rwplcore.h#L3515 etc
+	; or idb
 	; _DEFINE:rwPRIMTYPETRISTRIP=4
+	; _DEFINE:rwPRIMTYPETRIFAN=5
 	; _DEFINE:_RwEngineInstance=0xC97B24
 	; _DEFINE:RwEngineInstance.dOpenDevice.fpRenderStateSet=0x10+0x10
 	; _DEFINE:RwEngineInstance.dOpenDevice.fpIm2DRenderPrimitive=0x10+0x20
+	; _DEFINE:rwRENDERSTATENARENDERSTATE=0
 	; _DEFINE:rwRENDERSTATETEXTURERASTER=1
 	push eax
 	push esi
 	push edx
 	push ebx
 	push ecx
-	; TODO: remove this ;)
-	push 0xFF4848FF
-	push esp
-	push 0x42C80000
-	push 0x42C80000
-	push 0x42C80000
-	push 0x43480000
-	push 0x42C80000
-	push 0x42C80000
-	push 0x0
-	push 0x0
-	call 0x7285B0
-	add esp, 0x28
-	; ^ remove
+	; see CHud::Draw2DPolygon @ 0x7285B0
+	push rwRENDERSTATENARENDERSTATE  ; state
+	push 1 ; value
 	mov eax, [_RwEngineInstance]
+	call [eax+RwEngineInstance.dOpenDevice.fpRenderStateSet]
+	add esp, 0x8
 	push rwRENDERSTATETEXTURERASTER ; state
-	push 0 ; value
+	push NULL ; value
+	mov eax, [_RwEngineInstance]
 	call [eax+RwEngineInstance.dOpenDevice.fpRenderStateSet]
 	add esp, 0x8
 	push 4 ; numVertices
