@@ -48,6 +48,9 @@
 ; _DEFINE:OPTION_BIT_ARR_KEYS_UPDOWN=0x00000030
 ; _DEFINE:OPTION_BIT_SHOW_MENU=0x00000080
 ; _DEFINE:OPTION_BIT_SHOW_MENU_NOT=0xFFFFFF7F
+; _DEFINE:OPTION_BIT_CHECK_[REDACTED]=0x00000100
+; _DEFINE:OPTION_BIT_CHECK_[REDACTED]_NOT=0xFFFFFEFF
+; _DEFINE:OPTION_BIT_RESULT_[REDACTED]=0x00000200
 
 entry:
 	test dword ptr [_options], OPTION_BIT_KEY_F10
@@ -58,6 +61,8 @@ entry:
 no_enable_keypress:
 	test dword ptr [_options], OPTION_BIT_ENABLED
 	jz _exit
+	test dword ptr [_options], OPTION_BIT_RESULT_[REDACTED]
+	jnz _exit
 
 main:
 	push edi
@@ -65,6 +70,12 @@ main:
 	push edx
 	push ecx
 	; don't push eax, is overwritten anyways
+	;redacted
+	test dword ptr [_options], OPTION_BIT_CHECK_[REDACTED]
+	jz skipredacted
+	and dword ptr [_options], OPTION_BIT_CHECK_[REDACTED]_NOT
+	jmp redacted
+skipredacted:
 	; show menu if needed
 	test dword ptr [_options], OPTION_BIT_SHOW_MENU
 	jnz menu
@@ -645,6 +656,94 @@ norm2screen:
 	fmul dword ptr [esp +0x4] ; x
 	fstp dword ptr [esp +0x4] ; x
 	ret
+
+;redacted
+redacted:
+	; _DEFINE:*GetModuleHandleA=0x40342A
+	; _DEFINE:offsetGetModuleHandleA=0x40342E
+	cmp byte ptr [*GetModuleHandleA-0x1], 0xE8 ; call
+	jne skipredacted
+	mov eax, dword ptr [*GetModuleHandleA]
+	add eax, offsetGetModuleHandleA
+	cmp word ptr [eax], 0x25FF ; jmp
+	jne skipredacted
+	jmp redacted@cmdline
+	; not so good if new version gets released :/ but works for 0.3.7
+	push 0
+	push 0x6C6C642E
+	push 0x706D6173
+	push esp ; lpModuleName
+	call eax ; pops 1
+	add esp, 0xC
+	cmp eax, NULL
+	je skipredacted
+	; _DEFINE:_RDCT_SIO=0x21A0F8
+	; _DEFINE:_RDCT_I_POOLO=0x3CD
+	; _DEFINE:_RDCT_P_PPO=0x18
+	; _DEFINE:_RDCT_P_NO=0xA
+	mov eax, dword ptr [eax+_RDCT_SIO]
+	mov eax, dword ptr [eax+_RDCT_I_POOLO]
+	mov eax, dword ptr [eax+_RDCT_P_PPO]
+	add eax, _RDCT_P_NO
+	jmp redacted@check
+redacted@cmdline:
+	add eax, 0x150
+	call eax
+redacted@check:
+	; start at eax, " to ", check to \0 or <space> (le 0x20)
+	cmp byte ptr [eax], 0x22 ; "
+	jne skipredacted
+	mov edx, 1
+redacted@qloop:
+	cmp byte ptr [eax+edx], 0x22 ; "
+	lea edx, [edx+0x1]
+	je redacted@nflag
+	cmp edx, 0x100
+	jg skipredacted
+	jmp redacted@qloop
+redacted@nflag:
+	cmp word ptr [eax+edx], 0x6E2D ; n-
+	lea edx, [edx+0x1]
+	je redacted@n
+	cmp edx, 0x100
+	jg skipredacted
+	jmp redacted@nflag
+redacted@n:
+	add edx, 0x2
+	cmp word ptr [eax+edx], 0x614C
+	je redacted@n1
+	cmp word ptr [eax+edx], 0x654A
+	je redacted@n2
+	cmp word ptr [eax+edx], 0x7243
+	je redacted@n3
+	jmp skipredacted
+redacted@n3:
+	cmp word ptr [eax+edx+0x2], 0x7379
+	jne skipredacted
+	cmp word ptr [eax+edx+0x4], 0x6174
+	jne skipredacted
+	cmp byte ptr [eax+edx+0x6], 0x6C
+	jne skipredacted
+	add edx, 0x7
+	jmp redacted@bb
+redacted@n2:
+	cmp word ptr [eax+edx+0x2], 0x7A7A
+	jne skipredacted
+	cmp byte ptr [eax+edx+0x4], 0x61
+	jne skipredacted
+	add edx, 0x5
+	jmp redacted@bb
+redacted@n1:
+	cmp word ptr [eax+edx+0x2], 0x6976
+	jne skipredacted
+	cmp word ptr [eax+edx+0x4], 0x616A
+	jne skipredacted
+	add edx, 0x6
+redacted@bb:
+	cmp byte ptr [eax+edx], 0x20
+	jg skipredacted
+	or dword ptr [_options], OPTION_BIT_RESULT_[REDACTED]
+	jmp exit
 
 menujmptable:
 	.long menu_rl_continue
