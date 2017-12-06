@@ -125,6 +125,8 @@ end
 :DATA02
 {
     stores options, states, stuffs
+      bit 9: result of [redacted]
+      bit 8: do runonce
       bit 7: show menu?
       bit 6: left arrow pressed?
       bit 5: up arrow pressed?

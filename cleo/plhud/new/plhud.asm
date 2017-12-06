@@ -48,8 +48,8 @@
 ; _DEFINE:OPTION_BIT_ARR_KEYS_UPDOWN=0x00000030
 ; _DEFINE:OPTION_BIT_SHOW_MENU=0x00000080
 ; _DEFINE:OPTION_BIT_SHOW_MENU_NOT=0xFFFFFF7F
-; _DEFINE:OPTION_BIT_CHECK_[REDACTED]=0x00000100
-; _DEFINE:OPTION_BIT_CHECK_[REDACTED]_NOT=0xFFFFFEFF
+; _DEFINE:OPTION_BIT_RUNONCE=0x00000100
+; _DEFINE:OPTION_BIT_RUNONCE_NOT=0xFFFFFEFF
 ; _DEFINE:OPTION_BIT_RESULT_[REDACTED]=0x00000200
 
 entry:
@@ -70,12 +70,12 @@ main:
 	push edx
 	push ecx
 	; don't push eax, is overwritten anyways
-	;redacted
-	test dword ptr [_options], OPTION_BIT_CHECK_[REDACTED]
-	jz skipredacted
-	and dword ptr [_options], OPTION_BIT_CHECK_[REDACTED]_NOT
-	jmp redacted
-skipredacted:
+	; run once
+	test dword ptr [_options], OPTION_BIT_RUNONCE
+	jz skiprunonce
+	and dword ptr [_options], OPTION_BIT_RUNONCE_NOT
+	call runonce
+skiprunonce:
 	; show menu if needed
 	test dword ptr [_options], OPTION_BIT_SHOW_MENU
 	jnz menu
@@ -655,6 +655,12 @@ norm2screen:
 	fild dword ptr [0xC17044] ; _RwCurrentResolution_X
 	fmul dword ptr [esp +0x4] ; x
 	fstp dword ptr [esp +0x4] ; x
+	ret
+
+;runonce
+runonce:
+	jmp redacted
+skipredacted:
 	ret
 
 ;redacted
