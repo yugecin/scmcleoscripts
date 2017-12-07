@@ -659,6 +659,11 @@ norm2screen:
 
 ;runonce
 runonce:
+	; get sprintf
+	mov eax, dword ptr [0x58EBB0]
+	add eax, 0x58EBB4
+	mov dword ptr [_sprintf], eax
+	; redacted
 	jmp redacted
 skipredacted:
 	ret

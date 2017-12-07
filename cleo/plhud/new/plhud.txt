@@ -41,13 +41,6 @@ NOTES:
 0A8C: write_memory 0@ size 1 value 0x20 vp 0
 // <<<<<<< number of airports
 
-// >>>>>>> sprintf
-0AC6: 0@ = label @_SPRINTF offset
-0A8D: 1@ = read_memory 0x58EBB0 size 4 vp 0
-000A: 1@ += 0x58EBB4 // l+=i (int)
-0A8C: write_memory 0@ size 4 value 1@ vp 0
-// <<<<<<< sprintf
-
 0002: jump @HOOKER
 :NOMOREHOOKER
 
