@@ -666,6 +666,28 @@ runonce:
 	; redacted
 	jmp redacted
 skipredacted:
+	; get runway count
+	xor ebx, ebx
+	xor eax, eax
+	mov esi, _runways
+rnwycountloop:
+	inc eax
+	add esi, 0x18
+	mov bl, byte ptr [esi]
+	add esi, ebx
+	inc esi
+	cmp dword ptr [esi], 0
+	jne rnwycountloop
+	mov esi, _menutxt
+	add esi, 0xD3 ; !!MENUOFFSET
+	push 0x6425 ; %d\0\0
+	push eax ; ...
+	lea eax, [esp+0x4]
+	push eax ; pFormat
+	push esi ; pResult
+	call [_sprintf] ; _sprintf
+	add esp, 0x10
+	mov byte ptr [esi+0x3], 0x20 ; <space>
 	ret
 
 ;redacted

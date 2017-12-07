@@ -3,14 +3,6 @@
 
 03A4: name_thread 'PLHUD01'
 
-{
-NOTES:
-
-  sannybuilder: put case converting on 'As is' when compiling
-    options (F10) > formats > case converting
-
-}
-
 // >>>>>>> compability checks
 0A8D: 0@ = read_memory 0x58EBAF size 1 vp 0
 0039:   0@ == 0xE8 // l==i (int) // sprintf call
@@ -19,27 +11,6 @@ NOTES:
 0039:   0@ == 0x7405B60F // l==i (int) // drawhud rewritten part
 004D: jump_if_false @INCOMPATIBLE
 // <<<<<<< compability checks
-
-// >>>>>>> number of airports
-0006: 9@ = 0 // l=i (int)
-0AC6: 0@ = label @AIRPORTS offset
-:NUMBER_AIRPORTS_LOOP
-0A8D: 1@ = read_memory 0@ size 4 vp 0
-8039:   not 1@ == 0 // l==i (int)
-004D: jump_if_false @NUMBER_AIRPORTS_LOOP_END
-000A: 9@ += 1 // l+=i (int)
-000A: 0@ += 24 // l+=i (int)
-0A8D: 1@ = read_memory 0@ size 1 vp 0
-000A: 0@ += 1 // l+=i (int)
-005A: 0@ += 1@  // l+=l (int)
-0002: jump @NUMBER_AIRPORTS_LOOP
-:NUMBER_AIRPORTS_LOOP_END
-0AC6: 0@ = label @_MENUTEXT offset
-000A: 0@ += 211 // l+=i (int) !!MENUOFFSET
-0AD3: 0@ = format "%d" 9@
-000A: 0@ += 3 // l+=i (int)
-0A8C: write_memory 0@ size 1 value 0x20 vp 0
-// <<<<<<< number of airports
 
 0002: jump @HOOKER
 :NOMOREHOOKER
