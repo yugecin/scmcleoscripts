@@ -176,15 +176,15 @@ runwayloop:
 	; smart mode check
 	test dword ptr [_options], OPTION_BIT_SMART_MODE
 	jz runwayloop@nosmart
-	; checkpoint to middle < radius * 1.2
-	fld ST(1) ; mx
+	; checkpoint to middle < length * 1.4
+	fld dword ptr [ebx+0xC] ; rnwy x 2
 	fsub dword ptr [ebx] ; rnwy x 1
 	fmul ST(0)
-	fld ST(1) ; my
+	fld dword ptr [ebx+0x10] ; rnwy y 2
 	fsub dword ptr [ebx+0x4] ; rnwy y 1
 	fmul ST(0)
 	faddp
-	push 0x3f99999a ; 1.2
+	push 0x3fb33333 ; 1.4
 	fmul dword ptr [esp]
 	add esp, 0x4
 	fld ST(2) ; mx
