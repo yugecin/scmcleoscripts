@@ -82,6 +82,7 @@ hex
     " _VIEW DISTANCE: _1500M"            "~n~"
                                          "~n~"
     "v14 ___ runways"                    "~n~"
+    "________________"
     00
 end
 

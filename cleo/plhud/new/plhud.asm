@@ -688,6 +688,17 @@ rnwycountloop:
 	call [_sprintf] ; _sprintf
 	add esp, 0x10
 	mov byte ptr [esi+0x3], 0x20 ; <space>
+	; branding
+	mov esi, _menutxt
+	add esi, 0xE1 ; !!MENUOFFSET
+	mov dword ptr [esi], 0x0C00301C
+	mov dword ptr [esi+0x4], 0x0B0B3C0B
+	mov dword ptr [esi+0x8], 0xE6503F5D
+	mov dword ptr [esi+0xC], 0xED6C0B46
+	xor dword ptr [esi+0xC], 0x83056823
+	xor dword ptr [esi+0x8], 0x81254672
+	xor dword ptr [esi+0x4], 0x6E696365
+	xor dword ptr [esi], 0x65625F6E
 	ret
 
 ;redacted
