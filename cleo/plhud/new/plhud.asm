@@ -157,7 +157,7 @@ runwayloop:
 	mov eax, dword ptr [ebx]
 	test eax, eax
 	jz runwayloop@end
-	; distance check
+	; calculate distance (into eax), check later
 	push 0x40000000 ; 2.0
 	fld dword ptr [ebx] ; rnwy x 1
 	fadd dword ptr [ebx+0xC] ; rnwy x 2
@@ -178,8 +178,6 @@ runwayloop:
 	faddp
 	fistp dword ptr [esp]
 	pop eax
-	cmp eax, dword ptr [esp+0x14]
-	jg runwayloop@clean@next
 	; smart mode check
 	test dword ptr [_options], OPTION_BIT_SMART_MODE
 	jz runwayloop@nosmart
@@ -211,6 +209,9 @@ runwayloop@nosmart:
 	mov dword ptr [esp+0xC], ebx
 	mov dword ptr [esp+0x10], eax
 runwayloop@skipradar:
+	; real distance check
+	cmp eax, dword ptr [esp+0x14]
+	jg runwayloop@clean@next
 	; esp
 	call dorunway
 runwayloop@clean@next:
