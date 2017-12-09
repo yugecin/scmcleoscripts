@@ -30,6 +30,7 @@
 ; _DEFINE:_viewdis=_var04
 ; _DEFINE:_sprintf=_var05
 ; _DEFINE:_runways=_var06
+; _DEFINE:_lastrdr=_var08
 
 ; _DEFINE:MAXMENUIDX=2
 ; _DEFINE:MENUITEMS=MAXMENUIDX+1
@@ -260,6 +261,11 @@ runwayloop@end:
 	fadd ST(0)
 	fmulp
 	fstp dword ptr [0x8D06E0+0xC] ; radius
+	; force radar update if needed
+	cmp dword ptr [_lastrdr], ebx
+	je runwayloop@noradar
+	mov dword ptr [0xBA8300], 1
+	mov dword ptr [_lastrdr], ebx
 runwayloop@noradar:
 	; cleanup & exit
 	add esp, 0x18 ; 0xC player coords + 0xC viewdist + radar stuff
