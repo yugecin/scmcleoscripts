@@ -58,6 +58,7 @@ entry:
 	xor dword ptr [_options], OPTION_BIT_ENABLED
 	and dword ptr [_options], OPTION_BIT_ALL_KEYS_NOT
 	or dword ptr [_options], OPTION_BIT_SHOW_MENU
+	call fixairstrip
 no_enable_keypress:
 	test dword ptr [_options], OPTION_BIT_ENABLED
 	jz _exit
@@ -80,6 +81,7 @@ skiprunonce:
 	test dword ptr [_options], OPTION_BIT_SHOW_MENU
 	jnz menu
 menu_ret:
+	call breakairstrip
 	; set textdraw stuff for runways
 	push 0 ; a2
 	push 0 ; a1
@@ -135,8 +137,8 @@ dont_get_checkpoint:
 	fild dword ptr [_viewdis]
 	fmul ST(0), ST(0)
 	fistp dword ptr [esp]
-	push 0x4EBEBC20 ; closest distance (for radar) 1.6B
-	push 0xFFFFFFFF ; closest idx (for radar)
+	push 0x5F5E1000 ; closest distance (for radar) 1.6B (int)
+	push 0xFFFFFFFF ; ptr to closest runway (for radar)
 	sub esp, 0xC ; player coords
 	mov eax, esp
 	push 0
@@ -198,6 +200,13 @@ runwayloop:
 	fstp ST(0) ; dist b
 	ja runwayloop@clean@next
 runwayloop@nosmart:
+	; radar
+	cmp dword ptr [esp+0x10], eax
+	jl runwayloop@skipradar
+	mov dword ptr [esp+0xC], ebx
+	mov dword ptr [esp+0x10], eax
+runwayloop@skipradar:
+	; esp
 	call dorunway
 runwayloop@clean@next:
 	fstp ST(0) ; my
@@ -208,6 +217,51 @@ runwayloop@next:
 	add ebx, 0x19
 	jmp runwayloop
 runwayloop@end:
+	; radar
+	mov ebx, dword ptr [esp+0xC]
+	cmp ebx, 0xFFFFFFFF
+	je runwayloop@noradar
+	fld dword ptr [ebx+0x4] ; y1
+	fadd dword ptr [ebx+0x10] ; y2
+	fld dword ptr [ebx] ; x1
+	fadd dword ptr [ebx+0xC] ; x2
+	fld1
+	fadd ST(0), ST(0)
+	fdiv ST(2), ST(0)
+	fdivp
+	fstp dword ptr [0x8D06E0] ; mx
+	fstp dword ptr [0x8D06E0+0x4] ; my
+	push eax
+	sub esp, 0x8
+	fld dword ptr [ebx+0xC] ; x2
+	fsub dword ptr [ebx] ; x1
+	fst dword ptr [esp+0x4] ; dx
+	fld dword ptr [ebx+0x10] ; y2
+	fsub dword ptr [ebx+0x4] ; y1
+	fst dword ptr [esp] ; dy
+	; _DEFINE:CGeneral__getATanOfXY=0x53CC70
+	;             ^ modifies eax
+	call CGeneral__getATanOfXY
+	mov dword ptr [esp], 0x43340000 ; 180.0
+	fmul dword ptr [esp]
+	fldpi
+	fdivp
+	mov dword ptr [esp], 0x42b40000 ; 90.0
+	fadd dword ptr [esp]
+	fstp dword ptr [0x8D06E0+0x8] ; ang
+	add esp, 0x8
+	pop eax
+	fmul ST(0), ST(0)
+	fxch
+	fmul ST(0), ST(0)
+	faddp
+	fsqrt
+	fld1
+	fadd ST(0)
+	fmulp
+	fstp dword ptr [0x8D06E0+0xC] ; radius
+runwayloop@noradar:
+	; cleanup & exit
 	add esp, 0x18 ; 0xC player coords + 0xC viewdist + radar stuff
 	test dword ptr [_options], OPTION_BIT_SMART_MODE
 	jz exit
@@ -699,6 +753,34 @@ rnwycountloop:
 	xor dword ptr [esi+0x8], 0x81254672
 	xor dword ptr [esi+0x4], 0x6E696365
 	xor dword ptr [esi], 0x65625F6E
+	ret
+
+;breakairstrip
+breakairstrip:
+	mov dword ptr [0x8D06E0], 0x48435000
+	mov dword ptr [0x8D06F0], 0x48435000
+	mov dword ptr [0x8D0700], 0x48435000
+	mov dword ptr [0x8D0710], 0x48435000
+	ret
+
+;fixairstrip
+fixairstrip:
+	mov dword ptr [0x8D06E0], 0x44DAC000
+	mov dword ptr [0x8D06E4], 0xC51BE000
+	mov dword ptr [0x8D06E8], 0x43340000
+	mov dword ptr [0x8D06EC], 0x447A0000
+	mov dword ptr [0x8D06F0], 0xC4ABA000
+	mov dword ptr [0x8D06F4], 0x42F00000
+	mov dword ptr [0x8D06F8], 0x439D8000
+	mov dword ptr [0x8D06FC], 0x44BB8000
+	mov dword ptr [0x8D0700], 0x44B8C000
+	mov dword ptr [0x8D0704], 0x44B6A000
+	mov dword ptr [0x8D0708], 0x42B40000
+	mov dword ptr [0x8D070C], 0x44960000
+	mov dword ptr [0x8D0710], 0x432F0000
+	mov dword ptr [0x8D0714], 0x451C6000
+	mov dword ptr [0x8D0718], 0x43340000
+	mov dword ptr [0x8D071C], 0x447A0000
 	ret
 
 ;redacted
