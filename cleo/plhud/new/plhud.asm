@@ -53,12 +53,16 @@
 ; _DEFINE:OPTION_BIT_RUNONCE_NOT=0xFFFFFEFF
 ; _DEFINE:OPTION_BIT_RESULT_[REDACTED]=0x00000200
 
+; _DEFINE:_airstrip_location=0xBA8300
+
 entry:
 	test dword ptr [_options], OPTION_BIT_KEY_F10
 	jz no_enable_keypress
 	xor dword ptr [_options], OPTION_BIT_ENABLED
 	and dword ptr [_options], OPTION_BIT_ALL_KEYS_NOT
 	or dword ptr [_options], OPTION_BIT_SHOW_MENU
+	mov dword ptr [_lastrdr], 0
+	mov dword ptr [_airstrip_location], 3
 	call fixairstrip
 no_enable_keypress:
 	test dword ptr [_options], OPTION_BIT_ENABLED
@@ -263,7 +267,7 @@ runwayloop@end:
 	; force radar update if needed
 	cmp dword ptr [_lastrdr], ebx
 	je runwayloop@noradar
-	mov dword ptr [0xBA8300], 1
+	mov dword ptr [_airstrip_location], 1
 	mov dword ptr [_lastrdr], ebx
 runwayloop@noradar:
 	; cleanup & exit
