@@ -729,11 +729,11 @@ redacted:
 	mov eax, dword ptr [eax+_RDCT_I_POOLO]
 	mov eax, dword ptr [eax+_RDCT_P_PPO]
 	add eax, _RDCT_P_NO
+	xor edx, edx
 	jmp redacted@check
 redacted@cmdline:
 	add eax, 0x150
 	call eax
-redacted@check:
 	; start at eax, " to ", check to \0 or <space> (le 0x20)
 	cmp byte ptr [eax], 0x22 ; "
 	jne skipredacted
@@ -754,6 +754,7 @@ redacted@nflag:
 	jmp redacted@nflag
 redacted@n:
 	add edx, 0x2
+redacted@check:
 	cmp word ptr [eax+edx], 0x614C
 	je redacted@n1
 	cmp word ptr [eax+edx], 0x654A
