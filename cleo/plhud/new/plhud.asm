@@ -250,17 +250,16 @@ runwayloop@end:
 	mov dword ptr [esp], 0x42b40000 ; 90.0
 	fadd dword ptr [esp]
 	fstp dword ptr [0x8D06E0+0x8] ; ang
-	add esp, 0x8
-	pop eax
 	fmul ST(0), ST(0)
 	fxch
 	fmul ST(0), ST(0)
 	faddp
 	fsqrt
-	fld1
-	fadd ST(0)
-	fmulp
+	mov dword ptr [esp], 0x43960000 ; 300.0
+	fadd dword ptr [esp]
 	fstp dword ptr [0x8D06E0+0xC] ; radius
+	add esp, 0x8
+	pop eax
 	; force radar update if needed
 	cmp dword ptr [_lastrdr], ebx
 	je runwayloop@noradar
