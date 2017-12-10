@@ -36,8 +36,10 @@
 ; _DEFINE:MAXMENUIDX=2
 ; _DEFINE:MENUITEMS=MAXMENUIDX+1
 
-; _DEFINE:FONT_SIZE_X=0x3f000000
-; _DEFINE:FONT_SIZE_Y=0x3e8ccccd
+; _DEFINE:FONT_SIZE_X=0x3f000000 ; 0.5
+; _DEFINE:FONT_SIZE_Y=0x3e8ccccd ; 0.275
+; _DEFINE:MENU_POS_X=0x3e800000 ; 0.25
+; _DEFINE:MENU_POS_Y=0x3ee66666 ; 0.45
 
 ; _DEFINE:OPTION_BIT_ENABLED=0x00000001
 ; _DEFINE:OPTION_BIT_SMART_MODE=0x00000002
@@ -411,8 +413,8 @@ menushow:
 	call CText__SetWrappingCoordinateForLeftAlignedText
 	;add esp, 0x4
 	push _menutxt ; str
-	push 0x3ee66666 ; 0.45 ; y
-	push 0x3e800000 ; 0.25 ; x
+	push MENU_POS_Y ; y
+	push MENU_POS_X ; x
 	call norm2screen
 	call __drawText
 	;add esp, 0xC
