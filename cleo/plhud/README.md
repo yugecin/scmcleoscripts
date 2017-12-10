@@ -1,3 +1,11 @@
+# There is a new version of this script
+I recommend you check out [the new version](new/), wich has a lot of improvements.
+
+
+
+
+
+
 ## What
 HUD kind of thing that shows runways, specifically for [the pilot's life SA:MP server](http://thepilotslife.com).
 
