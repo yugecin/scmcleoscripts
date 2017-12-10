@@ -650,6 +650,10 @@ dorunway@notonscreen:
 ; modifies nothing (except values in stack)
 ;world2screen(float x, float y, float z) ; in place
 world2screen:
+	; _DEFINE:PARAMOFFSET=0x4
+	; _DEFINE:PARAM_X=0x0
+	; _DEFINE:PARAM_Y=0x4
+	; _DEFINE:PARAM_Z=0x8
 	; _DEFINE:MatrixMulVector=0x59C890
 	; _DEFINE:_cameraViewMatrix=0xB6FA2C
 	; _DEFINE:_RwCurrentResolution_X=0xC17044
@@ -657,50 +661,54 @@ world2screen:
 	push eax ; modified by MatrixMulVector
 	push ecx ; modified by MatrixMulVector
 	push edx ; modified by MatrixMulVector
-	push dword ptr [esp+0x18] ; z
-	push dword ptr [esp+0x18] ; y
-	push dword ptr [esp+0x18] ; x
+	; _DEFINE:PARAMOFFSET=PARAMOFFSET+0xC
+	push dword ptr [esp+PARAMOFFSET+PARAM_Z] ; z
+	; _DEFINE:PARAMOFFSET=PARAMOFFSET+0x4
+	push dword ptr [esp+PARAMOFFSET+PARAM_Y] ; y
+	; _DEFINE:PARAMOFFSET=PARAMOFFSET+0x4
+	push dword ptr [esp+PARAMOFFSET+PARAM_X] ; x
 	push esp ; in
 	push _cameraViewMatrix ; matrix
 	lea ecx, [esp+0x24]
 	push ecx ; out
 	call MatrixMulVector
 	add esp, 0x18
+	; _DEFINE:PARAMOFFSET=PARAMOFFSET-0x8
 	; adjust
-	fld dword ptr [esp+0x18] ; z
-	fld dword ptr [esp+0x10] ; x
+	fld dword ptr [esp+PARAMOFFSET+PARAM_Z] ; z
+	fld dword ptr [esp+PARAMOFFSET+PARAM_X] ; x
 	fild dword ptr [_RwCurrentResolution_X]
 	fmulp
 	fdiv ST(0), ST(1)
-	fstp dword ptr [esp+0x10] ; x
-	fld dword ptr [esp+0x14] ; y
+	fstp dword ptr [esp+PARAMOFFSET+PARAM_X] ; x
+	fld dword ptr [esp+PARAMOFFSET+PARAM_Y] ; y
 	fild dword ptr [_RwCurrentResolution_Y]
 	fmulp
 	fdiv ST(0), ST(1)
-	fstp dword ptr [esp+0x14] ; y
-	fistp dword ptr [esp+0x18] ; z
+	fstp dword ptr [esp+PARAMOFFSET+PARAM_Y] ; y
+	fistp dword ptr [esp+PARAMOFFSET+PARAM_Z] ; z
 	; try to minimize artifacts
 	push 0x461c4000 ; 10000.0
 	fld dword ptr [esp]
 	add esp, 0x4
-	fld dword ptr [esp+0x14] ; y
+	fld dword ptr [esp+PARAMOFFSET+PARAM_Y] ; y
 	fcomip ST, ST(1)
 	ja world2screen@oob
-	fld dword ptr [esp+0x10] ; x
+	fld dword ptr [esp+PARAMOFFSET+PARAM_X] ; x
 	fcomip ST, ST(1)
 	ja world2screen@oob
 	fstp ST(0)
 	push 0xc61c4000 ; -10000.0
 	fld dword ptr [esp]
 	add esp, 0x4
-	fld dword ptr [esp+0x14] ; y
+	fld dword ptr [esp+PARAMOFFSET+PARAM_Y] ; y
 	fcomip ST, ST(1)
 	jb world2screen@oob
-	fld dword ptr [esp+0x10] ; x
+	fld dword ptr [esp+PARAMOFFSET+PARAM_X] ; x
 	fcomip ST, ST(1)
 	jae world2screen@noob
 world2screen@oob:
-	mov dword ptr [esp+0x14], -1 ; z
+	mov dword ptr [esp+PARAMOFFSET+PARAM_Z], -1 ; z
 world2screen@noob:
 	fstp ST(0)
 	pop edx
