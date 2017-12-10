@@ -439,10 +439,17 @@ menu_write_mark:
 	ret
 
 ; ebx: ptr to runway
-; eax: distance^2
+; eax: distance^2 (int)
 ; nothing interesting in stack
 ; rnwy middle y, x in fpu stack
 dorunway:
+	; reserve a buffer for the airport name + distance
+	; _DEFINE:ESP_EXTRA_BUFFER_LENGTH=0xE ; ~n~2400000000m\0
+	push edx
+	mov dl, [ebx+0x18]
+	movzx edx, dl
+	add edx, ESP_EXTRA_BUFFER_LENGTH
+	sub esp, edx
 	; project middle first and see if it's on screen
 	sub esp, 0xC
 	fstp dword ptr [esp+0x4] ; my
@@ -457,9 +464,23 @@ dorunway:
 	call world2screen
 	cmp dword ptr [esp+0x8], 0 ; mz'
 	jl dorunway@notonscreen
-	; prepare the name and position of text in stack
+	; prepare the name and text in stack (used just before ret)
+	push 0
+	push 0x6D69257E ; mi%~
+	push 0x6E7E7325 ; n~s%
+	push eax
+	fild dword ptr [esp]
+	fsqrt
+	fistp dword ptr [esp] ; ... (dist)
 	lea eax, [ebx+0x19]
-	mov dword ptr [esp+0x8], eax ; str
+	push eax ; ... (name)
+	lea eax, [esp+0x8]
+	push eax ; pFormat
+	lea eax, [esp+0x24]
+	mov dword ptr [esp+0x20], eax ; str (for __drawText; see below)
+	push eax ; pResult
+	call [_sprintf] ; _sprintf
+	add esp, 0x1C
 	; param y already in place by world2screen
 	; param x already in place by world2screen
 	;
@@ -645,6 +666,12 @@ dorunway@skipesp:
 	call __drawText
 dorunway@notonscreen:
 	add esp, 0xC
+	; unalloc the string buffer for name + distance
+	mov al, [ebx+0x18]
+	movzx eax, al
+	add eax, ESP_EXTRA_BUFFER_LENGTH
+	add esp, eax
+	pop edx
 	ret
 
 ; modifies nothing (except values in stack)
