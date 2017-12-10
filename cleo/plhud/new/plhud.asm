@@ -654,39 +654,40 @@ world2screen:
 	; _DEFINE:_cameraViewMatrix=0xB6FA2C
 	; _DEFINE:_RwCurrentResolution_X=0xC17044
 	; _DEFINE:_RwCurrentResolution_Y=0xC17048
+	push eax ; modified by MatrixMulVector
 	push ecx ; modified by MatrixMulVector
 	push edx ; modified by MatrixMulVector
-	push dword ptr [esp+0x14] ; z
-	push dword ptr [esp+0x14] ; y
-	push dword ptr [esp+0x14] ; x
+	push dword ptr [esp+0x18] ; z
+	push dword ptr [esp+0x18] ; y
+	push dword ptr [esp+0x18] ; x
 	push esp ; in
 	push _cameraViewMatrix ; matrix
-	lea ecx, [esp+0x20]
+	lea ecx, [esp+0x24]
 	push ecx ; out
 	call MatrixMulVector
 	add esp, 0x18
 	; adjust
-	fld dword ptr [esp+0x14] ; z
-	fld dword ptr [esp+0xC] ; x
+	fld dword ptr [esp+0x18] ; z
+	fld dword ptr [esp+0x10] ; x
 	fild dword ptr [_RwCurrentResolution_X]
 	fmulp
 	fdiv ST(0), ST(1)
-	fstp dword ptr [esp+0xC] ; x
-	fld dword ptr [esp+0x10] ; y
+	fstp dword ptr [esp+0x10] ; x
+	fld dword ptr [esp+0x14] ; y
 	fild dword ptr [_RwCurrentResolution_Y]
 	fmulp
 	fdiv ST(0), ST(1)
-	fstp dword ptr [esp+0x10] ; y
-	fistp dword ptr [esp+0x14] ; z
+	fstp dword ptr [esp+0x14] ; y
+	fistp dword ptr [esp+0x18] ; z
 	; try to minimize artifacts
 	;push 0x447a0000 ; 0x461c4000 ; 10000.0
 	push 0x461c4000 ; 10000.0
 	fld dword ptr [esp]
 	add esp, 0x4
-	fld dword ptr [esp+0x10] ; y
+	fld dword ptr [esp+0x14] ; y
 	fcomip ST, ST(1)
 	ja world2screen@oob
-	fld dword ptr [esp+0xC] ; x
+	fld dword ptr [esp+0x10] ; x
 	fcomip ST, ST(1)
 	ja world2screen@oob
 	fstp ST(0)
@@ -694,21 +695,23 @@ world2screen:
 	push 0xc61c4000 ; -10000.0
 	fld dword ptr [esp]
 	add esp, 0x4
-	fld dword ptr [esp+0x10] ; y
+	fld dword ptr [esp+0x14] ; y
 	fcomip ST, ST(1)
 	jb world2screen@oob
-	fld dword ptr [esp+0xC] ; x
+	fld dword ptr [esp+0x10] ; x
 	fcomip ST, ST(1)
 	jb world2screen@oob
 	fstp ST(0)
 	pop edx
 	pop ecx
+	pop eax
 	ret
 world2screen@oob:
 	mov dword ptr [esp+0x14], -1 ; z
 	fstp ST(0)
 	pop edx
 	pop ecx
+	pop eax
 	ret
 
 ;hud2screen(float x, float y) ; in place
