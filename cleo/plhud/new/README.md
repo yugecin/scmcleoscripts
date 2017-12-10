@@ -13,7 +13,7 @@ This is the successor of [the old plhud](../), with a lot of improvements:
 
 ![preview](pic.png)
 
-[short demo video](https://youtu.be/4AXkKAutmwo)
+[short demo video](https://youtu.be/RtfCMnLkYAk)
 
 ## Requirements
 [CLEO4](http://cleo.li)
