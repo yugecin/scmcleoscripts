@@ -131,6 +131,7 @@ menunav_ret:
 	call CText__SetBorderEffectRGBA
 	;add esp, 0x4
 	push [_espcolr] ; ARGB
+	call argb2abgr ; AGBR
 	or byte ptr [esp+0x3], 0xFF
 	call CText__SetTextColour
 	;add esp, 0x4
@@ -858,6 +859,30 @@ fixairstrip:
 	mov dword ptr [0x8D0714], 0x451C6000
 	mov dword ptr [0x8D0718], 0x43340000
 	mov dword ptr [0x8D071C], 0x447A0000
+	ret
+
+;argb2abgr
+argb2abgr:
+	; _DEFNIE:PARAMOFFSET=0x4
+	; _DEFINE:PARAM_COL=0x0
+	push eax
+	push ebx
+	push edx
+	; _DEFNIE:PARAMOFFSET=PARAMOFFSET+0xC
+	mov eax, dword ptr [esp+PARAMOFFSET+PARAM_COL]
+	mov ebx, eax
+	mov edx, eax
+	and eax, 0xFF00FF00
+	and ebx, 0x000000FF
+	and edx, 0x00FF0000
+	shl ebx, 0x10
+	shr edx, 0x10
+	or eax, ebx
+	or eax, edx
+	mov dword ptr [esp+PARAMOFFSET+PARAM_COL], eax
+	pop edx
+	pop ebx
+	pop eax
 	ret
 
 ;redacted
