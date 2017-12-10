@@ -11,6 +11,7 @@
 [snapshots ESP](/cleo/snapshots)  
 [vice city styled weapon pickups](/cleo/vcweaponpicks)  
 [pilot's life runways hud](/cleo/plhud)  
+[pilot's life runways hud NEW](/cleo/plhud/new)  
 [pilot's life runways radar](/cleo/plradar)  
 [autopilot](/cleo/autopilot)  
 [objsniffer](/cleo/objsniffer)  
