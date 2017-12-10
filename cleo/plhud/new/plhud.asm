@@ -86,10 +86,10 @@ main:
 	and dword ptr [_options], OPTION_BIT_RUNONCE_NOT
 	call runonce
 skiprunonce:
-	; show menu if needed
+	; handle menu keys if menu is shown
 	test dword ptr [_options], OPTION_BIT_SHOW_MENU
-	jnz menu
-menu_ret:
+	jnz menunav
+menunav_ret:
 	call breakairstrip
 	; set textdraw stuff for runways
 	push 0 ; a2
@@ -280,6 +280,10 @@ runwayloop@noradar:
 	jz exit
 	add esp, 0x8
 exit:
+	; show menu if needed
+	test dword ptr [_options], OPTION_BIT_SHOW_MENU
+	jnz menushow
+menushow_ret:
 	pop ecx
 	pop edx
 	pop ebx
@@ -290,10 +294,9 @@ _exit:
 	jmp 0x58EAF6
 
 ; modifies eax, edx
-menu:
-	; >>>>>>> menu nav
+menunav:
 	test dword ptr [_options], OPTION_BIT_ARR_KEYS
-	jz menu_show
+	jz menunav_ret
 	test dword ptr [_options], OPTION_BIT_ARR_KEYS_UPDOWN
 	jz menu_rl_nav
 	; >>> updown nav
@@ -317,52 +320,7 @@ menu_update_idx:
 	; <<< updown nav
 menu_show_clearkeys:
 	and dword ptr [_options], OPTION_BIT_ARR_KEYS_NOT
-	; <<<<<<< menu nav
-menu_show:
-	; >>>>>>> menu text
-	push 0 ; a2
-	push 0 ; a1
-	call CText__SetTextBackground
-	;add esp, 0x8
-	;;push 0
-	call dummy_7194F0
-	;;add esp, 0x4
-	push FONT_SIZE_X ; y
-	push FONT_SIZE_Y ; x
-	call hud2screen
-	call CText__SetTextLetterSize ; flip x/y when alignment is center
-	;add esp, 0x8
-	push 1
-	call CText__SetTextUseProportionalValues
-	;add esp, 0x4
-	;;push 1
-	call CText__SetFont
-	;;add esp, 0x4
-	;;push 1 ; 0 center 1 left 2 right
-	call CText__SetTextAlignment
-	;;add esp, 0x4
-	;;push 1
-	call CText__SetTextOutline
-	;;add esp, 0x4
-	push 0xFF000000 ; ABGR
-	call CText__SetBorderEffectRGBA
-	;add esp, 0x4
-	push 0xFFFFFFFF; ABGR
-	call CText__SetTextColour
-	;add esp, 0x4
-	push 0x461c4000 ; 10000.0
-	call CText__SetWrappingCoordinateForLeftAlignedText
-	;add esp, 0x4
-	push _menutxt ; str
-	push 0x3ee66666 ; 0.45 ; y
-	push 0x3e800000 ; 0.25 ; x
-	call norm2screen
-	call __drawText
-	;add esp, 0xC
-	add esp, 0x2C
-	; <<<<<<< menu text
-	jmp menu_ret
-
+	jmp menunav_ret
 menu_rl_nav:
 	mov eax, [_menuidx]
 	imul eax, 4
@@ -373,7 +331,7 @@ menu_rl_nav:
 menu_rl_continue:
 	xor dword ptr [_options], OPTION_BIT_SHOW_MENU
 	and dword ptr [_options], OPTION_BIT_ARR_KEYS_NOT
-	jmp menu_ret
+	jmp menunav_ret
 menu_rl_smartmode:
 	xor dword ptr [_options], OPTION_BIT_SMART_MODE
 	mov eax, _menutxt
@@ -417,6 +375,52 @@ menu_rl_viewdistance@updatetxt:
 	mov byte ptr [edx+0xC7], al ; !!MENUOFFSET
 	jmp menu_show_clearkeys
 
+menushow:
+	; >>>>>>> menu text
+	push 0 ; a2
+	push 0 ; a1
+	call CText__SetTextBackground
+	;add esp, 0x8
+	;;push 0
+	call dummy_7194F0
+	;;add esp, 0x4
+	push FONT_SIZE_X ; y
+	push FONT_SIZE_Y ; x
+	call hud2screen
+	call CText__SetTextLetterSize ; flip x/y when alignment is center
+	;add esp, 0x8
+	push 1
+	call CText__SetTextUseProportionalValues
+	;add esp, 0x4
+	;;push 1
+	call CText__SetFont
+	;;add esp, 0x4
+	;;push 1 ; 0 center 1 left 2 right
+	call CText__SetTextAlignment
+	;;add esp, 0x4
+	;;push 1
+	call CText__SetTextOutline
+	;;add esp, 0x4
+	push 0xFF000000 ; ABGR
+	call CText__SetBorderEffectRGBA
+	;add esp, 0x4
+	push 0xFFFFFFFF; ABGR
+	call CText__SetTextColour
+	;add esp, 0x4
+	push 0x461c4000 ; 10000.0
+	call CText__SetWrappingCoordinateForLeftAlignedText
+	;add esp, 0x4
+	push _menutxt ; str
+	push 0x3ee66666 ; 0.45 ; y
+	push 0x3e800000 ; 0.25 ; x
+	call norm2screen
+	call __drawText
+	;add esp, 0xC
+	add esp, 0x2C
+	; <<<<<<< menu text
+	jmp menushow_ret
+
+;menu_write_mark
 menu_write_mark:
 	mov eax, [_menuidx]
 	imul eax, 0x1A ; !!MENUOFFSET
