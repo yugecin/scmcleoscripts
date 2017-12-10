@@ -12,6 +12,7 @@ This is the successor of [the old plhud](../), with a lot of improvements:
 * no need for a plugin anymore, just 1 cs file
 * runways stay on the screen longer, even if one end isn't visible
 * better performance
+* shows even when the HUD is hidden
 
 ![preview](pic.png)
 
