@@ -41,6 +41,14 @@
 ; _DEFINE:MENU_POS_X=0x3e800000 ; 0.25
 ; _DEFINE:MENU_POS_Y=0x3ee66666 ; 0.45
 
+; !!MENUOFFSET
+; _DEFINE:MENU_OFFSET_SMARTMODE_ONOFF=0xAA ; N char
+; _DEFINE:MENU_OFFSET_VIEWDISTANCE=0xC3 ; _ char
+; _DEFINE:MENU_OFFSET_FIRST_OPTION=0x7E ; > char
+; _DEFINE:MENU_OFFSET_OPTION_LINE_LENGTH=0x1A
+; _DEFINE:MENU_OFFSET_RUNWAYCOUNT=0xD3 ; _ char
+; _DEFINE:MENU_OFFSET_BRANDING=0xE1 ; _ char
+
 ; _DEFINE:OPTION_BIT_ENABLED=0x00000001
 ; _DEFINE:OPTION_BIT_SMART_MODE=0x00000002
 ; _DEFINE:OPTION_BIT_KEY_F10=0x00000004
@@ -337,8 +345,8 @@ menu_rl_continue:
 menu_rl_smartmode:
 	xor dword ptr [_options], OPTION_BIT_SMART_MODE
 	mov eax, _menutxt
-	add eax, 0xAA ; !!MENUOFFSET
-	lea edx, [eax-0x3] ; !!MENUOFFSET
+	add eax, MENU_OFFSET_SMARTMODE_ONOFF
+	lea edx, [eax-0x3]
 	test dword ptr [_options], OPTION_BIT_SMART_MODE
 	jz menu_rl_smartmode@off
 	mov word ptr [eax], 0x5F4E ; "_N"
@@ -372,9 +380,9 @@ menu_rl_viewdistance@updatetxt:
 	call [_sprintf] ; _sprintf
 	add esp, 0x10
 	mov edx, _menutxt
-	pop dword ptr [edx+0xC3] ; !!MENUOFFSET
+	pop dword ptr [edx+MENU_OFFSET_VIEWDISTANCE]
 	pop eax
-	mov byte ptr [edx+0xC7], al ; !!MENUOFFSET
+	mov byte ptr [edx+MENU_OFFSET_VIEWDISTANCE+0x4], al
 	jmp menu_show_clearkeys
 
 menushow:
@@ -425,9 +433,9 @@ menushow:
 ;menu_write_mark
 menu_write_mark:
 	mov eax, [_menuidx]
-	imul eax, 0x1A ; !!MENUOFFSET
+	imul eax, MENU_OFFSET_OPTION_LINE_LENGTH
 	add eax, _menutxt
-	mov byte ptr [eax+0x7E], dl ; !!MENUOFFSET
+	mov byte ptr [eax+MENU_OFFSET_FIRST_OPTION], dl
 	ret
 
 ; ebx: ptr to runway
@@ -752,7 +760,7 @@ rnwycountloop:
 	cmp dword ptr [esi], 0
 	jne rnwycountloop
 	mov esi, _menutxt
-	add esi, 0xD3 ; !!MENUOFFSET
+	add esi, MENU_OFFSET_RUNWAYCOUNT
 	push 0x6425 ; %d\0\0
 	push eax ; ...
 	lea eax, [esp+0x4]
@@ -763,7 +771,7 @@ rnwycountloop:
 	mov byte ptr [esi+0x3], 0x20 ; <space>
 	; branding
 	mov esi, _menutxt
-	add esi, 0xE1 ; !!MENUOFFSET
+	add esi, MENU_OFFSET_BRANDING
 	mov dword ptr [esi], 0x0C00301C
 	mov dword ptr [esi+0x4], 0x0B0B3C0B
 	mov dword ptr [esi+0x8], 0xE6503F5D

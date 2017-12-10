@@ -67,9 +67,8 @@ end
 :DATA01
 {
     stores menu text to show
-    when changing, search for
-      '!!MENUOFFSET' in cleo and asm
-      and change offsets as needed
+    when changing, change the offsets in
+      asm !!MENUOFFSET define section
 }
 hex
     "USE THE UP AND DOWN ARROW KEYS"     "~n~"
