@@ -745,7 +745,7 @@ runonce:
 	add eax, 0x58EBB4
 	mov dword ptr [_sprintf], eax
 	; redacted
-	jmp redacted
+	;jmp redacted
 skipredacted:
 	; get runway count
 	xor ebx, ebx
