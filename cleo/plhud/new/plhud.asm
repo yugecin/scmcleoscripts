@@ -680,7 +680,6 @@ world2screen:
 	fstp dword ptr [esp+0x14] ; y
 	fistp dword ptr [esp+0x18] ; z
 	; try to minimize artifacts
-	;push 0x447a0000 ; 0x461c4000 ; 10000.0
 	push 0x461c4000 ; 10000.0
 	fld dword ptr [esp]
 	add esp, 0x4
@@ -691,7 +690,6 @@ world2screen:
 	fcomip ST, ST(1)
 	ja world2screen@oob
 	fstp ST(0)
-	;push 0xc47a0000 ; 0xc61c4000 ; -10000.0
 	push 0xc61c4000 ; -10000.0
 	fld dword ptr [esp]
 	add esp, 0x4
@@ -700,14 +698,10 @@ world2screen:
 	jb world2screen@oob
 	fld dword ptr [esp+0x10] ; x
 	fcomip ST, ST(1)
-	jb world2screen@oob
-	fstp ST(0)
-	pop edx
-	pop ecx
-	pop eax
-	ret
+	jae world2screen@noob
 world2screen@oob:
 	mov dword ptr [esp+0x14], -1 ; z
+world2screen@noob:
 	fstp ST(0)
 	pop edx
 	pop ecx
