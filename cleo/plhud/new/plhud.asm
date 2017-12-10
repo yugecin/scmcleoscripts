@@ -33,7 +33,7 @@
 ; _DEFINE:_espcolr=_var07
 ; _DEFINE:_lastrdr=_var08
 
-; _DEFINE:MAXMENUIDX=2
+; _DEFINE:MAXMENUIDX=3
 ; _DEFINE:MENUITEMS=MAXMENUIDX+1
 
 ; _DEFINE:FONT_SIZE_X=0x3f000000 ; 0.5
@@ -46,8 +46,9 @@
 ; _DEFINE:MENU_OFFSET_VIEWDISTANCE=0xC3 ; _ char
 ; _DEFINE:MENU_OFFSET_FIRST_OPTION=0x7E ; > char
 ; _DEFINE:MENU_OFFSET_OPTION_LINE_LENGTH=0x1A
-; _DEFINE:MENU_OFFSET_RUNWAYCOUNT=0xD3 ; _ char
-; _DEFINE:MENU_OFFSET_BRANDING=0xE1 ; _ char
+; _DEFINE:MENU_OFFSET_COLOR=0xD5 ; P char
+; _DEFINE:MENU_OFFSET_RUNWAYCOUNT=0xED ; _ char
+; _DEFINE:MENU_OFFSET_BRANDING=0xFB ; _ char
 
 ; _DEFINE:OPTION_BIT_ENABLED=0x00000001
 ; _DEFINE:OPTION_BIT_SMART_MODE=0x00000002
@@ -383,6 +384,28 @@ menu_rl_viewdistance@updatetxt:
 	pop dword ptr [edx+MENU_OFFSET_VIEWDISTANCE]
 	pop eax
 	mov byte ptr [edx+MENU_OFFSET_VIEWDISTANCE+0x4], al
+	jmp menu_show_clearkeys
+menu_rl_color:
+	mov eax, 0x8
+	test dword ptr [_options], OPTION_BIT_KEY_LARR
+	jz menu_rl_color@next
+	neg eax
+menu_rl_color@next:
+	push ecx
+	mov edx, __BASEADDR
+	sub edx, 0x8
+menu_rl_color@loop:
+	add edx, 0x8
+	mov ecx, dword ptr [edx+espcolors]
+	cmp ecx, dword ptr [_espcolr]
+	jne menu_rl_color@loop
+	add edx, eax
+	mov ecx, dword ptr [edx+espcolors]
+	mov dword ptr [_espcolr], ecx
+	mov ecx, dword ptr [edx+espcolors+0x4]
+	mov edx, _menutxt
+	mov dword ptr [edx+MENU_OFFSET_COLOR], ecx
+	pop ecx
 	jmp menu_show_clearkeys
 
 menushow:
@@ -930,4 +953,21 @@ menujmptable:
 	.long menu_rl_continue
 	.long menu_rl_smartmode
 	.long menu_rl_viewdistance
+	.long menu_rl_color
+
+;espcolors
+	.long 0x55FF4848 ; red (to wrap)
+	.long 0x5F444552 ; _DER
+espcolors:
+	; argb
+	.long 0x55FF48FF ; pink
+	.long 0x4B4E4950 ; KNIP
+	.long 0x5548FF48 ; lime
+	.long 0x454D494C ; EMIL
+	.long 0x554848FF ; blue
+	.long 0x45554C42 ; EULB
+	.long 0x55FF4848 ; red
+	.long 0x5F444552 ; _DER
+	.long 0x55FF48FF ; pink (to wrap)
+	.long 0x4B4E4950 ; KNIP
 
