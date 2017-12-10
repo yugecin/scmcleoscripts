@@ -36,6 +36,9 @@
 ; _DEFINE:MAXMENUIDX=2
 ; _DEFINE:MENUITEMS=MAXMENUIDX+1
 
+; _DEFINE:FONT_SIZE_X=0x3f000000
+; _DEFINE:FONT_SIZE_Y=0x3e8ccccd
+
 ; _DEFINE:OPTION_BIT_ENABLED=0x00000001
 ; _DEFINE:OPTION_BIT_SMART_MODE=0x00000002
 ; _DEFINE:OPTION_BIT_KEY_F10=0x00000004
@@ -99,10 +102,8 @@ menu_ret:
 	;;push 0 ; 0 center 1 left 2 right
 	call CText__SetTextAlignment
 	;;add esp, 0x4
-	;push 0x3e19999a ; x ; 0.15
-	;push 0x3f733333 ; y ; 0.95
-	push [0x858F14] ; y ; 1.1
-	push [0x866CAC] ; x ; 0.55000001
+	push FONT_SIZE_X ; y
+	push FONT_SIZE_Y ; x
 	call hud2screen
 	call CText__SetTextLetterSize ; flip x/y when alignment is center
 	;add esp, 0x8
@@ -326,8 +327,8 @@ menu_show:
 	;;push 0
 	call dummy_7194F0
 	;;add esp, 0x4
-	push [0x858F14] ; y ; 1.1
-	push [0x866CAC] ; x ; 0.55000001
+	push FONT_SIZE_X ; y
+	push FONT_SIZE_Y ; x
 	call hud2screen
 	call CText__SetTextLetterSize ; flip x/y when alignment is center
 	;add esp, 0x8
