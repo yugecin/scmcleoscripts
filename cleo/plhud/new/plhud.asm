@@ -1,4 +1,5 @@
-; _ASM_HOOKADDR: 0058EAF1
+;; _ASM_HOOKADDR: 0058EAF1
+; _ASM_HOOKADDR: 0058FBC5
 ; _ASM_JUMP: true
 ; _ASM_CORRECT_OFFSETS: true
 ; _ASM_COMMENTS: false
@@ -302,8 +303,11 @@ menushow_ret:
 	pop edi
 
 _exit:
-	sub esp, 0x1A0
-	jmp 0x58EAF6
+	;sub esp, 0x1A0
+	;jmp 0x58EAF6
+	; _DEFINE:_menu.EnableHudInOptions=0xBA6769
+	mov al, _menu.EnableHudInOptions
+	jmp 0x58FBC9
 
 ; modifies eax, edx
 menunav:
