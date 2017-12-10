@@ -2,6 +2,8 @@
 HUD kind of thing that shows runways, specifically for [the pilot's life SA:MP server](http://thepilotslife.com).
 
 This is the successor of [the old plhud](../), with a lot of improvements:
+* plane instead of a line
+* better text visibility
 * no ghosting
 * does not affect SA-MP textdraws opacity
 * airstrips on the radar are updated instantly
