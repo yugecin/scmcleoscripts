@@ -444,7 +444,6 @@ menu_write_mark:
 ; rnwy middle y, x in fpu stack
 dorunway:
 	; project middle first and see if it's on screen
-	push eax
 	sub esp, 0xC
 	fstp dword ptr [esp+0x4] ; my
 	fstp dword ptr [esp] ; mx
@@ -458,16 +457,12 @@ dorunway:
 	call world2screen
 	cmp dword ptr [esp+0x8], 0 ; mz'
 	jl dorunway@notonscreen
-	; show the name & distance
+	; prepare the name and position of text in stack
 	lea eax, [ebx+0x19]
-	push eax; str
-	;push 0x43600000 ; y (224.0)
-	;push 0x43a00000 ; x (320.0)
-	push [esp+0x8] ; y
-	push [esp+0x8] ; x
-	call __drawText
-	add esp, 0x18
-	pop eax
+	mov dword ptr [esp+0x8], eax ; str
+	; param y already in place by world2screen
+	; param x already in place by world2screen
+	;
 	; draw stuff
 	; get 4 points
 	; _DEFINE:CGeneral__getATanOfXY=0x53CC70
@@ -646,10 +641,10 @@ dorunway@skipesp:
 	fstp ST(0)
 	fstp ST(0)
 	fstp ST(0)
-	ret
+	; draw the name (scroll up for params)
+	call __drawText
 dorunway@notonscreen:
 	add esp, 0xC
-	pop eax
 	ret
 
 ; modifies nothing (except values in stack)
