@@ -30,6 +30,7 @@
 ; _DEFINE:_viewdis=_var04
 ; _DEFINE:_sprintf=_var05
 ; _DEFINE:_runways=_var06
+; _DEFINE:_espcolr=_var07
 ; _DEFINE:_lastrdr=_var08
 
 ; _DEFINE:MAXMENUIDX=2
@@ -114,10 +115,11 @@ menu_ret:
 	;;push 1
 	call CText__SetTextOutline
 	;;add esp, 0x4
-	push 0xFF000000 ; ABGR
+	push 0xFF000000 ; ARGB
 	call CText__SetBorderEffectRGBA
 	;add esp, 0x4
-	push 0xFFFFFF50 ; ABGR
+	push [_espcolr] ; ARGB
+	or byte ptr [esp+0x3], 0xFF
 	call CText__SetTextColour
 	;add esp, 0x4
 	add esp, 0x1C
@@ -510,7 +512,7 @@ dorunway:
 	inc edx
 	push 0 ; v
 	push 0 ; u
-	push 0x334848FF ; argb
+	push [_espcolr] ; argb
 	push fRecipNearClip ; rwh
 	push dword ptr [ebx+0x8] ; z1 z1
 	sub esp, 0x8
@@ -528,7 +530,7 @@ dorunway:
 	inc edx
 	push 0 ; v
 	push 0 ; u
-	push 0x334848FF ; argb
+	push [_espcolr] ; argb
 	push fRecipNearClip ; rwh
 	push dword ptr [ebx+0x8] ; z1 z2
 	sub esp, 0x8
@@ -546,7 +548,7 @@ dorunway:
 	inc edx
 	push 0 ; v
 	push 0 ; u
-	push 0x334848FF ; argb
+	push [_espcolr] ; argb
 	push fRecipNearClip ; rwh
 	push dword ptr [ebx+0x14] ; z2 z3
 	sub esp, 0x8
@@ -564,7 +566,7 @@ dorunway:
 	inc edx
 	push 0 ; v
 	push 0 ; u
-	push 0x334848FF ; argb
+	push [_espcolr] ; argb
 	push fRecipNearClip ; rwh
 	push dword ptr [ebx+0x14] ; z2 z4
 	sub esp, 0x8

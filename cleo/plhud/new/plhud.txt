@@ -140,6 +140,14 @@ end
 }
 {$INCLUDE ../plhudairports.txt}
 
+:DATA07
+{
+    esp color (ARGB, so BGRA)
+}
+hex
+    FF 48 FF 44
+end
+
 :DATA08
 {
     last runway used for radar
