@@ -79,6 +79,7 @@ hex
     "> CONTINUE_____________"            "~n~"
     " _SMART MODE: ~g~ON_~w~"            "~n~"
     " _VIEW DISTANCE: _1500M"            "~n~"
+    " _COLOR: PINK__________"            "~n~"
                                          "~n~"
     "v14 ___ runways"                    "~n~"
     "________________"
