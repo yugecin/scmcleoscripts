@@ -561,18 +561,16 @@ dorunway:
 	;  | \\ |
 	; 1|..\\|2
 	;
-	;; _DEFINE:fNearScreenZ=0x38D1B717 ; 0.0001f
-	;; _DEFINE:fRecipNearClip=0x40555555 ; 3.333333254f
-	; _DEFINE:fNearScreenZ=0x00000000
-	; _DEFINE:fRecipNearClip=0x00000000
+	; _DEFINE:_ZBufferNear=0x00000000
+	; _DEFINE:_FogPlane=0x40555556 ; 3.333333492
 	push edx
 	xor edx, edx
 	; p1
 	inc edx
 	push 0 ; v
-	push 0 ; u
+	push 0x3F800000 ; u 1.0
 	push [_espcolr] ; argb
-	push fRecipNearClip ; rwh
+	push _FogPlane ; rwh
 	push dword ptr [ebx+0x8] ; z1 z1
 	sub esp, 0x8
 	fld dword ptr [ebx+0x4] ; y1
@@ -583,14 +581,14 @@ dorunway:
 	fstp dword ptr [esp] ; x1 x1
 	call world2screen
 	cmp dword ptr [esp+0x8], 1
-	mov dword ptr [esp+0x8], fNearScreenZ
+	mov dword ptr [esp+0x8], _ZBufferNear
 	jl dorunway@skipesp
 	; p2
 	inc edx
 	push 0 ; v
-	push 0 ; u
+	push 0x3F800000 ; u 1.0
 	push [_espcolr] ; argb
-	push fRecipNearClip ; rwh
+	push _FogPlane ; rwh
 	push dword ptr [ebx+0x8] ; z1 z2
 	sub esp, 0x8
 	fld dword ptr [ebx+0x4] ; y1
@@ -601,14 +599,14 @@ dorunway:
 	fstp dword ptr [esp] ; x1 x2
 	call world2screen
 	cmp dword ptr [esp+0x8], 1
-	mov dword ptr [esp+0x8], fNearScreenZ
+	mov dword ptr [esp+0x8], _ZBufferNear
 	jl dorunway@skipesp
 	; p3
 	inc edx
 	push 0 ; v
-	push 0 ; u
+	push 0x3F800000 ; u 1.0
 	push [_espcolr] ; argb
-	push fRecipNearClip ; rwh
+	push _FogPlane ; rwh
 	push dword ptr [ebx+0x14] ; z2 z3
 	sub esp, 0x8
 	fld dword ptr [ebx+0x10] ; y2
@@ -619,14 +617,14 @@ dorunway:
 	fstp dword ptr [esp] ; x2 x3
 	call world2screen
 	cmp dword ptr [esp+0x8], 1
-	mov dword ptr [esp+0x8], fNearScreenZ
+	mov dword ptr [esp+0x8], _ZBufferNear
 	jl dorunway@skipesp
 	; p4
 	inc edx
 	push 0 ; v
-	push 0 ; u
+	push 0x3F800000 ; u 1.0
 	push [_espcolr] ; argb
-	push fRecipNearClip ; rwh
+	push _FogPlane ; rwh
 	push dword ptr [ebx+0x14] ; z2 z4
 	sub esp, 0x8
 	fld dword ptr [ebx+0x10] ; y2
@@ -637,14 +635,14 @@ dorunway:
 	fstp dword ptr [esp] ; x2 x4
 	call world2screen
 	cmp dword ptr [esp+0x8], 1
-	mov dword ptr [esp+0x8], fNearScreenZ
+	mov dword ptr [esp+0x8], _ZBufferNear
 	jl dorunway@skipesp
 	; draw it!
 	; see https://github.com/DK22Pac/plugin-sdk/blob/plugin_sa/game_sa/rw/rwplcore.h#L3515 etc
 	; or idb
 	; _DEFINE:rwPRIMTYPETRISTRIP=4
 	; _DEFINE:rwPRIMTYPETRIFAN=5
-	; _DEFINE:_RwEngineInstance=0xC97B24
+	; _DEFINE:*_RwEngineInstance=0xC97B24
 	; _DEFINE:RwEngineInstance.dOpenDevice.fpRenderStateSet=0x10+0x10
 	; _DEFINE:RwEngineInstance.dOpenDevice.fpIm2DRenderPrimitive=0x10+0x20
 	; _DEFINE:rwRENDERSTATENARENDERSTATE=0
@@ -659,13 +657,19 @@ dorunway:
 	; see CHud::Draw2DPolygon @ 0x7285B0
 	push rwRENDERSTATENARENDERSTATE  ; state
 	push 1 ; value
-	mov eax, [_RwEngineInstance]
+	mov eax, [*_RwEngineInstance]
 	call [eax+RwEngineInstance.dOpenDevice.fpRenderStateSet]
 	;add esp, 0x8
 	; _DEFINE:__lineoffset=0x8+__lineoffset
 	push rwRENDERSTATETEXTURERASTER ; state
-	push NULL ; value
-	mov eax, [_RwEngineInstance]
+	push 7 ; value
+	mov eax, [*_RwEngineInstance]
+	call [eax+RwEngineInstance.dOpenDevice.fpRenderStateSet]
+	;add esp, 0x8
+	; _DEFINE:__lineoffset=0x8+__lineoffset
+	push rwRENDERSTATETEXTURERASTER ; state
+	push 0xC ; value
+	mov eax, [*_RwEngineInstance]
 	call [eax+RwEngineInstance.dOpenDevice.fpRenderStateSet]
 	;add esp, 0x8
 	; _DEFINE:__lineoffset=0x8+__lineoffset
@@ -673,10 +677,10 @@ dorunway:
 	push 4 ; numVertices
 	push eax ; vertices
 	push rwPRIMTYPETRISTRIP ; primType
-	mov eax, [_RwEngineInstance]
+	mov eax, [*_RwEngineInstance]
 	call [eax+RwEngineInstance.dOpenDevice.fpIm2DRenderPrimitive]
 	;add esp, 0xC
-	add esp, 0x1C
+	add esp, 0x24
 	pop ecx
 	pop ebx
 	pop edx
