@@ -18,6 +18,7 @@
 const
     OPTIONS = 0@
     _OPTIONS = 1@
+    AUTOHIDETIME = 2550
 end
 
 0006: OPTIONS = 0 // l=i (int)
@@ -46,6 +47,7 @@ end
 004D: jump_if_false @KEYS_LOOP
 88B7:   not test 9@ bit 30@
 004D: jump_if_false @KEYS_LOOP_END
+0006: 33@ = 0x0 // l=i (int)
 08BD: set 9@ bit 30@
 000A: 30@ += 2 // l+=i (int)
 0A8D: OPTIONS = read_memory _OPTIONS size 4 vp 0
@@ -53,6 +55,14 @@ end
 0A8C: write_memory _OPTIONS size 4 value OPTIONS vp 0
 :KEYS_LOOP_END
 // <<<<<<< keys
+
+// >>>>>>> autohide
+0019:   33@ > AUTOHIDETIME // l>i (int)
+004D: jump_if_false @MAIN_LOOP
+0A8D: OPTIONS = read_memory _OPTIONS size 4 vp 0
+08C3: clear OPTIONS bit 7
+0A8C: write_memory _OPTIONS size 4 value OPTIONS vp 0
+// <<<<<<< autohide
 
 0002: jump @MAIN_LOOP
 
