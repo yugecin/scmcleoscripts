@@ -10,6 +10,7 @@
 [dont fall of bike](/cleo/nofallofbike)  
 [snapshots ESP](/cleo/snapshots)  
 [vice city styled weapon pickups](/cleo/vcweaponpicks)  
+[pickuprevealer](/cleo/pickuprevealer)  
 [pilot's life runways hud](/cleo/plhud)  
 [pilot's life runways hud NEW](/cleo/plhud/new)  
 [pilot's life runways radar](/cleo/plradar)  
