@@ -18,6 +18,7 @@
 [objsniffer](/cleo/objsniffer)  
 [objsniffer - fast version](/cleo/objsniffer-plugin)  
 [gps](/cleo/gps)  
+[helirotor](/cleo/helirotor)  
 
 ### SCM scripts
 [train editing](/scm/trains)  
