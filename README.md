@@ -14,6 +14,7 @@
 [pilot's life runways hud](/cleo/plhud)  
 [pilot's life runways hud NEW](/cleo/plhud/new)  
 [pilot's life runways radar](/cleo/plradar)  
+[pilot's life roads radar](/cleo/plroads)  
 [autopilot](/cleo/autopilot)  
 [objsniffer](/cleo/objsniffer)  
 [objsniffer - fast version](/cleo/objsniffer-plugin)  
