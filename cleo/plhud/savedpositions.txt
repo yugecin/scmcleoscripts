@@ -172,8 +172,12 @@ AddPlayerClass(115,-4544.3823,6181.9063,12.9033,269.7947,0,0,0,0,0,0); //
 AddPlayerClass(115,-4676.7266,6181.8042,12.9033,267.4564,0,0,0,0,0,0); // Glenfiddigogogoch Island 27
 AddPlayerClass(115,-4822.6196,6056.8286,64.6133,179.1301,0,0,0,0,0,0); // 
 AddPlayerClass(115,-4822.6943,6170.4780,64.7003,359.7998,0,0,0,0,0,0); // Glenfiddigogogoch Island 36
-AddPlayerClass(115,-4403.4375,6383.4043,6.7820,1.5341,0,0,0,0,0,0); // 
-AddPlayerClass(115,-4403.3418,6286.1265,6.7820,180.9733,0,0,0,0,0,0); // Paradiso Island
+;AddPlayerClass(115,-4403.4375,6383.4043,6.7820,1.5341,0,0,0,0,0,0); // 
+;AddPlayerClass(115,-4403.3418,6286.1265,6.7820,180.9733,0,0,0,0,0,0); // Paradiso Island
+; ^ is a bit too short for smart mode and distance to checkpoint etc etc nice sentence
+; -
+AddPlayerClass(192,-4402.7148,6235.8530,6.7920,180.4464,0,0,0,0,0,0); // 
+AddPlayerClass(192,-4402.9390,6385.7075,6.7820,2.1384,0,0,0,0,0,0); // Paradiso Island
 AddPlayerClass(115,-3625.1265,4566.5288,8.3813,123.8864,0,0,0,0,0,0); // 
 AddPlayerClass(115,-3553.1101,4604.9126,8.3705,297.6000,0,0,0,0,0,0); // Crude Power Station
 AddPlayerClass(115,-3951.5957,4632.3765,11.0865,18.1368,0,0,0,0,0,0); // 
