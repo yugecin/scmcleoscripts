@@ -1,0 +1,88 @@
+[color=black][font=arial]
+[b]Changelog[/b]
+Sept 10: fixed mission destination indicators for rescue missions, robin's theme: fixed fuel price not being shown when not in an airplane & the bar indicaters now also show for all vehicles
+August 20: changed opcodes for compatibility with sampfuncs (redownload and replace both the .cs and .cleo theme files!)
+August 19: initial D release
+[/font][/color][hr][color=black][font=arial]
+
+Good day all,
+
+This is a mod that I made which changes the HUD panel on PL.
+
+Main features:
+* Fixes fuel/health bars showing while on foot
+* Fixes heading bar having values like -1 -0 (0) 1 2 or 358 359 (360) 361 362
+* Changes 'Damage' to 'Health'
+* Per-frame instant updates for: heading bar, mission distance left, altitude, airspeed/car speed, vehicle health (both percentage and bar). [b]This means (internet) lag won't affect the update rate of the panel for these values![/b]
+* Blinking fuel bar when fuel is 20% or less
+* Blinking health bar when health is 35% or less
+
+Aside from these general patches, there are 3 themes available:
+
+[size=12pt]Standard theme[/size]
+[/font][/color][hr][color=black][font=arial]
+The normal bar as you probably know it, but with the patches.
+
+[img]https://user-images.githubusercontent.com/12662260/29479931-374aebbe-8475-11e7-9cf2-3c5b434d94f4.png[/img]
+
+[size=12pt]Classic theme[/size]
+[/font][/color][hr][color=black][font=arial]
+Get that sweet 2011 feeling with this remake of the old panel! Extra features for this theme:
+
+* Passenger satisfaction included in panel instead of a separate textdraw
+* GPS position above radar
+* Blinking fuel/health/odo indicator when critical level almost reached
+
+[img]https://user-images.githubusercontent.com/12662260/29479911-24072ae0-8475-11e7-8d50-d816f0a36e38.png[/img]
+
+[size=12pt]Robin's theme[/size]
+[/font][/color][hr][color=black][font=arial]
+Totally new panel 'design'. Extra features for this theme:
+
+* GPS position above radar
+* 'Native' progressbars for almost all values
+* Fuel price next to the fuel bar
+* Passenger satisfaction has its own bar
+* Blinkings fuel/health/odo bars when critical level almost reached
+* Classic themed status bar
+
+[img]https://user-images.githubusercontent.com/12662260/29479937-3b764f26-8475-11e7-947f-cc126c5f81f9.png[/img]
+
+[/font][/color][hr][color=black][font=arial]
+[color=blue][u][url=https://youtu.be/c9XvolkgaUE]demo video[/url][/u][/color] - just watch how instantly the indicators update, this is like pr0n
+
+[size=14pt]Requirements[/size]
+You need CLEO4: [color=blue][u][url=http://cleo.li]http://cleo.li[/url][/u][/color].
+I won't help you with installing CLEO, use the internet and your common sense (if applicable).
+I only tested this on my exe, which is the EU1.0 version according to SAMP. I might look for compatibility with other exe's later.
+
+[size=14pt]Download[/size]
+Download this cs file: [color=blue][u][url=https://github.com/yugecin/scmcleoscripts/blob/master/cleoplugins/plpanel/plpanel.cs?raw=true]plpanel.cs[/url][/u][/color]
+Themes: [color=blue][u][url=https://github.com/yugecin/scmcleoscripts/blob/master/cleoplugins/plpanel/Release/plpanel-standard.cleo?raw=true]plpanel-standard.cleo[/url][/u][/color] - [color=blue][u][url=https://github.com/yugecin/scmcleoscripts/blob/master/cleoplugins/plpanel/Release/plpanel-classic.cleo?raw=true]plpanel-classic.cleo[/url][/u][/color] - [color=blue][u][url=https://github.com/yugecin/scmcleoscripts/blob/master/cleoplugins/plpanel/Release/plpanel-robin.cleo?raw=true]plpanel-robin.cleo[/url][/u][/color]
+
+[size=14pt]Installation[/size]
+Put the plpanel.cs file and [b]ONE[/b] of the .cleo files (choose your theme) in your CLEO directory.
+
+[b]uninstall:[/b] remove the .cs and the .cleo
+[b]switching themes:[/b] remove the .cleo file and place a different one in the CLEO directory
+
+The CLEO directory is where your GTASA installation is placed, usually at [font=courier]C:\Program Files (x86)\Rockstar Games\GTA San Andreas\[/font].
+If you can't find the [font=courier]CLEO [/font]folder, you are either looking in the wrong place, or you didn't install CLEO (correctly) yet: in that case, go back to Requirements.
+
+[size=14pt]Usage[/size]
+No usage, it is always active.
+It won't have any effect on different servers or in singleplayer, so you don't need to uninstall it to play on non-pl servers.
+
+[size=14pt]Disclaimer[/size]
+Use this at your own risk. You won't get banned for using this (unless hud things get banned - but even then admins cannot detect this), but no guarantee that this won't break your computer, dog or marriage.
+
+[size=14pt]OMG MY GAEM CRASH WHEN START PLZ HELP!!!!1!11[/size]
+I only tested this on my exe, which is the EU1.0 version according to SAMP. Try to find a compatible [s]crack[/s] exe. I'm not going to help you with this, sorry. Just ask google (gta sa eu 1.0).
+
+[size=8pt]Psst: it's on github:
+[color=blue][u][url=https://github.com/yugecin/scmcleoscripts/tree/master/cleoplugins/plpanel]https://github.com/yugecin/scmcleoscripts/tree/master/cleoplugins/plpanel[/url][/u][/color][/size]
+
+Have a good flight!
+
+
+Cheers[/color]

@@ -1,0 +1,186 @@
+[color=black][font=arial][size=12pt]Current version: v17 with 163 runways[/size]
+[s]For new versions: just redownload plhud.cs and replace it, unless otherwise noted. Check your current version by pressing F10: there should show a message saying the current version & how many runways are loaded.[/s]
+You only need the .cs since v14.
+
+[b]Changelog[/b]
+* Jun3 v17: added Svaberg runways as recommended by Odertan
+* may27 v16: changed paradiso island runway length so it works with smart mode too
+* dec13 v15: added menu autohide after 2.5s
+* (dec12: compatibility update for intel(r) hd graphics processors)
+* dec10 v14: 161 rnwys: complete rewrite with lots of improvements, see [url=http://thepilotslife.com/forums/index.php?topic=52635.msg337591#msg337591][u][color=blue]this update post[/color][/u][/url]
+* sept11 v13: 161 rnwys: fixed old line rendering positioning when > 6 runways are on screen, renamed delta int'l 30 -> delta int'l 03 (thanks OhYeah)
+* sept11 v12: 161 rnwys: removed Floyd, added an alternate line rendering method
+* august23 v11: 162 rnwys: added Seychelles carrier, renamed unk afb sw angel pine -> whenuapai afb, renamed lopez island b -> lopez island airbase
+* august13 v10: 161 rnwys: added Abu Dhabi
+* august10 v9: 160 rnwys: added Pripyat Island
+* june23 v8: 159 rnwys: added Kingston Carrier, S.A.S. Adelaide (thanks Unza)
+* june22 v7: 157 rnwys: added Rockway Lighthouse, Beograd Island (thanks OhYeah & NthWinterMoe)
+* june20 v6: 155 rnwys: added RADAR MOD
+* june17 v5: 155 rnwys: added Blueberry Airport (thanks Unza)
+* june16 v4: 154 rnwys: fixed some names & spelling, fixed a bug with smart mode, added Gangnam Carrier, Palomino Outpost, Apoloxis Carrier (thanks Unza)
+* june16 v3: 151 rnwys: added Chilliad AFB (thanks Unza)
+* june16 v2: 150 rnwys: added Verdant Bluff Airbase (thanks Unza)
+* june15 v1: 149 rnwys: initial release
+
+[/color][hr][color=black]
+
+[b][size=14pt]CLEO Runway helper[/size][/b]
+This CLEO mod shows you where PL runways are.
+
+Additionally, it will move the airstrip icons on your radar so you can see where it is on you minimap. (If you only want this, you can just set the viewdistance to 0.)
+
+[img]https://raw.githubusercontent.com/yugecin/scmcleoscripts/master/cleo/plhud/new/pic.png[/img]
+
+[img]http://pokit.org/get/img/892e910f703485141bb63233b811a227.jpg[/img]
+
+[color=blue][u][url=https://www.youtube.com/watch?v=RtfCMnLkYAk]Demo YouTube vid[/url][/u][/color]
+
+[b][size=14pt]Requirements[/size][/b]
+You need CLEO3 or higher: [color=blue][u][url=http://cleo.li]http://cleo.li[/url][/u][/color].
+I won't help you with installing CLEO, use the internet and your common sense (if applicable).
+I only tested this on my exe, which is the EU1.0 version according to SAMP. I might look for compatibility with other exe's later.
+
+[size=14pt]Download[/size]
+[color=blue][u][url=https://github.com/yugecin/scmcleoscripts/blob/master/cleo/plhud/new/plhud.cs?raw=true]plhud.cs[/url][/u][/color]
+
+[size=14pt]Installation[/size]
+Put [font=courier]plhud.cs[/font] in your CLEO directory.
+
+The CLEO directory is where your GTASA installation is placed, usually at [font=courier]C:\Program Files (x86)\Rockstar Games\GTA San Andreas\[/font].
+If you can't find the [font=courier]CLEO [/font]folder, you are either looking in the wrong place, or you didn't install CLEO (correctly) yet: in that case, go back to Requirements.
+
+[size=14pt]Usage[/size]
+* [font=courier]F10[/font] - enable/disable, show menu
+* Use the arrow keys to navigate the menu
+
+Smart mode = only show runways in range of the (un)loading point (enabled by default).
+
+[size=14pt]"It crashes my gta"[/size]
+I only tested this on my exe, which is the EU1.0 version according to SAMP. Try to find a compatible [s]crack[/s] exe. I'm not going to help you with this, sorry. Just ask google (gta sa eu 1.0).
+
+[/color][hr][color=black]
+
+[b]Old version below if you somehow like that one better[/b]
+
+[quote author=robin_be][color=black]
+Good day all,
+
+These are 2 CLEO mods that I made to help with landing on PL's custom islands/airports.
+[b]plradar.cs[/b] shows runways on your minimap radar.
+[b]plhud.cs[/b] shows the runways in 3D by drawing a line [b](contains the minimap radar mod)[/b].
+
+[/color]
+[color=red][size=18pt]plradar.cs[/size][/color]
+[quote author=robin_be][color=black]
+This is a CLEO mod which shows you where various runways are by placing the airstrip blip on your minimap radar. This helps in knowing the heading/angle of the runway.
+[b]SA can only show one such blip per time, so only the closest runway will be shown. Smart mode makes sure the runway near the (un)loading point gets shown.[/b]
+
+[img]https://raw.githubusercontent.com/yugecin/scmcleoscripts/master/cleo/plradar/pic.png[/img]
+
+[color=blue][u][url=https://youtu.be/_pCwW5apmGc]Demo YouTube vid[/url][/u][/color]
+
+[size=14pt]Requirements[/size]
+You need CLEO3 or higher: [color=blue][u][url=http://cleo.li]http://cleo.li[/url][/u][/color].
+I won't help you with installing CLEO, use the internet and your common sense (if applicable).
+I only tested this on my exe, which is the EU1.0 version according to SAMP. I might look for compatibility with other exe's later.
+
+[size=14pt]Download[/size]
+[color=blue][u][url=https://github.com/yugecin/scmcleoscripts/blob/master/cleo/plradar/plradar.cs?raw=true]plradar.cs[/url][/u][/color]
+
+[size=14pt]Installation[/size]
+Put [font=courier]plradar.cs[/font] in your CLEO directory.
+
+The CLEO directory is where your GTASA installation is placed, usually at [font=courier]C:\Program Files (x86)\Rockstar Games\GTA San Andreas\[/font].
+If you can't find the [font=courier]CLEO [/font]folder, you are either looking in the wrong place, or you didn't install CLEO (correctly) yet: in that case, go back to Requirements.
+
+[size=14pt]Usage[/size]
+* [font=courier]F11[/font] - enable/disable (default: disabled)
+* [font=courier]G+F11[/font] - enable/disable smart mode (default: enabled)
+
+Smart mode = only show runways in range of the (un)loading point (enabled by default).
+
+[size=14pt]It crashes after enabling[/size]
+I only tested this on my exe, which is the EU1.0 version according to SAMP. Try to find a compatible [s]crack[/s] exe. I'm not going to help you with this, sorry. Just ask google (gta sa eu 1.0).
+[/color][/quote]
+
+
+[color=red][size=18pt]plhud.cs[/size][/color]
+[quote author=robin_be][color=black]
+[b]This one also has the radar, you don't need plradar.cs when you use this.[/b]
+
+This is a CLEO mod which shows you where various runways are by drawing a line on your screen.
+This makes it easier to know how to do a decent approach, even with the low draw distances.
+
+[img]https://raw.githubusercontent.com/yugecin/scmcleoscripts/master/cleo/plhud/pic.png[/img]
+
+[img]https://raw.githubusercontent.com/yugecin/scmcleoscripts/master/cleo/plhud/pic2.png[/img]
+
+[img]http://i.imgur.com/DKlSOtR.png[/img]
+
+[color=blue][u][url=https://youtu.be/4AXkKAutmwo]Demo YouTube vid[/url][/u][/color]
+
+[size=14pt]Requirements[/size]
+You need CLEO3 or higher: [color=blue][u][url=http://cleo.li]http://cleo.li[/url][/u][/color].
+I won't help you with installing CLEO, use the internet and your common sense (if applicable).
+I only tested this on my exe, which is the EU1.0 version according to SAMP. I might look for compatibility with other exe's later.
+
+[size=14pt]Download[/size]
+Download these files: [color=blue][u][url=https://github.com/yugecin/scmcleoscripts/blob/master/cleo/plhud/plhud.cs?raw=true]plhud.cs[/url][/u][/color] and [color=blue][u][url=https://github.com/yugecin/scmcleoscripts/blob/master/cleoplugins/yugecodes/bin/yugecodes.cleo?raw=true]yugecodes.cleo[/url][/u][/color]
+
+[size=14pt]Installation[/size]
+Put the files ([font=courier]plhud.cs[/font] and [font=courier]yugecodes.cleo[/font]) in your CLEO directory.
+
+The CLEO directory is where your GTASA installation is placed, usually at [font=courier]C:\Program Files (x86)\Rockstar Games\GTA San Andreas\[/font].
+If you can't find the [font=courier]CLEO [/font]folder, you are either looking in the wrong place, or you didn't install CLEO (correctly) yet: in that case, go back to Requirements.
+
+[size=14pt]Usage[/size]
+* [font=courier]F10[/font] - enable/disable (default: disabled)
+* [font=courier]Y+F10[/font] - increase viewdistance (default: 1500m)
+* [font=courier]H+F10[/font] - decrease viewdistance (default: 1500m)
+* [font=courier]G+F10[/font] - enable/disable smart mode (default: enabled)
+* [font=courier]U+F10[/font] - switch between line render modes
+
+Smart mode = only show runways in range of the (un)loading point.
+
+[size=14pt]OMG MY GAEM CRASH WHEN START PLZ HELP!!!!1!11[/size]
+I only tested this on my exe, which is the EU1.0 version according to SAMP. Try to find a compatible [s]crack[/s] exe. I'm not going to help you with this, sorry. Just ask google (gta sa eu 1.0).
+
+[size=14pt]It crashes after enabling[/size]
+You probably forgot to copy the [font=courier]yugecodes.cleo[/font] file, see download & installation.
+[/color][/quote]
+[/quote]
+
+[color=black]
+[b][size=14pt]Notes[/size][/b]
+* PLHUD contains PLRADAR, you don't need them both.
+* Not all runways are probably in this. Please read the point below to help me completing this.
+* I used the 'nearest airport' thing to get the names. That thing doesn't work 100% so names might be wrong. See the points below.
+* I used the [color=blue][u][url=http://plmap.guth3d.com/]interactive map[/url][/u][/color] to get names/airports, so thank you GeriBoss!
+
+[b][size=14pt]Found a runway that is not in it?[/size][/b]
+You can help me adding it!
+
+* Go to one end of the runway (preferably the one that has the easiest approach), and type [font=courier]/save[/font]
+* Go to the other end of the runway, and type [font=courier]/save <airportname>[/font]
+* If there are multiple runways, add the heading and/or R/L (example: [font=courier]/save Angel Pine 22[/font])
+* Find the file [font=courier]<your username>/documents/GTA San Andreas User Files/SAMP/savedpositions.txt[/font] and open it.
+* Find the last 2 lines and post a reply with them. Example:
+[/color][code]
+AddPlayerClass(115,-1856.9274,-2374.4834,34.3113,315.1182,0,0,0,0,0,0); // 
+AddPlayerClass(115,-1965.5531,-2483.0464,34.2633,227.0531,0,0,0,0,0,0); // Angel Pine 22
+[/code][color=black]
+
+[color=blue][u][url=http://p1.portal2sounds.com/154]Thank you for helping us help you help us all.[/url][/u][/color]
+
+[b][size=14pt]Found a runway with a wrong name?[/size][/b]
+Reply to this topic, tell the wrong name and the correct name.
+
+
+[size=8pt]Psst: it's on github:
+new version [color=blue][u][url=https://github.com/yugecin/scmcleoscripts/tree/master/cleo/plhud/new]https://github.com/yugecin/scmcleoscripts/tree/master/cleo/plhud/new[/url][/u][/color]
+old version [color=blue][u][url=https://github.com/yugecin/scmcleoscripts/tree/master/cleo/plhud]https://github.com/yugecin/scmcleoscripts/tree/master/cleo/plhud[/url][/u][/color]
+radar [color=blue][u][url=https://github.com/yugecin/scmcleoscripts/tree/master/cleo/plradar]https://github.com/yugecin/scmcleoscripts/tree/master/cleo/plradar[/url][/u][/color]
+plugin (now unused) [color=blue][u][url=https://github.com/yugecin/scmcleoscripts/tree/master/cleoplugins/yugecodes]https://github.com/yugecin/scmcleoscripts/tree/master/cleoplugins/yugecodes[/url][/u][/color][/size]
+
+
+Cheers[/color]
