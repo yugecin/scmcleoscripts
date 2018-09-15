@@ -24,6 +24,7 @@
 ### SCM scripts
 [train editing](/scm/trains)  
 [garage esp](/scm/garages)  
+[camera export](/scm/cameraexport)  
 
 ### CLEO plugins
 [sign extending floats](/cleoplugins/signext)  

@@ -1,0 +1,93 @@
+                       
+03A4: name_thread 'MAIN' 
+01F0: set_max_wanted_level_to 0
+0111: toggle_wasted_busted_check 0 
+00C0: set_current_time_hours_to 8 minutes_to 0 
+04E4: unknown_refresh_game_renderer_at 2785.3813 1821.3121
+03CB: set_rendering_origin_at 2785.3813 1821.3121 10.8203
+0053: $PLAYER_CHAR = create_player #NULL at 2785.3813 1821.3121 10.8203
+01F5: $PLAYER_ACTOR = create_player_actor $PLAYER_CHAR 
+07AF: $PLAYER_GROUP = player $PLAYER_CHAR group 
+0373: set_camera_directly_behind_player 
+01B6: set_weather 0
+0001: wait 0 ms 
+087B: set_player $PLAYER_CHAR clothes_texture "PLAYER_FACE" model "HEAD" body_part 1 
+087B: set_player $PLAYER_CHAR clothes_texture "worktrcamogrn" model "worktr" body_part 2 
+087B: set_player $PLAYER_CHAR clothes_texture "sneakerprowht" model "SNEAKER" body_part 3 
+087B: set_player $PLAYER_CHAR clothes_texture "hatmancblk" model "hatmanc" body_part 16 
+087B: set_player $PLAYER_CHAR clothes_texture "glasses04dark" model "glasses04" body_part 15
+087B: set_player $PLAYER_CHAR clothes_texture "player_torso" model "torso" body_part 0  
+070D: rebuild_player $PLAYER_CHAR 
+01B4: toggle_player $PLAYER_CHAR can_move 1 
+016A: fade 1 time 0 
+04BB: select_interior 0 
+016C: restart_if_wasted_at 2032.1702 -1416.7808 16.9922 angle 133.0 town_number 0 
+016D: restart_if_busted_at 2492.6692 -1670.1124 13.3359 angle 0.0 town_number 0 
+0180: set_on_mission_flag_to $ONMISSION // Note: your missions have to use the variable defined here 
+0004: $DEFAULT_WAIT_TIME = 250
+
+015F: set_camera_position 2772.6509 1816.0591 15.8203 rotation 30.0 0.0 0.0
+//093D: lock_camera_on_cinematic_view 1
+092F: lock_camera_target_point 1
+0930: lock_camera_position 1
+//0931: lock_camera_zoom 1
+//0A13: unknown_sync_player_camera
+
+// wxorking stuff
+//0922: set_camera_zoom_from 70.0 to 100.0 timelimit 10000 smooth_transition 1
+//099C: jiggle_camera type 10 timelimit 20000.0 intensity 5.0
+//0920: point_camera 2359.521 -1246.843 28.7047 transverse_to -2772.6509 1816.0591 15.8203 time 7000 smooth_transition 1
+//0936: set_camera 2358.656 -1246.348 28.7884 position_to 2772.6509 1816.0591 15.8203 time 7000 smooth_transition 1
+//0003: shake_camera 4000
+//099C: jiggle_camera type 0 timelimit 20000.0 intensity 5.0
+// NO 8
+// 9 WTF COLOR
+// 10 weird, need to move mouse
+// 11 WTF COLOR
+// 12 crash
+
+//0920: point_camera 0.0 0.0 100.0 transverse_to 0.0 0.0 100.0 time 10000 smooth_transition 0
+//0936: set_camera -1000.0 0.0 100.0 position_to -100.0 -100.0 100.0 time 10000 smooth_transition 0
+
+0920: point_camera 0.0 0.0 100.0 transverse_to 0.0 0.0 100.0 time 10000 smooth_transition 0
+0936: set_camera 0.0 -100.0 100.0 position_to 0.0 -100.0 100.0 time 10000 smooth_transition 0
+
+33@ = 0
+//099C: jiggle_camera type 0 timelimit 20000.0 intensity 15.0
+
+:MAIN_LOOP
+wait 250
+00BF: $TIME_HOURS = current_time_hours, $TIME_MINS = current_time_minutes
+
+001B:   11000 > 33@ // i>l (int)
+jf @MAIN_LOOP
+
+801B: not  10500 > 33@ // i>l (int)
+jf @DOSTUFF
+{$O 0DE0=0,}
+0DE0:
+0002: jump @MAIN_LOOP
+:DOSTUFF
+
+068D: get_camera_position_to 4@ 5@ 6@ 
+068E: get_camera_target_point_to 7@ 8@ 19@
+
+{$O 0DDF=20,%1d% %2d% %3d% %4d% %5d% %6d% %7d% %8d% %9d% %10d% %11d% %12d% %13d% %14d% %15d% %16d% %17d% %18d% %19d% %20d%}
+2@ = 0xB6FA2C
+for 0@ = 0 to 15
+    0A8D: 10@(0@,1i) = read_memory 2@ size 4 virtual_protect 0
+    2@ += 4
+end
+0DDF: 33@ 4@ 5@ 6@ 10@ 11@ 12@ 13@ 14@ 15@ 16@ 17@ 18@ 19@ 20@ 21@ 22@ 23@ 24@ 25@
+
+/*
+00E1:   player 0 pressed_key 7
+jf @MAIN_LOOP
+0109: player $PLAYER_CHAR money += 1
+099C: jiggle_camera type 0@ timelimit 20000.0 intensity 5.0
+0@++
+wait 1000
+*/
+0002: jump @MAIN_LOOP
+
+
