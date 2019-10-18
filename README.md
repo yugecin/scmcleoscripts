@@ -2,6 +2,7 @@
 ### CLEO scripts
 [allcopcarsonetown](/cleo/allcopcarsonetown)  
 [simple ELS](/cleo/els_simple)  
+[advanced ELS/ELM](/cleo/elm)  
 [ESP](/cleo/esp)  
 [framelimiter tweaks](/cleo/framelimiter)  
 [gamespeed hotkeys](/cleo/gamespeed)  

@@ -1,0 +1,62 @@
+ELS0 ELS ~r~disabled~w~
+ELS1 ELS ~g~enabled~w~
+
+REM0T ~p~Lights
+REM0I1 Front..
+REM0I1A Front >
+REM0I2 Rear..
+REM0I2A Rear >
+REM0I4 ~w~Cleo mod created
+REM0I5 ~w~by ~b~robin_be~w~.
+REM0I6 ~w~
+
+REM1T ~p~Patterns
+REM1I1 Strobe A
+REM1I2 Strobe B
+REM1I3 Hazard..
+REM1I3A Hazard >
+REM1I4 Full..
+REM1I4A Full >
+REM1I5 Static..
+REM1I5A Static >
+REM1I6 ~w~
+
+REM2T ~p~Patterns
+REM2I1 Strobe A
+REM2I2 Strobe B
+REM2I3 Strobe C
+REM2I4 Strobe D
+REM2I5 Full..
+REM2I5A Full >
+REM2I6 Static..
+REM2I6A Static >
+
+REM3T ~p~Hazard
+REM3I1 Normal
+REM3I2 Fast
+REM3I3 Fastest
+REM3I6 ~w~
+
+REM4T ~p~Full flash speed
+REM4I1 Half
+REM4I2 Quarter
+REM4I3 Eigth
+REM4I4 Sixteenth
+REM4I6 ~w~
+
+REM5T ~p~Full flash speed
+REM5I1 Half
+REM5I2 Quarter
+REM5I3 Eigth
+REM5I4 Sixteenth
+REM5I6 ~w~
+
+REM6T ~p~Static
+REM6I1 On
+REM6I2 Off
+REM6I6 ~w~
+
+REM7T ~p~Static
+REM7I1 On
+REM7I2 Off
+REM7I6 ~w~

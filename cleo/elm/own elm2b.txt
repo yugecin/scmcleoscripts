@@ -1,0 +1,821 @@
+{$CLEO .cs}
+
+thread 'OWNELS'
+ 
+0000: NOP
+
+:ELM
+0A8C: write_memory 0x6E1D4F size 1 value 2 vp 0
+//temp = 33@
+
+/*  
+0 = NO ACTION
+1 = DAMAGE L&R //B
+2 = REPAIR L
+3 = REPAIR R
+4 = REPAIR L&R //B
+*/
+
+/*
+1 strobe	 6@
+2 strobe B
+3 hazard > normal	6@+2
+4 hazard > fast		
+5 hazard > fastest		
+6 full > half	6@+5	
+7 full > quarter 	
+8 full > eigth	
+9 full > sixteenth
+10 static > on  6@+9
+11 static > off
+*/
+
+/*
+  
+1 strobe     7@	
+2 strobe B
+3 strobe C	
+4 strobe D	
+5 full > half   7@+4		
+6 full > quarter	 	
+7 full > eigth		
+8 full > sixteenth
+9 static > on  7@+8
+10 static > off
+*/
+                                   
+0006: 0@ = 1 //is menu interactive
+0006: 10@ = 0 //current shown menu: 0=lights,1=pattern front,2=pattern rear,3=front hazard,4=front full,5=rear full,6=front static,7=rear static
+0006: 20@ = 1 //menu 0 row
+0006: 21@ = 1 //menu 1 row
+0006: 22@ = 1 //menu 2 row
+0006: 23@ = 1 //menu 3 row
+0006: 24@ = 1 //menu 4 row
+0006: 25@ = 1 //menu 5 row
+0006: 26@ = 1 //menu 6 row
+0006: 27@ = 1 //menu 7 row
+                     
+0006: 2@ = 0 //to be destroyed/repaired
+0006: 3@ = 0 //enabled        
+0006: 4@ = 0 //incar
+0006: 5@ = 0 //current index
+0006: 6@ = 1 //front pattern
+0006: 7@ = 1 //rear pattern
+0006: 8@ = 1 //car
+0006: 9@ = 1 //struct
+
+
+:OWNELM_START
+wait 0
+gosub @INCAR
+if
+    0039:   4@ == 0 //incar
+jf @OWNELM_MAIN
+0006: 5@ = 0 //current index
+if
+0AB0:   key_pressed 122        
+jf @OWNELM_START
+jump @OWNELM_MENU_JUMPER      
+
+//############################################################################################################## MENU LOGIC
+//=============================================== menu jumper
+
+:OWNELM_MENU_JUMPER
+//0AD1: show_formatted_text_highpriority "front is %d back is %d" time 2000 6@ 5@
+0871: init_jump_table 10@ total_jumps 8 default_jump -1 @OWNELM_START jumps 0 @OWNELM_MENU_0 1 @OWNELM_MENU_1 2 @OWNELM_MENU_2 3 @OWNELM_MENU_3 4 @OWNELM_MENU_4 5 @OWNELM_MENU_5 6 @OWNELM_MENU_6
+0872: jump_table_jumps 7 @OWNELM_MENU_7 -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START
+                                                  
+//=============================================== menu loop
+                
+:OWNELM_MENU_LOOP_DELAY //begin loop hier, delay voor keydelay
+wait 300
+:OWNELM_MENU_LOOP
+wait 0
+if or                  
+    0AB0:   key_pressed 37 // left arrow
+    0AB0:   key_pressed 122 // F11
+then
+    gosub @OWNELM_MENU_HIDE
+    jump @OWNELM_MENU_LOOP_EXIT
+end
+if or
+    0AB0:   key_pressed 39 //right arrow
+    0AB0:   key_pressed 32 //spacebar
+jf @OWNELM_MENU_LOOP  
+
+//select item 
+:OWNELM_MENU_LOOP_1 //alleen gebruikt in jump table
+gosub @OWNELM_MENU_CHOICE 
+gosub @OWNELM_MENU_HIDE
+0871: init_jump_table 10@ total_jumps 8 default_jump -1 @OWNELM_START jumps 0 @OWNELM_MENU_01 1 @OWNELM_MENU_11 2 @OWNELM_MENU_21 3 @OWNELM_MENU_31 4 @OWNELM_MENU_41 5 @OWNELM_MENU_51 6 @OWNELM_MENU_61
+0872: jump_table_jumps 7 @OWNELM_MENU_71 -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START
+
+:OWNELM_MENU_LOOP_EXIT
+if 0AB0: key_pressed 37 // left arrow (terug naar vorig menu)
+jf @OWNELM_MENU_LOOP_EXIT_9 //exit menu
+0871: init_jump_table 10@ total_jumps 8 default_jump -1 @OWNELM_START jumps 0 @OWNELM_START 1 @OWNELM_MENU_0 2 @OWNELM_MENU_0 3 @OWNELM_MENU_1 4 @OWNELM_MENU_1 5 @OWNELM_MENU_2 6 @OWNELM_MENU_1
+0872: jump_table_jumps 7 @OWNELM_MENU_2 -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START
+
+:OWNELM_MENU_LOOP_EXIT_9
+wait 300
+jump @OWNELM_START //exit menu
+
+//=============================================== hide menus
+
+:OWNELM_MENU_HIDE
+0871: init_jump_table 10@ total_jumps 8 default_jump -1 @OWNELM_START jumps 0 @OWNELM_MENU_HIDE_0 1 @OWNELM_MENU_HIDE_1 2 @OWNELM_MENU_HIDE_2 3 @OWNELM_MENU_HIDE_3 4 @OWNELM_MENU_HIDE_4 5 @OWNELM_MENU_HIDE_5 6 @OWNELM_MENU_HIDE_6
+0872: jump_table_jumps 7 @OWNELM_MENU_HIDE_7 -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START
+:OWNELM_MENU_HIDE_0
+08DA: remove_panel 11@
+return
+:OWNELM_MENU_HIDE_1              
+08DA: remove_panel 11@
+08DA: remove_panel 13@
+return
+:OWNELM_MENU_HIDE_2         
+08DA: remove_panel 11@
+08DA: remove_panel 14@
+return
+:OWNELM_MENU_HIDE_3         
+08DA: remove_panel 12@ //lights + front patterns
+08DA: remove_panel 15@
+return
+:OWNELM_MENU_HIDE_4         
+08DA: remove_panel 12@ //lights + front patterns 
+08DA: remove_panel 16@
+return
+:OWNELM_MENU_HIDE_5         
+08DA: remove_panel 12@ //lights + rear patterns
+08DA: remove_panel 17@
+return
+:OWNELM_MENU_HIDE_6         
+08DA: remove_panel 12@ //lights + front patterns
+08DA: remove_panel 18@
+return
+:OWNELM_MENU_HIDE_7         
+08DA: remove_panel 12@ //lights + rear patterns
+08DA: remove_panel 19@
+return
+
+//=============================================== get choice
+
+:OWNELM_MENU_CHOICE
+0871: init_jump_table 10@ total_jumps 8 default_jump -1 @OWNELM_START jumps 0 @OWNELM_MENU_CHOICE_0 1 @OWNELM_MENU_CHOICE_1 2 @OWNELM_MENU_CHOICE_2 3 @OWNELM_MENU_CHOICE_3 4 @OWNELM_MENU_CHOICE_4 5 @OWNELM_MENU_CHOICE_5 6 @OWNELM_MENU_CHOICE_6
+0872: jump_table_jumps 7 @OWNELM_MENU_CHOICE_7 -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START -1 @OWNELM_START
+:OWNELM_MENU_CHOICE_0
+08D7: $choice = panel 11@ active_row   
+008B: 20@ = $choice // (int)
+return
+:OWNELM_MENU_CHOICE_1
+08D7: $choice = panel 13@ active_row
+008B: 21@ = $choice // (int)
+return
+:OWNELM_MENU_CHOICE_2
+08D7: $choice = panel 14@ active_row 
+008B: 22@ = $choice // (int)
+return
+:OWNELM_MENU_CHOICE_3
+08D7: $choice = panel 15@ active_row 
+008B: 23@ = $choice // (int)
+return
+:OWNELM_MENU_CHOICE_4
+08D7: $choice = panel 16@ active_row 
+008B: 24@ = $choice // (int)
+return
+:OWNELM_MENU_CHOICE_5
+08D7: $choice = panel 17@ active_row 
+008B: 25@ = $choice // (int)
+return
+:OWNELM_MENU_CHOICE_6
+08D7: $choice = panel 18@ active_row 
+008B: 26@ = $choice // (int)
+return
+:OWNELM_MENU_CHOICE_7
+08D7: $choice = panel 19@ active_row 
+008B: 27@ = $choice // (int)
+return
+
+//############################################################################################################## MENUS
+//=============================================== menu 0: lights
+
+:OWNELM_MENU_0 //lights 
+0006: 10@ = 0
+gosub @OWNELM_SHOWMENU_0 //show menu
+jump @OWNELM_MENU_LOOP_DELAY //menu loop
+:OWNELM_MENU_01
+
+if
+    0038:   $choice == 1 //0 = empty, 1 = front, 2 = rear
+jf @OWNELM_MENU_2
+jump @OWNELM_MENU_1
+
+//=============================================== menu 1: pattern front
+
+:OWNELM_MENU_1 //patterns front 
+0006: 10@ = 1
+06D1: v$EDITSTRING = "REM0I1"
+06D1: v$EDITSTRINGVAL = "Front >"  
+gosub @OWNELM_SHOWMENU_1 //show menu
+jump @OWNELM_MENU_LOOP_DELAY //menu loop
+:OWNELM_MENU_11
+0871: init_jump_table $choice total_jumps 3 default_jump -1 @OWNELM_MENU_12 jumps 3 @OWNELM_MENU_3 4 @OWNELM_MENU_4 5 @OWNELM_MENU_6 -1 @OWNELM_MENU_12 -1 @OWNELM_MENU_12 -1 @OWNELM_MENU_12 -1 @OWNELM_MENU_12
+:OWNELM_MENU_12
+0085: 6@ = 21@ // (int) 
+jump @OWNELM_START 
+
+//=============================================== menu 2: pattern rear
+
+:OWNELM_MENU_2 //patterns rear  
+0006: 10@ = 2
+06D1: v$EDITSTRING = "REM0I2"
+06D1: v$EDITSTRINGVAL = "Rear >"  
+gosub @OWNELM_SHOWMENU_2 //show menu
+jump @OWNELM_MENU_LOOP_DELAY //menu loop
+:OWNELM_MENU_21
+0871: init_jump_table $choice total_jumps 2 default_jump -1 @OWNELM_MENU_22 jumps 5 @OWNELM_MENU_5 6 @OWNELM_MENU_7 -1 @OWNELM_MENU_22 -1 @OWNELM_MENU_22 -1 @OWNELM_MENU_22 -1 @OWNELM_MENU_12 -1 @OWNELM_MENU_12
+:OWNELM_MENU_22 
+0085: 7@ = 22@ // (int)      
+jump @OWNELM_START 
+
+//=============================================== menu 3: front hazard
+
+:OWNELM_MENU_3 //front hazard
+0006: 10@ = 3  
+06D1: v$EDITSTRING = "REM1I3"
+06D1: v$EDITSTRINGVAL = "Hazard >"  
+gosub @OWNELM_SHOWMENU_3 //show menu
+jump @OWNELM_MENU_LOOP_DELAY //menu loop
+:OWNELM_MENU_31                
+0006: 6@ = 2
+005A: 6@ += 23@  // (int)
+jump @OWNELM_START 
+
+//=============================================== menu 4: front full
+
+:OWNELM_MENU_4 //front full
+0006: 10@ = 4          
+06D1: v$EDITSTRING = "REM1I4"
+06D1: v$EDITSTRINGVAL = "Full >"  
+gosub @OWNELM_SHOWMENU_4 //show menu
+jump @OWNELM_MENU_LOOP_DELAY //menu loop
+:OWNELM_MENU_41             
+0006: 6@ = 5
+005A: 6@ += 24@  // (int)
+jump @OWNELM_START 
+
+//=============================================== menu 5: rear full
+
+:OWNELM_MENU_5 //rear full
+0006: 10@ = 5          
+06D1: v$EDITSTRING = "REM2I5"
+06D1: v$EDITSTRINGVAL = "Full >" 
+gosub @OWNELM_SHOWMENU_5 //show menu
+jump @OWNELM_MENU_LOOP_DELAY //menu loop
+:OWNELM_MENU_51               
+0006: 7@ = 4
+005A: 7@ += 25@  // (int) 
+jump @OWNELM_START 
+
+//=============================================== menu 6: front static
+
+:OWNELM_MENU_6 //rear full
+0006: 10@ = 6          
+06D1: v$EDITSTRING = "REM1I5"
+06D1: v$EDITSTRINGVAL = "Static >" 
+gosub @OWNELM_SHOWMENU_6 //show menu
+jump @OWNELM_MENU_LOOP_DELAY //menu loop
+:OWNELM_MENU_61             
+0006: 6@ = 9
+005A: 6@ += 26@  // (int)
+jump @OWNELM_START 
+
+//=============================================== menu 7: rear static
+
+:OWNELM_MENU_7 //rear full
+0006: 10@ = 7         
+06D1: v$EDITSTRING = "REM2I6"
+06D1: v$EDITSTRINGVAL = "Static >" 
+gosub @OWNELM_SHOWMENU_7 //show menu
+jump @OWNELM_MENU_LOOP_DELAY //menu loop
+:OWNELM_MENU_71                   
+0006: 7@ = 8
+005A: 7@ += 27@  // (int) 
+jump @OWNELM_START 
+
+//############################################################################################################## SHOW MENUS
+//=============================================== show menu 0 (lights)
+
+:OWNELM_SHOWMENU_0
+08D4: 11@ = create_panel_with_title 'DUMMY' position 30.0 120.0 width 155.0 columns 1 interactive 0@ background 1 alignment 1
+if
+0039: 10@ == 1
+jf @OWNELM_SHOWMENU_02
+08DB: set_panel 11@ column 0 header 'REM0T' data 'DUMMY' 'REM0I1A' 'REM0I2' 'DUMMY' 'REM0I4' 'REM0I5' 'REM0I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+jump @OWNELM_SHOWMENU_04
+:OWNELM_SHOWMENU_02
+if
+0039: 10@ == 2
+jf @OWNELM_SHOWMENU_03
+08DB: set_panel 11@ column 0 header 'REM0T' data 'DUMMY' 'REM0I1' 'REM0I2A' 'DUMMY' 'REM0I4' 'REM0I5' 'REM0I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+jump @OWNELM_SHOWMENU_04
+:OWNELM_SHOWMENU_03
+08DB: set_panel 11@ column 0 header 'REM0T' data 'DUMMY' 'REM0I1' 'REM0I2' 'DUMMY' 'REM0I4' 'REM0I5' 'REM0I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+:OWNELM_SHOWMENU_04
+
+if
+    0039:   0@ == 1 
+jf @OWNELM_SHOWMENU_01
+
+08D9: set_panel 11@ row 0 enable 0  
+08D9: set_panel 11@ row 3 enable 0
+08D9: set_panel 11@ row 4 enable 0
+08D9: set_panel 11@ row 5 enable 0
+08D9: set_panel 11@ row 6 enable 0
+090E: set_panel 11@ active_row 20@
+
+:OWNELM_SHOWMENU_01
+return           
+
+//=============================================== show menu 0 (lights)  ### ALT1 (front) ###
+
+:OWNELM_SHOWMENU_0_ALT1 
+08D4: 12@ = create_panel_with_title 'DUMMY' position 30.0 120.0 width 175.0 columns 2 interactive 0 background 1 alignment 1
+if
+0039: 10@ == 3
+jf @OWNELM_SHOWMENU_0_ALT1_01
+08DB: set_panel 12@ column 0 header 'REM0T' data 'DUMMY' 'REM0I1A' 'REM0I2' 'DUMMY' 'REM0I4' 'REM0I5' 'REM0I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+08DB: set_panel 12@ column 1 header 'REM1T' data 'DUMMY' 'REM1I1' 'REM1I2' 'REM1I3A' 'REM1I4' 'REM1I5' 'REM1I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+return
+
+:OWNELM_SHOWMENU_0_ALT1_01
+if
+0039: 10@ == 4  
+jf @OWNELM_SHOWMENU_0_ALT1_02 
+08DB: set_panel 12@ column 0 header 'REM0T' data 'DUMMY' 'REM0I1A' 'REM0I2' 'DUMMY' 'REM0I4' 'REM0I5' 'REM0I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+08DB: set_panel 12@ column 1 header 'REM1T' data 'DUMMY' 'REM1I1' 'REM1I2' 'REM1I3' 'REM1I4A' 'REM1I5' 'REM1I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+return
+
+:OWNELM_SHOWMENU_0_ALT1_02
+if
+0039: 10@ == 6
+jf @OWNELM_SHOWMENU_0_ALT1_03
+08DB: set_panel 12@ column 0 header 'REM0T' data 'DUMMY' 'REM0I1A' 'REM0I2' 'DUMMY' 'REM0I4' 'REM0I5' 'REM0I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+08DB: set_panel 12@ column 1 header 'REM1T' data 'DUMMY' 'REM1I1' 'REM1I2' 'REM1I3' 'REM1I4' 'REM1I5A' 'REM1I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+return
+
+:OWNELM_SHOWMENU_0_ALT1_03  
+08DB: set_panel 12@ column 0 header 'REM0T' data 'DUMMY' 'REM0I1A' 'REM0I2' 'DUMMY' 'REM0I4' 'REM0I5' 'REM0I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+08DB: set_panel 12@ column 1 header 'REM1T' data 'DUMMY' 'REM1I1' 'REM1I2' 'REM1I3' 'REM1I4' 'REM1I5' 'REM1I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+return                        
+
+//=============================================== show menu 0 (lights)  ### ALT2 (rear) ###
+
+:OWNELM_SHOWMENU_0_ALT2 
+08D4: 12@ = create_panel_with_title 'DUMMY' position 30.0 120.0 width 175.0 columns 2 interactive 0 background 1 alignment 1            
+if
+0039: 10@ == 7
+jf @OWNELM_SHOWMENU_0_ALT2_01
+08DB: set_panel 12@ column 0 header 'REM0T' data 'DUMMY' 'REM0I1' 'REM0I2A' 'DUMMY' 'REM0I4' 'REM0I5' 'REM0I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+08DB: set_panel 12@ column 1 header 'REM2T' data 'DUMMY' 'REM2I1' 'REM2I2' 'REM2I3' 'REM2I4' 'REM2I5' 'REM2I6A' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+return    
+:OWNELM_SHOWMENU_0_ALT2_01
+if
+0039: 10@ == 5
+jf @OWNELM_SHOWMENU_0_ALT2_02
+08DB: set_panel 12@ column 0 header 'REM0T' data 'DUMMY' 'REM0I1' 'REM0I2A' 'DUMMY' 'REM0I4' 'REM0I5' 'REM0I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+08DB: set_panel 12@ column 1 header 'REM2T' data 'DUMMY' 'REM2I1' 'REM2I2' 'REM2I3' 'REM2I4' 'REM2I5A' 'REM2I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+return   
+:OWNELM_SHOWMENU_0_ALT2_02
+08DB: set_panel 12@ column 0 header 'REM0T' data 'DUMMY' 'REM0I1' 'REM0I2' 'DUMMY' 'REM0I4' 'REM0I5' 'REM0I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+08DB: set_panel 12@ column 1 header 'REM2T' data 'DUMMY' 'REM2I1' 'REM2I2' 'REM2I3' 'REM2I4' 'REM2I5' 'REM2I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'
+return  
+
+//=============================================== show menu 1 (front patterns)
+
+:OWNELM_SHOWMENU_1
+08D4: 13@ = create_panel_with_title 'DUMMY' position 204.5 120.0 width 175.0 columns 1 interactive 0@ background 1 alignment 1
+08DB: set_panel 13@ column 0 header 'REM1T' data 'DUMMY' 'REM1I1' 'REM1I2' 'REM1I3' 'REM1I4' 'REM1I5' 'REM1I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'  
+if
+    0039:   0@ == 1
+jf @OWNELM_SHOWMENU_11
+
+08D9: set_panel 13@ row 0 enable 0 
+08D9: set_panel 13@ row 6 enable 0 
+090E: set_panel 13@ active_row 21@
+//show prev menus (max 1)  
+0085: 33@ = 0@ // (int)
+0006: 0@ = 0
+gosub @OWNELM_SHOWMENU_0
+0085: 0@ = 33@ // (int)
+     
+:OWNELM_SHOWMENU_11 
+return 
+
+//=============================================== show menu 2 (rear patterns)
+
+:OWNELM_SHOWMENU_2
+08D4: 14@ = create_panel_with_title 'DUMMY' position 204.5 120.0 width 175.0 columns 1 interactive 0@ background 1 alignment 1
+08DB: set_panel 14@ column 0 header 'REM2T' data 'DUMMY' 'REM2I1' 'REM2I2' 'REM2I3' 'REM2I4' 'REM2I5' 'REM2I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'  
+if
+    0039:   0@ == 1
+jf @OWNELM_SHOWMENU_21
+
+08D9: set_panel 14@ row 0 enable 0 
+090E: set_panel 14@ active_row 22@
+//show prev menus (max 1)
+0085: 33@ = 0@ // (int)
+0006: 0@ = 0
+gosub @OWNELM_SHOWMENU_0 //lights
+0085: 0@ = 33@ // (int)
+      
+:OWNELM_SHOWMENU_21
+return
+
+//=============================================== show menu 3 (front hazard)
+
+:OWNELM_SHOWMENU_3
+08D4: 15@ = create_panel_with_title 'DUMMY' position 398.5 120.0 width 175.0 columns 1 interactive 0@ background 1 alignment 1
+08DB: set_panel 15@ column 0 header 'REM3T' data 'DUMMY' 'REM3I1' 'REM3I2' 'REM3I3' 'DUMMY' 'DUMMY' 'REM3I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'  
+if
+    0039:   0@ == 1
+jf @OWNELM_SHOWMENU_31
+
+08D9: set_panel 15@ row 0 enable 0 
+08D9: set_panel 15@ row 6 enable 0  
+090E: set_panel 15@ active_row 23@
+//show prev menus (max 1)
+0085: 33@ = 0@ // (int)
+0006: 0@ = 0
+gosub @OWNELM_SHOWMENU_0_ALT1 //lights + front patterns
+0085: 0@ = 33@ // (int)
+return
+      
+:OWNELM_SHOWMENU_31
+return
+
+//=============================================== show menu 4 (front full)
+
+:OWNELM_SHOWMENU_4
+08D4: 16@ = create_panel_with_title 'DUMMY' position 398.5 120.0 width 175.0 columns 1 interactive 0@ background 1 alignment 1
+08DB: set_panel 16@ column 0 header 'REM4T' data 'DUMMY' 'REM4I1' 'REM4I2' 'REM4I3' 'REM4I4' 'REM4I5' 'REM4I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'  
+if
+    0039:   0@ == 1
+jf @OWNELM_SHOWMENU_41
+
+08D9: set_panel 16@ row 0 enable 0
+08D9: set_panel 16@ row 5 enable 0
+08D9: set_panel 16@ row 6 enable 0  
+090E: set_panel 16@ active_row 24@
+//show prev menus (max 1) 
+0085: 33@ = 0@ // (int)
+0006: 0@ = 0
+gosub @OWNELM_SHOWMENU_0_ALT1 //lights + front patterns
+0085: 0@ = 33@ // (int)
+
+:OWNELM_SHOWMENU_41
+return
+
+//=============================================== show menu 5 (rear full)
+
+:OWNELM_SHOWMENU_5
+08D4: 17@ = create_panel_with_title 'DUMMY' position 398.5 120.0 width 175.0 columns 1 interactive 0@ background 1 alignment 1
+08DB: set_panel 17@ column 0 header 'REM5T' data 'DUMMY' 'REM5I1' 'REM5I2' 'REM5I3' 'REM5I4' 'DUMMY' 'REM5I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'  
+if
+    0039:   0@ == 1
+jf @OWNELM_SHOWMENU_51
+
+08D9: set_panel 17@ row 0 enable 0 
+08D9: set_panel 17@ row 6 enable 0 
+090E: set_panel 17@ active_row 25@ 
+
+//show prev menus (max 1)   
+0085: 33@ = 0@ // (int)
+0006: 0@ = 0
+gosub @OWNELM_SHOWMENU_0_ALT2 //lights + rear patterns
+0085: 0@ = 33@ // (int)
+
+:OWNELM_SHOWMENU_51
+return
+
+//=============================================== show menu 6 (front static)
+
+:OWNELM_SHOWMENU_6
+08D4: 18@ = create_panel_with_title 'DUMMY' position 398.5 120.0 width 175.0 columns 1 interactive 0@ background 1 alignment 1
+08DB: set_panel 18@ column 0 header 'REM6T' data 'DUMMY' 'REM6I1' 'REM6I2' 'DUMMY' 'DUMMY' 'DUMMY' 'REM6I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'  
+if
+    0039:   0@ == 1
+jf @OWNELM_SHOWMENU_61
+
+08D9: set_panel 18@ row 0 enable 0
+08D9: set_panel 18@ row 6 enable 0 
+090E: set_panel 18@ active_row 26@ 
+
+//show prev menus (max 1)   
+0085: 33@ = 0@ // (int)
+0006: 0@ = 0
+gosub @OWNELM_SHOWMENU_0_ALT1 //lights + front patterns
+0085: 0@ = 33@ // (int)
+
+:OWNELM_SHOWMENU_61
+return
+
+//=============================================== show menu 7 (rear static)
+
+:OWNELM_SHOWMENU_7
+08D4: 19@ = create_panel_with_title 'DUMMY' position 398.5 120.0 width 175.0 columns 1 interactive 0@ background 1 alignment 1
+08DB: set_panel 19@ column 0 header 'REM7T' data 'DUMMY' 'REM7I1' 'REM7I2' 'DUMMY' 'DUMMY' 'DUMMY' 'REM7I6' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY' 'DUMMY'  
+if
+    0039:   0@ == 1
+jf @OWNELM_SHOWMENU_71
+
+08D9: set_panel 19@ row 0 enable 0
+08D9: set_panel 19@ row 6 enable 0 
+090E: set_panel 19@ active_row 27@ 
+
+//show prev menus (max 1)   
+0085: 33@ = 0@ // (int)
+0006: 0@ = 0
+gosub @OWNELM_SHOWMENU_0_ALT2 //lights + rear patterns
+0085: 0@ = 33@ // (int)
+
+:OWNELM_SHOWMENU_71
+return
+
+//############################################################################################################## MAIN
+//=============================================== dim
+
+:OWNELM_DIM
+0006: 3@ = 0 //enabled 
+00BC: show_text_highpriority GXT 'ELS0' time 250 flag 1
+wait 250
+gosub @ALL_OFF     
+jump @OWNELM_START  
+
+//=============================================== toggle
+
+:OWNELM_TOGGLE
+000A: 3@ += 1  //enabled
+018C: play_sound 1052 at 0.0 0.0 0.0
+if
+    0019:   3@ > 1 //enabled
+jf @OWNELM_TOGGLE_1
+0006: 3@ = 0 //enabled  
+00BC: show_text_highpriority GXT 'ELS0' time 250 flag 1 
+wait 250
+gosub @ALL_ON
+jump @OWNELM_START
+:OWNELM_TOGGLE_1
+00BC: show_text_highpriority GXT 'ELS1' time 250 flag 1
+wait 250
+jump @OWNELM_START  
+
+//=============================================== main jumps (lights on)
+
+:OWNELM_MAIN_MENU
+gosub @ALL_ON
+jump @OWNELM_MENU_JUMPER
+
+:OWNELM_MAIN_TOGGLE
+gosub @ALL_ON
+jump @OWNELM_TOGGLE
+
+
+//=============================================== main
+
+:OWNELM_MAIN   
+if
+    8AB0: not key_pressed 122        
+jf @OWNELM_MAIN_MENU
+if
+    8AB0: not key_pressed 123       
+jf @OWNELM_MAIN_TOGGLE
+if
+    8AB0: not key_pressed 121       
+jf @OWNELM_DIM    
+if
+    0039:   3@ == 1 //enabled 
+jf @OWNELM_START
+
+//patterns start
+:PAT_START
+0871: init_jump_table 6@ total_jumps 11 default_jump -1 @PAT_START_REAR jumps 1 @PAT_F_STROBE_A 2 @PAT_F_STROBE_B 3 @PAT_F_HAZARD_NORMAL 4 @PAT_F_HAZARD_FAST 5 @PAT_F_HAZARD_FASTEST 6 @PAT_F_FULL_HALF 7 @PAT_F_FULL_QUARTER
+0872: jump_table_jumps 8 @PAT_F_FULL_EIGTH 9 @PAT_F_FULL_SIXTEENTH 10 @PAT_F_STATIC_ON 11 @PAT_F_STATIC_OFF -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+:PAT_START_REAR
+0871: init_jump_table 7@ total_jumps 10 default_jump -1 @PAT_END jumps 1 @PAT_R_STROBE_A 2 @PAT_R_STROBE_B 3 @PAT_R_STROBE_C 4 @PAT_R_STROBE_D 5 @PAT_R_FULL_HALF 6 @PAT_R_FULL_QUARTER 7 @PAT_R_FULL_EIGTH
+0872: jump_table_jumps 8 @PAT_R_FULL_SIXTEENTH 9 @PAT_R_STATIC_ON 10 @PAT_R_STATIC_OFF -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
+   
+//pattern end
+:PAT_END 
+000A: 5@ += 1  //index                              
+if
+    0019:   5@ > 23
+jf @PAT_END_1
+0006: 5@ = 0 //index
+:PAT_END_1
+wait 75
+jump @OWNELM_START      
+
+//############################################################################################################## PATTERNS
+//=============================================== FRONT
+
+:PAT_F_STROBE_A
+0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_START_REAR jumps 0 @L_L 1 @D_LR 2 @L_L 3 @D_LR 6 @L_R 7 @D_LR 8 @L_R 
+0872: jump_table_jumps 9 @D_LR 12 @L_L 13 @D_LR 14 @L_L 15 @D_LR 18 @L_R 19 @D_LR 20 @L_R 21 @D_LR
+:PAT_F_STROBE_B
+0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_START_REAR jumps 0 @L_LR 1 @D_LR 2 @L_LR 3 @D_LR 6 @L_LR 7 @D_LR 8 @L_LR 
+0872: jump_table_jumps 9 @D_LR 12 @L_LR 13 @D_LR 14 @L_LR 15 @D_LR 18 @L_LR 19 @D_LR 20 @L_LR 21 @D_LR
+:PAT_F_HAZARD_NORMAL
+0871: init_jump_table 5@ total_jumps 4 default_jump -1 @PAT_START_REAR jumps 0 @L_L 6 @L_R 12 @L_L 18 @L_R -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+:PAT_F_HAZARD_FAST
+0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_START_REAR jumps 0 @L_L 3 @L_R 6 @L_L 9 @L_R 12 @L_L 15 @L_R 18 @L_L
+0872: jump_table_jumps 21 @L_R -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+:PAT_F_HAZARD_FASTEST
+0871: init_jump_table 5@ total_jumps 12 default_jump -1 @PAT_START_REAR jumps 0 @L_L 2 @L_R 4 @L_L 6 @L_R 8 @L_L 10 @L_R 12 @L_L 
+0872: jump_table_jumps 14 @L_R 16 @L_L 18 @L_R 20 @L_L 22 @L_R -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+:PAT_F_FULL_HALF
+0871: init_jump_table 5@ total_jumps 3 default_jump -1 @PAT_START_REAR jumps 0 @D_LR 6 @L_LR 18 @D_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR 
+:PAT_F_FULL_QUARTER
+0871: init_jump_table 5@ total_jumps 5 default_jump -1 @PAT_START_REAR jumps 0 @L_LR 3 @D_LR 9 @L_LR 15 @D_LR 21 @L_LR -1 @PAT_START_REAR -1 @PAT_START_REAR  
+:PAT_F_FULL_EIGTH
+0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_START_REAR jumps 0 @L_LR 3 @D_LR 6 @L_LR 9 @D_LR 12 @L_LR 15 @D_LR 18 @L_LR
+0872: jump_table_jumps 21 @D_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR  
+:PAT_F_FULL_SIXTEENTH
+0871: init_jump_table 5@ total_jumps 12 default_jump -1 @PAT_START_REAR jumps 0 @L_LR 2 @D_LR 4 @L_LR 6 @D_LR 8 @L_LR 10 @D_LR 12 @L_LR
+0872: jump_table_jumps 14 @D_LR 16 @L_LR 18 @D_LR 20 @L_LR 22 @D_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+:PAT_F_STATIC_ON
+0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_START_REAR jumps 0 @L_LR 12 @L_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+:PAT_F_STATIC_OFF
+0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_START_REAR jumps 0 @D_LR 12 @D_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+          
+//=============================================== REAR
+
+:PAT_R_STROBE_A
+0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_END jumps 0 @L_B 1 @D_B 2 @L_B 3 @D_B 6 @L_B 7 @D_B 8 @L_B
+0872: jump_table_jumps 9 @D_B 12 @L_B 13 @D_B 14 @L_B 15 @D_B 18 @L_B 19 @D_B 20 @L_B 21 @D_B
+:PAT_R_STROBE_B
+0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_END jumps 0 @L_B 3 @D_B 6 @L_B 9 @D_B 12 @L_B 15 @D_B 18 @L_B
+0872: jump_table_jumps 21 @D_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END 
+:PAT_R_STROBE_C
+0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_END jumps 0 @D_B 3 @L_B 4 @D_B 5 @L_B 6 @D_B 9 @L_B 10 @D_B
+0872: jump_table_jumps 11 @L_B 12 @D_B 15 @L_B 16 @D_B 17 @L_B 18 @D_B 21 @L_B 22 @D_B 23 @L_B
+:PAT_R_STROBE_D
+0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_END jumps 0 @D_B 3 @L_B 6 @D_B 9 @L_B 12 @D_B 15 @L_B 18 @D_B
+0872: jump_table_jumps 21 @L_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
+:PAT_R_FULL_HALF
+0871: init_jump_table 5@ total_jumps 3 default_jump -1 @PAT_END jumps 0 @D_B 6 @L_B 18 @D_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END 
+:PAT_R_FULL_QUARTER
+0871: init_jump_table 5@ total_jumps 5 default_jump -1 @PAT_END jumps 0 @L_B 3 @D_B 9 @L_B 15 @D_B 21 @L_B -1 @PAT_END -1 @PAT_END  
+:PAT_R_FULL_EIGTH
+0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_END jumps 0 @L_B 3 @D_B 6 @L_B 9 @D_B 12 @L_B 15 @D_B 18 @L_B
+0872: jump_table_jumps 21 @D_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END  
+:PAT_R_FULL_SIXTEENTH
+0871: init_jump_table 5@ total_jumps 12 default_jump -1 @PAT_END jumps 0 @L_B 2 @D_B 4 @L_B 6 @D_B 8 @L_B 10 @D_B 12 @L_B
+0872: jump_table_jumps 14 @D_B 16 @L_B 18 @D_B 20 @L_B 22 @D_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
+:PAT_R_STATIC_ON
+0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_END jumps 0 @L_B 12 @L_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
+:PAT_R_STATIC_OFF
+0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_END jumps 0 @D_B 12 @D_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
+
+//############################################################################################################## LIGHT CONTROL
+//=============================================== FRONT
+
+:L_L            
+gosub @DESTROY_R  
+gosub @REPAIR_L
+jump @PAT_START_REAR  
+
+:L_R       
+gosub @DESTROY_L
+gosub @REPAIR_R
+jump @PAT_START_REAR
+
+:L_LR
+gosub @REPAIR_L
+gosub @REPAIR_R
+jump @PAT_START_REAR 
+
+:D_LR
+gosub @DESTROY_R
+gosub @DESTROY_L
+jump @PAT_START_REAR   
+
+//=============================================== BACK 
+      
+:L_B 
+gosub @REPAIR_B
+jump @PAT_END
+ 
+:D_B
+gosub @DESTROY_B
+jump @PAT_END 
+     
+//############################################################################################################## MISC   
+//=============================================== repair
+:REPAIR_L
+0006: 2@ = 0
+gosub @REPAIR
+return
+
+:REPAIR_R
+0006: 2@ = 1
+gosub @REPAIR
+return
+
+:REPAIR_B
+0006: 2@ = 3
+gosub @REPAIR
+return
+//=============================================== destroy
+:DESTROY_L
+0006: 2@ = 0
+gosub @DESTROY
+return
+
+:DESTROY_R
+0006: 2@ = 1
+gosub @DESTROY
+return
+
+:DESTROY_B
+0006: 2@ = 3
+gosub @DESTROY
+return
+//=============================================== turn lights on
+      
+//0006: 2@ = 0 //to be destroyed/repaired
+:ALL_ON  
+0006: 2@ = -1
+gosub @REPAIR 
+067F: force_car_lights 8@ to 2
+/*
+  067f:
+    param 2:
+        0 = NO_CAR_LIGHT_OVERRIDE
+        1 = FORCE_CAR_LIGHTS_OFF
+        2 = FORCE_CAR_LIGHTS_ON
+*/
+return
+
+//=============================================== turn lights off
+      
+//0006: 2@ = 0 //to be destroyed/repaired
+:ALL_OFF  
+0006: 2@ = -1
+gosub @REPAIR 
+067F: force_car_lights 8@ to 1
+return
+
+//=============================================== repair
+      
+//0006: 2@ = 0 //to be destroyed/repaired
+:REPAIR
+if
+    0029:   2@ >= 0
+jf @REPAIR_1
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light 2@
+067F: force_car_lights 8@ to 2
+return
+:REPAIR_1
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light 0
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light 1
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light 3
+067F: set_car 8@ lights 2
+return
+
+//=============================================== destroy
+      
+//0006: 2@ = 0 //to be destroyed/repaired
+:DESTROY
+if
+    0029:   2@ >= 0
+jf @DESTROY_1
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light 2@
+return
+:DESTROY_1
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light 0
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light 1
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light 3
+return
+ 
+//=============================================== car
+
+:INCAR
+0006: 4@ = 0 //incar
+00D6: if and
+00DF:   actor $PLAYER_ACTOR driving 
+84C8:   not actor $PLAYER_ACTOR driving_flying_vehicle 
+84A9:   not actor $PLAYER_ACTOR driving_heli 
+84A7:   not actor $PLAYER_ACTOR driving_boat
+847A:   not actor $PLAYER_ACTOR driving_bike
+jf @INCAR_1 
+//00D9: 8@ = actor $PLAYER_ACTOR car  CRASH
+8@ = Actor.CurrentCar($PLAYER_ACTOR)
+046C: 33@ = car 8@ driver //33@ = temp
+if 
+    003A:   $PLAYER_ACTOR == 33@ // (int) 
+jf @INCAR_1
+0006: 4@ = 1 //incar
+0A97: 9@ = car 8@ pointer
+000A: 9@ += 0x5A0
+:INCAR_1    
+return
