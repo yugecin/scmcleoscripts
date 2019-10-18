@@ -1,10 +1,19 @@
 {$CLEO .cs}
+{$NOSOURCE}
 
-thread 'OWNELS'
+thread 'OWNELM2'
  
 0000: NOP
 
+const
+    LIGHT_FL = 0
+    LIGHT_FR = 1
+    LIGHT_BL = 2
+    LIGHT_BR = 3
+end
+
 :ELM
+// makes rear lights controllable separately
 0A8C: write_memory 0x6E1D4F size 1 value 2 vp 0
 //temp = 33@
 
@@ -596,6 +605,8 @@ if
     0039:   3@ == 1 //enabled 
 jf @OWNELM_START
 
+067F: force_car_lights 8@ to 2
+
 //patterns start
 :PAT_START
 0871: init_jump_table 6@ total_jumps 11 default_jump -1 @PAT_START_REAR jumps 1 @PAT_F_STROBE_A 2 @PAT_F_STROBE_B 3 @PAT_F_HAZARD_NORMAL 4 @PAT_F_HAZARD_FAST 5 @PAT_F_HAZARD_FASTEST 6 @PAT_F_FULL_HALF 7 @PAT_F_FULL_QUARTER
@@ -619,127 +630,107 @@ jump @OWNELM_START
 //=============================================== FRONT
 
 :PAT_F_STROBE_A
-0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_START_REAR jumps 0 @L_L 1 @D_LR 2 @L_L 3 @D_LR 6 @L_R 7 @D_LR 8 @L_R 
-0872: jump_table_jumps 9 @D_LR 12 @L_L 13 @D_LR 14 @L_L 15 @D_LR 18 @L_R 19 @D_LR 20 @L_R 21 @D_LR
+0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_START_REAR jumps 0 @F_L 1 @F_ 2 @F_L 3 @F_ 6 @F_R 7 @F_ 8 @F_R 
+0872: jump_table_jumps 9 @F_ 12 @F_L 13 @F_ 14 @F_L 15 @F_ 18 @F_R 19 @F_ 20 @F_R 21 @F_
 :PAT_F_STROBE_B
-0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_START_REAR jumps 0 @L_LR 1 @D_LR 2 @L_LR 3 @D_LR 6 @L_LR 7 @D_LR 8 @L_LR 
-0872: jump_table_jumps 9 @D_LR 12 @L_LR 13 @D_LR 14 @L_LR 15 @D_LR 18 @L_LR 19 @D_LR 20 @L_LR 21 @D_LR
+0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_START_REAR jumps 0 @F_LR 1 @F_ 2 @F_LR 3 @F_ 6 @F_LR 7 @F_ 8 @F_LR 
+0872: jump_table_jumps 9 @F_ 12 @F_LR 13 @F_ 14 @F_LR 15 @F_ 18 @F_LR 19 @F_ 20 @F_LR 21 @F_
 :PAT_F_HAZARD_NORMAL
-0871: init_jump_table 5@ total_jumps 4 default_jump -1 @PAT_START_REAR jumps 0 @L_L 6 @L_R 12 @L_L 18 @L_R -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+0871: init_jump_table 5@ total_jumps 4 default_jump -1 @PAT_START_REAR jumps 0 @F_L 6 @F_R 12 @F_L 18 @F_R -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
 :PAT_F_HAZARD_FAST
-0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_START_REAR jumps 0 @L_L 3 @L_R 6 @L_L 9 @L_R 12 @L_L 15 @L_R 18 @L_L
-0872: jump_table_jumps 21 @L_R -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_START_REAR jumps 0 @F_L 3 @F_R 6 @F_L 9 @F_R 12 @F_L 15 @F_R 18 @F_L
+0872: jump_table_jumps 21 @F_R -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
 :PAT_F_HAZARD_FASTEST
-0871: init_jump_table 5@ total_jumps 12 default_jump -1 @PAT_START_REAR jumps 0 @L_L 2 @L_R 4 @L_L 6 @L_R 8 @L_L 10 @L_R 12 @L_L 
-0872: jump_table_jumps 14 @L_R 16 @L_L 18 @L_R 20 @L_L 22 @L_R -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+0871: init_jump_table 5@ total_jumps 12 default_jump -1 @PAT_START_REAR jumps 0 @F_L 2 @F_R 4 @F_L 6 @F_R 8 @F_L 10 @F_R 12 @F_L 
+0872: jump_table_jumps 14 @F_R 16 @F_L 18 @F_R 20 @F_L 22 @F_R -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
 :PAT_F_FULL_HALF
-0871: init_jump_table 5@ total_jumps 3 default_jump -1 @PAT_START_REAR jumps 0 @D_LR 6 @L_LR 18 @D_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR 
+0871: init_jump_table 5@ total_jumps 3 default_jump -1 @PAT_START_REAR jumps 0 @F_ 6 @F_LR 18 @F_ -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR 
 :PAT_F_FULL_QUARTER
-0871: init_jump_table 5@ total_jumps 5 default_jump -1 @PAT_START_REAR jumps 0 @L_LR 3 @D_LR 9 @L_LR 15 @D_LR 21 @L_LR -1 @PAT_START_REAR -1 @PAT_START_REAR  
+0871: init_jump_table 5@ total_jumps 5 default_jump -1 @PAT_START_REAR jumps 0 @F_LR 3 @F_ 9 @F_LR 15 @F_ 21 @F_LR -1 @PAT_START_REAR -1 @PAT_START_REAR  
 :PAT_F_FULL_EIGTH
-0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_START_REAR jumps 0 @L_LR 3 @D_LR 6 @L_LR 9 @D_LR 12 @L_LR 15 @D_LR 18 @L_LR
-0872: jump_table_jumps 21 @D_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR  
+0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_START_REAR jumps 0 @F_LR 3 @F_ 6 @F_LR 9 @F_ 12 @F_LR 15 @F_ 18 @F_LR
+0872: jump_table_jumps 21 @F_ -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR  
 :PAT_F_FULL_SIXTEENTH
-0871: init_jump_table 5@ total_jumps 12 default_jump -1 @PAT_START_REAR jumps 0 @L_LR 2 @D_LR 4 @L_LR 6 @D_LR 8 @L_LR 10 @D_LR 12 @L_LR
-0872: jump_table_jumps 14 @D_LR 16 @L_LR 18 @D_LR 20 @L_LR 22 @D_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+0871: init_jump_table 5@ total_jumps 12 default_jump -1 @PAT_START_REAR jumps 0 @F_LR 2 @F_ 4 @F_LR 6 @F_ 8 @F_LR 10 @F_ 12 @F_LR
+0872: jump_table_jumps 14 @F_ 16 @F_LR 18 @F_ 20 @F_LR 22 @F_ -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
 :PAT_F_STATIC_ON
-0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_START_REAR jumps 0 @L_LR 12 @L_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_START_REAR jumps 0 @F_LR 12 @F_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
 :PAT_F_STATIC_OFF
-0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_START_REAR jumps 0 @D_LR 12 @D_LR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
+0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_START_REAR jumps 0 @F_ 12 @F_ -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR -1 @PAT_START_REAR
           
 //=============================================== REAR
 
 :PAT_R_STROBE_A
-0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_END jumps 0 @L_B 1 @D_B 2 @L_B 3 @D_B 6 @L_B 7 @D_B 8 @L_B
-0872: jump_table_jumps 9 @D_B 12 @L_B 13 @D_B 14 @L_B 15 @D_B 18 @L_B 19 @D_B 20 @L_B 21 @D_B
+0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_END jumps 0 @B_L 1 @B_ 2 @B_L 3 @B_ 6 @B_R 7 @B_ 8 @B_R 
+0872: jump_table_jumps 9 @B_ 12 @B_L 13 @B_ 14 @B_L 15 @B_ 18 @B_R 19 @B_ 20 @B_R 21 @B_
 :PAT_R_STROBE_B
-0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_END jumps 0 @L_B 3 @D_B 6 @L_B 9 @D_B 12 @L_B 15 @D_B 18 @L_B
-0872: jump_table_jumps 21 @D_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END 
+0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_END jumps 0 @B_LR 1 @B_ 2 @B_LR 3 @B_ 6 @B_LR 7 @B_ 8 @B_LR 
+0872: jump_table_jumps 9 @B_ 12 @B_LR 13 @B_ 14 @B_LR 15 @B_ 18 @B_LR 19 @B_ 20 @B_LR 21 @B_
 :PAT_R_STROBE_C
-0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_END jumps 0 @D_B 3 @L_B 4 @D_B 5 @L_B 6 @D_B 9 @L_B 10 @D_B
-0872: jump_table_jumps 11 @L_B 12 @D_B 15 @L_B 16 @D_B 17 @L_B 18 @D_B 21 @L_B 22 @D_B 23 @L_B
+0871: init_jump_table 5@ total_jumps 16 default_jump -1 @PAT_END jumps 0 @B_L 1 @B_LR 2 @B_L 3 @B_LR 6 @B_R 7 @B_LR 8 @B_R 
+0872: jump_table_jumps 9 @B_LR 12 @B_L 13 @B_LR 14 @B_L 15 @B_LR 18 @B_R 19 @B_LR 20 @B_R 21 @B_LR
 :PAT_R_STROBE_D
-0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_END jumps 0 @D_B 3 @L_B 6 @D_B 9 @L_B 12 @D_B 15 @L_B 18 @D_B
-0872: jump_table_jumps 21 @L_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
+0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_END jumps 0 @B_ 3 @B_LR 6 @B_ 9 @B_LR 12 @B_ 15 @B_LR 18 @B_
+0872: jump_table_jumps 21 @B_LR -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
 :PAT_R_FULL_HALF
-0871: init_jump_table 5@ total_jumps 3 default_jump -1 @PAT_END jumps 0 @D_B 6 @L_B 18 @D_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END 
+0871: init_jump_table 5@ total_jumps 3 default_jump -1 @PAT_END jumps 0 @B_ 6 @B_LR 18 @B_ -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END 
 :PAT_R_FULL_QUARTER
-0871: init_jump_table 5@ total_jumps 5 default_jump -1 @PAT_END jumps 0 @L_B 3 @D_B 9 @L_B 15 @D_B 21 @L_B -1 @PAT_END -1 @PAT_END  
+0871: init_jump_table 5@ total_jumps 5 default_jump -1 @PAT_END jumps 0 @B_ 3 @B_LR 9 @B_ 15 @B_LR 21 @B_ -1 @PAT_END -1 @PAT_END  
 :PAT_R_FULL_EIGTH
-0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_END jumps 0 @L_B 3 @D_B 6 @L_B 9 @D_B 12 @L_B 15 @D_B 18 @L_B
-0872: jump_table_jumps 21 @D_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END  
+0871: init_jump_table 5@ total_jumps 8 default_jump -1 @PAT_END jumps 0 @B_ 3 @B_LR 6 @B_ 9 @B_LR 12 @B_ 15 @B_LR 18 @B_
+0872: jump_table_jumps 21 @B_LR -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END  
 :PAT_R_FULL_SIXTEENTH
-0871: init_jump_table 5@ total_jumps 12 default_jump -1 @PAT_END jumps 0 @L_B 2 @D_B 4 @L_B 6 @D_B 8 @L_B 10 @D_B 12 @L_B
-0872: jump_table_jumps 14 @D_B 16 @L_B 18 @D_B 20 @L_B 22 @D_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
+0871: init_jump_table 5@ total_jumps 12 default_jump -1 @PAT_END jumps 0 @B_ 2 @B_LR 4 @B_ 6 @B_LR 8 @B_ 10 @B_LR 12 @B_
+0872: jump_table_jumps 14 @B_LR 16 @B_ 18 @B_LR 20 @B_ 22 @B_LR -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
 :PAT_R_STATIC_ON
-0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_END jumps 0 @L_B 12 @L_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
+0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_END jumps 0 @B_LR 12 @B_LR -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
 :PAT_R_STATIC_OFF
-0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_END jumps 0 @D_B 12 @D_B -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
+0871: init_jump_table 5@ total_jumps 2 default_jump -1 @PAT_END jumps 0 @B_ 12 @B_ -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END -1 @PAT_END
 
 //############################################################################################################## LIGHT CONTROL
 //=============================================== FRONT
 
-:L_L            
-gosub @DESTROY_R  
-gosub @REPAIR_L
+:F_L            
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light LIGHT_FL
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light LIGHT_FR
 jump @PAT_START_REAR  
 
-:L_R       
-gosub @DESTROY_L
-gosub @REPAIR_R
+:F_R       
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light LIGHT_FL
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light LIGHT_FR
 jump @PAT_START_REAR
 
-:L_LR
-gosub @REPAIR_L
-gosub @REPAIR_R
+:F_LR
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light LIGHT_FL
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light LIGHT_FR
 jump @PAT_START_REAR 
 
-:D_LR
-gosub @DESTROY_R
-gosub @DESTROY_L
-jump @PAT_START_REAR   
+:F_
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light LIGHT_FL
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light LIGHT_FR
+jump @PAT_START_REAR    
 
-//=============================================== BACK 
-      
-:L_B 
-gosub @REPAIR_B
-jump @PAT_END
- 
-:D_B
-gosub @DESTROY_B
+:B_L
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light LIGHT_BL
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light LIGHT_BR
+jump @PAT_END 
+
+:B_R
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light LIGHT_BL
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light LIGHT_BR
+jump @PAT_END 
+
+:B_LR
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light LIGHT_BL
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light LIGHT_BR
+jump @PAT_END 
+
+:B_
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light LIGHT_BL
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light LIGHT_BR
 jump @PAT_END 
      
-//############################################################################################################## MISC   
-//=============================================== repair
-:REPAIR_L
-0006: 2@ = 0
-gosub @REPAIR
-return
 
-:REPAIR_R
-0006: 2@ = 1
-gosub @REPAIR
-return
-
-:REPAIR_B
-0006: 2@ = 3
-gosub @REPAIR
-return
-//=============================================== destroy
-:DESTROY_L
-0006: 2@ = 0
-gosub @DESTROY
-return
-
-:DESTROY_R
-0006: 2@ = 1
-gosub @DESTROY
-return
-
-:DESTROY_B
-0006: 2@ = 3
-gosub @DESTROY
-return
 //=============================================== turn lights on
       
 //0006: 2@ = 0 //to be destroyed/repaired
@@ -761,7 +752,7 @@ return
 //0006: 2@ = 0 //to be destroyed/repaired
 :ALL_OFF  
 0006: 2@ = -1
-gosub @REPAIR 
+gosub @DESTROY 
 067F: force_car_lights 8@ to 1
 return
 
@@ -778,6 +769,7 @@ return
 :REPAIR_1
 0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light 0
 0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light 1
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light 2
 0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 0 light 3
 067F: set_car 8@ lights 2
 return
@@ -794,6 +786,7 @@ return
 :DESTROY_1
 0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light 0
 0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light 1
+0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light 2
 0AA6: call_method 0x6C2100 struct 9@ num_params 2 pop flag 0 destroyed 1 light 3
 return
  
