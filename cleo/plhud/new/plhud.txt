@@ -91,7 +91,7 @@ hex
     " _VIEW DISTANCE: _1500M"            "~n~"
     " _COLOR: PINK__________"            "~n~"
                                          "~n~"
-    "v19 ___ runways"                    "~n~"
+    "v20 ___ runways"                    "~n~"
     "________________"
     00
 end
