@@ -999,6 +999,10 @@ espcolors:
 	.long 0x454D494C ; EMIL
 	.long 0x554848FF ; blue
 	.long 0x45554C42 ; EULB
+	.long 0x55FF952B ; orange
+	.long 0x4E41524F ; NARO
+	.long 0x55FFFB16 ; yellow
+	.long 0x4C4C4559 ; LLEY
 	.long 0x55FF4848 ; red
 	.long 0x5F444552 ; _DER
 	.long 0x55FF48FF ; pink (to wrap)
