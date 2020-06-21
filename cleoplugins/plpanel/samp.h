@@ -109,7 +109,7 @@ struct stTextdraw
 	BYTE		byte9D1;
 	DWORD		dword9D2;
 };
-VALIDATE_SIZE(stTextdraw, 0x9D6);
+EXPECT_SIZE(struct stTextdraw, 0x9D6);
 
 struct stTextdrawPool
 {

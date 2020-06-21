@@ -5,7 +5,8 @@
 	https://github.com/DK22Pac/plugin-sdk
 */
 
-#define VALIDATE_SIZE(struc, size) static_assert(sizeof(struc) == size, "Invalid structure size of " #struc)
+#define STATIC_ASSERT(E) typedef char __static_assert_[(E)?1:-1]
+#define EXPECT_SIZE(S,SIZE) STATIC_ASSERT(sizeof(S)==(SIZE))
 
 #define DrawBarChart(x, y, width, height, progress, progressAdd, drawPercentage, \
     drawBlackBorder, color, addColor) ((void (__cdecl *)(float, float, unsigned short,\

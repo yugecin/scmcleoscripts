@@ -34,7 +34,7 @@ struct SRaceCheckpoint
 	BYTE		dwField_36;
 	BYTE		dwField_37;
 };
-VALIDATE_SIZE(SRaceCheckpoint, 0x38);
+EXPECT_SIZE(SRaceCheckpoint, 0x38);
 
 #define MAX_RACECHECKPOINTS	(0x20)
 #define SA_RACECHECKPOINTS	(0xC7F158)
