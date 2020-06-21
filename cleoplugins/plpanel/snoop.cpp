@@ -48,7 +48,7 @@ void savetd(stTextdraw *td)
 	WriteFile(hFile, buf, strlen(buf), &w, NULL);
 }
 
-OpcodeResult WINAPI op0C36(CScriptThread *thread)
+OpcodeResult WINAPI op6C36(CScriptThread *thread)
 {
 	static struct stSAMP *g_SAMP = NULL;
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#define SNOOP 0
+
 #include "Stdafx.h"
 #include "CLEO.h"
 #include "samp.h"

@@ -39,6 +39,10 @@ enum Limits
 #pragma pack(push, 1)
 struct stSAMPPools
 {
+	void *unk1; /*0.3.7-R4*/
+	void *unk2; /*0.3.7-R4*/
+	void *unk3; /*0.3.7-R4*/
+	void *unk4; /*0.3.7-R4*/
 	void	   			*pActor; // stActorPool
 	void	   			*pObject; // stObjectPool
 	void				*pGangzone; // stGangzonePool
@@ -55,16 +59,19 @@ struct stSAMP
 	void				*pUnk0;
 	void				*pServerInfo; // stServerInfo
 	char				byteSpace[24];
+	char pad[16]; /*since 0.3.7-R4*/
 	char				szIP[257];
 	char				szHostname[259];
 	BYTE				bNametagStatus; // changes by /nametagstatus // is bool, shown as byte for 1 byte emphasis
 	unsigned int			ulPort;
-	unsigned int			ulMapIcons[100];
-	int				iLanMode;
-	int				iGameState;
-	unsigned int			ulConnectTick;
-	void				*pSettings; // stServerPresets
-	void				*pRakClientInterface;
+
+	char padddd[421];
+
+	/* +3D5? */
+	//void				*pSettings; // stServerPresets
+
+	/* +3E8 */
+	//void				*pRakClientInterface;
 	struct stSAMPPools		*pPools;
 };
 

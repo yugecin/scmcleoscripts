@@ -213,17 +213,25 @@ OpcodeResult WINAPI op6C37(CScriptThread *thread)
 			goto exitzero;
 		}
 		if (g_SAMP->pPools == NULL || g_SAMP->pPools->pTextdraw == NULL ||
-				g_SAMP->ulPort != 7777 || strcmp("142.44.161.46", g_SAMP->szIP) != 0) {
+				g_SAMP->ulPort != 7777 || strcmp("51.178.2.56", g_SAMP->szIP) != 0) {
 			goto exitzero;
 		}
 		tdpool = g_SAMP->pPools->pTextdraw;
 
 		HMODULE samp_dll = GetModuleHandle("samp.dll");
+		/* 0.3.7-R1
 		DWORD mem = (DWORD)samp_dll + 0x1AD40;
 		DWORD *sub = (DWORD*)(mem);
 		hookedcall = *sub;
 		hookedcall += mem + 5;
-		samp_21A0B4 = (DWORD*)((DWORD)samp_dll + 0x21A0B4);
+		samp_21A0B4 = (DWORD*)((DWORD)samp_dll + 0x21A0B4);*/
+
+		/* 0.3.7-R4*/
+		DWORD mem = (DWORD)samp_dll + 0x1E7E0;
+		DWORD *sub = (DWORD*)(mem);
+		hookedcall = *sub;
+		hookedcall += mem + 5;
+		samp_21A0B4 = (DWORD*)((DWORD)samp_dll + 0x26E9C4);
 
 		CLEO_SetIntOpcodeParam(thread, mem);
 		CLEO_SetIntOpcodeParam(thread, ((DWORD) &hookstuff) - mem + 1 - 4 - 2);

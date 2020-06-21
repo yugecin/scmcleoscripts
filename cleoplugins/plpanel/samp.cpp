@@ -1,7 +1,8 @@
 
 #include "samp.h"
 
-#define SAMP_INFO_OFFSET 0x21A0F8
+//#define SAMP_INFO_OFFSET 0x21A0F8 /*R1*/
+#define SAMP_INFO_OFFSET 0x26EA0C /*R4*/
 
 struct stSAMP *getSamp(void)
 {

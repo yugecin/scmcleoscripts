@@ -210,7 +210,7 @@ BOOL setupTextdraws()
 	satisfstr[0] = 0;
 	odoval = 0;
 	fuelval = 0;
-	setupTD(PLTD_FUEL, 0x44078000, 0x43C48000, 0x44078000, 0x43C48148, &fuelhandler);
+	setupTD(PLTD_FUEL, 0x44044000, 0x43C60000, 0x44078000, 0x43C48148, &fuelhandler);
 	setupTD(PLTD_DAMAGE, 0x44044000, 0x43CB0000, 0x44044000, 0x43CB0148, &damagepatchhandlerex);
 	setupTD(PLTD_STATUSBARBOX, 0x43A00000, 0x43D60000, 0x43A00000, 0x43D70000, &statusbarhandler);
 	setupTD(PLTD_FUELDMGBOX, 0x4403C000, 0x43C48000, 0x4403C000, 0x43C48148, &fueldmgboxhandler);
