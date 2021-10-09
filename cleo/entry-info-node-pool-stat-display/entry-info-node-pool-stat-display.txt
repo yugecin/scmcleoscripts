@@ -1,0 +1,52 @@
+{$CLEO}
+{$NOSOURCE}
+
+03A4: name_thread 'ENTRYIN' 
+
+const
+    _EntryInfoNodePool = 0xB7448C
+    _ObjectPool = 0xB7449C
+    CPool_Size = 0x8
+    CPool_Top = 0xC
+    GetNoOfUsedSpaces = 0x54F6B0
+end
+
+wait 3000
+03F0: enable_text_draw 1
+
+:MAIN_LOOP
+wait 0
+
+0A8D: 0@ = read_memory _EntryInfoNodePool size 4 vp 0
+0085: 1@ = 0@ // (int)
+000A: 1@ += CPool_Size
+0A8D: 11@ = read_memory 1@ size 4 vp 0
+0AA8: call_method_return 0x54F6B0 struct 0@ num_params 0 pop 0 10@
+
+0A8D: 0@ = read_memory _ObjectPool size 4 vp 0
+0085: 1@ = 0@ // (int)
+000A: 1@ += CPool_Size
+0A8D: 21@ = read_memory 1@ size 4 vp 0
+0AA8: call_method_return 0x54F6B0 struct 0@ num_params 0 pop 0 20@ 
+
+0342: set_text_draw_centered 0
+081C: draw_text_outline 1 RGBA 0 0 0 255
+0340: set_text_draw_RGBA 50 255 50 255
+033F: set_text_draw_letter_size 0.125 0.8
+045A: draw_text_1number 380.0 20.0 GXT 'NUMBER' number 10@ // ~1
+081C: draw_text_outline 1 RGBA 0 0 0 255
+0340: set_text_draw_RGBA 50 255 50 255
+033F: set_text_draw_letter_size 0.125 0.8
+045A: draw_text_1number 400.0 20.0 GXT 'NUMBER' number 11@ // ~1~
+081C: draw_text_outline 1 RGBA 0 0 0 255
+0340: set_text_draw_RGBA 50 255 50 255
+033F: set_text_draw_letter_size 0.125 0.8
+045A: draw_text_1number 380.0 40.0 GXT 'NUMBER' number 20@ // ~1~
+081C: draw_text_outline 1 RGBA 0 0 0 255
+0340: set_text_draw_RGBA 50 255 50 255
+033F: set_text_draw_letter_size 0.125 0.8
+045A: draw_text_1number 400.0 40.0 GXT 'NUMBER' number 21@ // ~1~
+
+0002: jump @MAIN_LOOP
+
+0A93: end_custom_thread
