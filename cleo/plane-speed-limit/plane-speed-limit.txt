@@ -1,0 +1,16 @@
+{$CLEO}
+{$NOSOURCE}
+{$USE bitwise}
+03A4: name_thread 'HYDRASP' 
+:MAIN_LOOP
+0001: wait 0
+00D6: if and
+0AB0:   is_key_pressed 0x78 // F9
+0AB0:   is_key_pressed 0x79 // F10
+004D: jump_if_false @MAIN_LOOP
+0A8D: 0@ = read_memory 0x6DADE8 size 1 vp 0
+0B12: 0@ = 0@ XOR 0x9E
+0A8C: write_memory 0x6DADE8 size 1 value 0@ vp 0
+0001: wait 1000 
+0002: jump @MAIN_LOOP
+0A93: end_custom_thread

@@ -16,11 +16,13 @@
 [pilot's life runways hud NEW](/cleo/plhud/new)  
 [pilot's life runways radar](/cleo/plradar)  
 [pilot's life roads radar](/cleo/plroads)  
+[plane speed limit remover](/cleo/plane-speed-limit)  
 [autopilot](/cleo/autopilot)  
 [objsniffer](/cleo/objsniffer)  
 [objsniffer - fast version](/cleo/objsniffer-plugin)  
 [gps](/cleo/gps)  
 [helirotor](/cleo/helirotor)  
+[entry-info-node-pool-stat-display](/cleo/entry-info-node-pool-stat-display)  
 
 ### SCM scripts
 [train editing](/scm/trains)  
