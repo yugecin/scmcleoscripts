@@ -47,6 +47,9 @@
 ### Tools
 [asm](/tools/asm)  
 
+### Other
+[3DBlipsSaExclusion](/other/3DBlipsSaExclusion)  
+
 ### License
 [GPLv3](/LICENSE)  
 
