@@ -29,6 +29,7 @@
 [train editing](/scm/trains)  
 [garage esp](/scm/garages)  
 [camera export](/scm/cameraexport)  
+[train-as-truck-cargo](/scm/train-as-truck-cargo)  
 
 ### CLEO plugins
 [sign extending floats](/cleoplugins/signext)  
